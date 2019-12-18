@@ -1,3 +1,5 @@
+package ir.sharif.aichallenge.server.Logic;
+
 public class Cell {
     int row, col;
 

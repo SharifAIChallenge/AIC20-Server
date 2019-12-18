@@ -1,3 +1,5 @@
+package ir.sharif.aichallenge.server.Logic;
+
 import java.util.ArrayList;
 
 public class Map {

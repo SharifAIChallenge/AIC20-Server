@@ -1,3 +1,5 @@
+package ir.sharif.aichallenge.server.Logic;
+
 public class Spell {
 
     BaseSpell baseSpell;

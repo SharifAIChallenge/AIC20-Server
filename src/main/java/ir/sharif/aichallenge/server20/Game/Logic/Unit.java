@@ -1,4 +1,5 @@
 public class Unit {
+    BaseUnit baseUnit;
     PathCell position;
     int level, health, damage, speed, unitId;
     Player player;

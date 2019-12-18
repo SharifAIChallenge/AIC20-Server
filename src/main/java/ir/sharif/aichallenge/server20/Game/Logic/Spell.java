@@ -1,4 +1,6 @@
 public class Spell {
+
+    BaseSpell baseSpell;
     int id, remainingTurn;
     Player player;
 

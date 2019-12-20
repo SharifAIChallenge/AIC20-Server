@@ -8,7 +8,6 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class Map {
-    int width, height;
     HashMap<Integer, Path> paths;
 
     UnitsInCellsCollection unitsInCell;
@@ -17,6 +16,14 @@ public class Map {
     public Map(int width, int height) {
         unitsInCell = new UnitsInCellsCollection(width, height);
         paths = new HashMap<>();
+    }
+
+    public int getHeight() {
+        return unitsInCell.getHeight();
+    }
+
+    public int getWidth() {
+        return unitsInCell.getWidth();
     }
 
     public void addPath(Path path) {
@@ -36,8 +43,7 @@ public class Map {
     }
 
     public Stream<Unit> getUnits(int row, int col) {
-        final List<Unit> units = unitsInCell.getUnits(row, col);
-        return units == null ? Stream.empty() : units.stream();
+        return unitsInCell.getUnits(row, col);
     }
 
     public Stream<Unit> getUnitsInRange(int centerRow, int centerCol, int range) {
@@ -45,17 +51,25 @@ public class Map {
         throw new UnsupportedOperationException();
     }
 
-
     public Stream<Unit> getUnitsInArea(int startRow, int startCol, int endRow, int endCol) {
         throw new UnsupportedOperationException();
 
     }
 
-    public Stream<Unit> getUnitsInManhattanRange(int centerRow, int centerCol, int range) {
-        throw new UnsupportedOperationException();
+    public Stream<Unit> getUnitsInManhattanRange(Cell cell, int range) {
+        return getUnitsInManhattanRange(cell.row, cell.col, range);
     }
 
-    public Optional<Unit> getNearestUnit(int centerRow, int centerCol, int range, TargetType targetType) {
+    public Stream<Unit> getUnitsInManhattanRange(int centerRow, int centerCol, int range) {
+        return IntStream.rangeClosed(Math.max(centerRow - range, 0), Math.min(centerRow + range, getHeight() - 1)).boxed()
+                .flatMap(r -> {
+                    int remaining = range - Math.abs(r - centerRow);
+                    return IntStream.rangeClosed(Math.max(centerCol - remaining, 0), Math.min(centerCol + remaining, getHeight() - 1))
+                            .boxed().flatMap(c -> unitsInCell.getUnits(r, c));
+                });
+    }
+
+    public Optional<Unit> getNearestTargetUnit(int centerRow, int centerCol, int range, TargetType targetType) {
         Stream<Unit> units = getUnitsInRange(centerRow, centerCol, range);
         if (targetType != TargetType.BOTH)
             units = units.filter(unit -> unit.getMoveType().value == targetType.value);

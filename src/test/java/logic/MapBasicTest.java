@@ -1,6 +1,5 @@
 package logic;
 
-import com.sun.rowset.internal.Row;
 import ir.sharif.aichallenge.server.logic.entities.BaseUnit;
 import ir.sharif.aichallenge.server.logic.entities.Unit;
 import ir.sharif.aichallenge.server.logic.map.Cell;
@@ -35,7 +34,13 @@ public class MapBasicTest {
     }
 
     @Test
-    @Order(0)
+    public void testAll() {
+        testPutUnit();
+        testUnitsInRangePart0();
+        testMoveUnitPart0();
+        testMoveUnitPart1();
+    }
+
     public void testPutUnit() {
         map.putUnit(addUnit(new Unit(0, BaseUnit.getInstance(0, 0), null)), 0);
         map.putUnit(addUnit(new Unit(1, BaseUnit.getInstance(1, 0), null)), 1);
@@ -45,9 +50,13 @@ public class MapBasicTest {
         assertUnitIdsAt(0, 9, 2);
     }
 
-    @Test
-    @Order(1)
-    public void testMoveUnit() {
+    public void testUnitsInRangePart0() {
+        assertUnitIdsInRange(units.get(0), 0, 1);
+        assertUnitIdsInRange(units.get(1), 0, 1);
+        assertUnitIdsInRange(units.get(2), 2);
+    }
+
+    public void testMoveUnitPart0() {
         map.moveUnit(units.get(0), units.get(0).nextCell());
         map.moveUnit(units.get(1), units.get(1).nextCell());
         map.moveUnit(units.get(2), units.get(2).nextCell());
@@ -57,9 +66,44 @@ public class MapBasicTest {
         assertUnitIdsAt(1, 9, 2);
     }
 
+    public void testUnitsInRangePart1() {
+        assertUnitIdsInRange(units.get(0), 0, 1);
+        assertUnitIdsInRange(units.get(1), 0, 1);
+        assertUnitIdsInRange(units.get(2), 2);
+    }
+
+    public void testMoveUnitPart1() {
+        map.moveUnit(units.get(0), units.get(0).nextCell());
+        map.moveUnit(units.get(1), units.get(1).nextCell());
+        map.moveUnit(units.get(2), units.get(2).nextCell());
+
+        assertUnitIdsAt(2, 2, 0);
+        assertUnitIdsAt(2, 0, 1);
+        assertUnitIdsAt(2, 9, 2);
+
+        map.moveUnit(units.get(0), units.get(0).nextCell());
+        map.moveUnit(units.get(1), units.get(1).nextCell());
+        map.moveUnit(units.get(2), units.get(2).nextCell());
+
+        assertUnitIdsAt(3, 3, 0);
+        assertUnitIdsAt(3, 0, 1);
+        assertUnitIdsAt(3, 9, 2);
+    }
+
+    public void testUnitsInRangePart2() {
+        assertUnitIdsInRange(units.get(0), 0);
+        assertUnitIdsInRange(units.get(1), 1);
+        assertUnitIdsInRange(units.get(2), 2);
+    }
+
     public void assertUnitIdsAt(int row, int col, Integer... ids) {
-        assertEquals(map.getUnits(row, col).map(Unit::getUnitId).collect(Collectors.toSet()),
-                new HashSet<>(Arrays.asList(ids)));
+        assertEquals(new HashSet<>(Arrays.asList(ids)),
+                map.getUnits(row, col).map(Unit::getUnitId).collect(Collectors.toSet()));
+    }
+
+    public void assertUnitIdsInRange(Unit unit, Integer... ids) {
+        assertEquals(new HashSet<>(Arrays.asList(ids)),
+                map.getUnitsInManhattanRange(unit.getCell(), unit.getRange()).map(Unit::getUnitId).collect(Collectors.toSet()));
     }
 
     private Unit addUnit(Unit unit) {

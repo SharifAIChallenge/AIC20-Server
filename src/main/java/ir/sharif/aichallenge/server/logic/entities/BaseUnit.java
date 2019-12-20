@@ -38,7 +38,7 @@ public class BaseUnit {
         BaseUnit instance = instances.get(new BaseInfo(type, level));
         if (instance == null) {
             //create one or read from file or ...
-            instance = new BaseUnit(type, level, 0, 0, 0, MoveType.GROUND, TargetType.BOTH);
+            instance = new BaseUnit(type, level, 0, 0, 2, 0, MoveType.GROUND, TargetType.BOTH);
         }
 
         return instance;
@@ -49,18 +49,25 @@ public class BaseUnit {
 
     private final int baseHealth;
     private final int baseDamage;
+    private final int baseDamageRange;
     private final int baseSpeed;
 
     private final MoveType moveType;
     private final TargetType targetType;
 
-    public BaseUnit(int type, int level, int baseHealth, int baseDamage, int baseSpeed, MoveType moveType, TargetType targetType) {
+    public BaseUnit(int type, int level, int baseHealth, int baseDamage, int baseDamageRange, int baseSpeed, MoveType moveType, TargetType targetType) {
         this.type = type;
         this.level = level;
         this.baseHealth = baseHealth;
         this.baseDamage = baseDamage;
+        this.baseDamageRange = baseDamageRange;
         this.baseSpeed = baseSpeed;
         this.moveType = moveType;
         this.targetType = targetType;
+    }
+
+    public int getRange() {
+        //Set the formula here
+        return this.baseDamageRange;
     }
 }

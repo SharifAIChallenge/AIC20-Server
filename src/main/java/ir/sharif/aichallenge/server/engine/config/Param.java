@@ -1,7 +1,7 @@
 package ir.sharif.aichallenge.server.engine.config;
 
 import com.google.gson.JsonObject;
-import ir.sharif.aichallenge.server.common.util.Log;
+import ir.sharif.aichallenge.server.utils.Log;
 
 import javax.swing.*;
 import java.util.ArrayList;

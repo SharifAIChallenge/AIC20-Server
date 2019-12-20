@@ -1,4 +1,4 @@
-package ir.sharif.aichallenge.server.common.util;
+package ir.sharif.aichallenge.server.utils;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

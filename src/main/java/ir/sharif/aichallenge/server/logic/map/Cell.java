@@ -1,7 +1,7 @@
-package ir.sharif.aichallenge.server.Logic;
+package ir.sharif.aichallenge.server.logic.map;
 
 public class Cell {
-    int row, col;
+    public final int row, col;
 
     public Cell(int row, int col) {
         this.row = row;
@@ -12,15 +12,7 @@ public class Cell {
         return row;
     }
 
-    public void setRow(int row) {
-        this.row = row;
-    }
-
     public int getCol() {
         return col;
-    }
-
-    public void setCol(int col) {
-        this.col = col;
     }
 }

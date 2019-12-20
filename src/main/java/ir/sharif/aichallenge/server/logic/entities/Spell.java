@@ -1,4 +1,6 @@
-package ir.sharif.aichallenge.server.Logic;
+package ir.sharif.aichallenge.server.logic.entities;
+
+import ir.sharif.aichallenge.server.logic.map.Map;
 
 public class Spell {
 

@@ -2,7 +2,7 @@ package ir.sharif.aichallenge.server.engine.core;
 
 import ir.sharif.aichallenge.server.common.network.Json;
 import ir.sharif.aichallenge.server.common.network.data.Message;
-import ir.sharif.aichallenge.server.common.util.Log;
+import ir.sharif.aichallenge.server.utils.Log;
 import ir.sharif.aichallenge.server.engine.network.UINetwork;
 
 import ir.sharif.aichallenge.server.engine.config.Configs;

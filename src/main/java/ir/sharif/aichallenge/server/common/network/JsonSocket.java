@@ -1,7 +1,7 @@
 package ir.sharif.aichallenge.server.common.network;
 
 import com.google.gson.JsonObject;
-import ir.sharif.aichallenge.server.common.util.Log;
+import ir.sharif.aichallenge.server.utils.Log;
 
 
 import java.io.IOException;
@@ -27,8 +27,6 @@ import java.nio.charset.Charset;
  * Note that the other endpoint of the communication must use a
  * <code>JsonSocket</code> to send and receive objects correctly.
  * <p>
- * This class is a member of {@link server.network}.
- *
  * @see com.google.gson.Gson
  * @see Socket
  */

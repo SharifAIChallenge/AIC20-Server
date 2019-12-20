@@ -1,4 +1,4 @@
-package ir.sharif.aichallenge.server.Logic;
+package ir.sharif.aichallenge.server.logic.map;
 
 public class PathCell {
     Path path;
@@ -23,5 +23,13 @@ public class PathCell {
 
     public void setNumberOfCell(int numberOfCell) {
         this.numberOfCell = numberOfCell;
+    }
+
+    public Cell getCell() {
+        return path.getCellAt(numberOfCell);
+    }
+
+    public PathCell nextCell() {
+        return new PathCell(this.path, numberOfCell + 1);
     }
 }

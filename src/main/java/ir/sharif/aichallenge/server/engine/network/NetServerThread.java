@@ -1,7 +1,7 @@
 package ir.sharif.aichallenge.server.engine.network;
 
 import ir.sharif.aichallenge.server.common.network.JsonSocket;
-import ir.sharif.aichallenge.server.common.util.Log;
+import ir.sharif.aichallenge.server.utils.Log;
 
 import java.io.IOException;
 import java.net.ServerSocket;

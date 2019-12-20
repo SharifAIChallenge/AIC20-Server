@@ -4,7 +4,7 @@ import ir.sharif.aichallenge.server.common.model.Event;
 import ir.sharif.aichallenge.server.common.network.Json;
 import ir.sharif.aichallenge.server.common.network.JsonSocket;
 import ir.sharif.aichallenge.server.common.network.data.Message;
-import ir.sharif.aichallenge.server.common.util.Log;
+import ir.sharif.aichallenge.server.utils.Log;
 
 import java.io.IOException;
 import java.util.ArrayList;

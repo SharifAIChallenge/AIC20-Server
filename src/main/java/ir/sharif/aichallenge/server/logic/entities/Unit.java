@@ -67,4 +67,8 @@ public class Unit {
     void move() {
     }
 
+    public void decreaseHealth(int damage) {
+        health -= damage;
+        health = Math.max(0, health);
+    }
 }

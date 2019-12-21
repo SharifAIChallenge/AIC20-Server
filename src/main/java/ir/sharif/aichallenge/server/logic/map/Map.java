@@ -42,6 +42,8 @@ public class Map {
         unitsInCell.add(unit);
     }
 
+    public void removeUnit(Unit unit) {}
+
     public Stream<Unit> getUnits(int row, int col) {
         return unitsInCell.getUnits(row, col);
     }

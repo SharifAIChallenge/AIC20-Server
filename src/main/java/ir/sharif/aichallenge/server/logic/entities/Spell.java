@@ -8,7 +8,14 @@ public class Spell {
     int id, remainingTurn;
     Player player;
 
-    void applyTo(Map map) {
+    public void applyTo(Map map) {
     }
 
+    public void decreaseTime() {
+        remainingTurn --;
+    }
+
+    public boolean shouldRemove() {
+        return remainingTurn == 0;
+    }
 }

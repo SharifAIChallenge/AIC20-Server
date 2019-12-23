@@ -20,9 +20,11 @@ public class Unit {
     private int health;
     private int damage;
     private int speed;
+    private int remainingTime;
     private int range;
     private Player player;
     private Unit targetUnit;
+    private boolean hasAttacked;
 
     public Unit(int unitId, BaseUnit baseUnit, Player player) {
         this.unitId = unitId;
@@ -32,6 +34,14 @@ public class Unit {
         this.damage = baseUnit.getBaseDamage();
         this.speed = baseUnit.getBaseSpeed();
         this.range = baseUnit.getRange();
+
+        this.remainingTime = -1;
+
+    }
+
+    public Unit(int unitId, BaseUnit baseUnit, Player player, int remainingTime) {
+        this(unitId, baseUnit, player);
+        this.remainingTime = remainingTime;
     }
 
     boolean isEnemy(Unit other) {
@@ -47,6 +57,7 @@ public class Unit {
         if (targetUnit == null || targetUnit.getHealth() <= 0 || getManhattanDistance(getCell(), targetUnit.getCell()) > getRange())
             resetTargetUnit(map);
         return targetUnit;
+
     }
 
     private int getManhattanDistance(Cell cell1, Cell cell2) {
@@ -71,4 +82,22 @@ public class Unit {
         health -= damage;
         health = Math.max(0, health);
     }
+
+    public void decreaseRemainingTime() {
+        if(remainingTime == -1) return ;
+        remainingTime --;
+    }
+
+    public boolean getHasAttacked(){
+        return hasAttacked;
+    }
+
+    public void setHasAttacked(boolean status) {
+        hasAttacked = status;
+    }
+
+    public boolean isPresent() {
+        return health > 0 && remainingTime > 0;
+    }
+
 }

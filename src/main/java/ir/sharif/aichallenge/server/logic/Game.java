@@ -30,7 +30,8 @@ public class Game {
 
         evaluateSpells();
 
-        moveAndAttack();
+        attack();
+        move();
 
         evaluateUnits();
 
@@ -44,7 +45,7 @@ public class Game {
         ArrayList<Unit> allUnits = streamUnits.collect(Collectors.toCollection(ArrayList::new));
 
         for (Unit unit : allUnits)
-            if(unit.getHealth() <= 0)
+            if(!unit.isPresent())
                 map.removeUnit(unit);
 
     }
@@ -58,37 +59,34 @@ public class Game {
         //network ....
     }
 
-    private void moveAndAttack() {
+    private void attack() {
         //iterate over all units.
 
         Stream<Unit> streamUnits = map.getUnitsInArea(0, 0, map.getHeight(), map.getWidth());
         ArrayList<Unit> allUnits = streamUnits.collect(Collectors.toCollection(ArrayList::new));
 
-        ArrayList<Boolean> canAttack = new ArrayList<>();
-        ArrayList<Unit> attackTargets = new ArrayList<>();
-
         for (Unit unit : allUnits) {
             Unit targetUnit = unit.getTarget(map);
-            if (targetUnit != null) {
-                canAttack.add(true);
-                attackTargets.add(targetUnit);
-            }
-            else {
-                canAttack.add(false);
-                attackTargets.add(null);
-            }
+            if (targetUnit != null)
+                unit.setHasAttacked(true);
+            else unit.setHasAttacked(false);
         }
 
-        int counter = 0;
+        for (Unit unit : allUnits) {
+            if (unit.getHasAttacked()) {
+                Unit targetUnit = unit.getTarget(map);
+                targetUnit.decreaseHealth(unit.getDamage());
+            }
+        }
+    }
+
+    private void move() {
+        Stream<Unit> streamUnits = map.getUnitsInArea(0, 0, map.getHeight(), map.getWidth());
+        ArrayList<Unit> allUnits = streamUnits.collect(Collectors.toCollection(ArrayList::new));
 
         for (Unit unit : allUnits) {
-            if(canAttack.get(counter)) {
-                Unit targetUnit = attackTargets.get(counter);
-                targetUnit.decreaseHealth(unit.getDamage());
-            }else {
+            if(unit.isPresent() && !unit.getHasAttacked())
                 map.moveUnit(unit, unit.nextCell());
-            }
-            counter ++;
         }
 
     }

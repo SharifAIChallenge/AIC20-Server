@@ -9,6 +9,7 @@ public class Spell {
     Player player;
 
     public void applyTo(Map map) {
+
     }
 
     public void decreaseTime() {

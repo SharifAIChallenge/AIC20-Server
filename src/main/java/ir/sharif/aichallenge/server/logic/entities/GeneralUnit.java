@@ -28,10 +28,6 @@ public class GeneralUnit extends Unit {
                 baseUnit.getBaseHealth(), baseUnit.getBaseDamage(), baseUnit.getBaseSpeed());
     }
 
-    public boolean canAttack(Map map) {
-        return map.getNearestTargetUnit(getCell().getRow(), getCell().getCol(),
-                getRange(), getTargetType()).isPresent();
-    }
 
     public Unit getTarget(Map map) {
         if (targetUnit == null || targetUnit.getHealth() <= 0 || MapUtils.calcManhattanDistance(getCell(), targetUnit.getCell()) > getRange())
@@ -40,8 +36,7 @@ public class GeneralUnit extends Unit {
     }
 
     private void resetTargetUnit(Map map) {
-        Optional<Unit> result = map.getNearestTargetUnit(getCell().getRow(), getCell().getCol(),
-                getRange(), getTargetType());
+        Optional<Unit> result = map.getNearestTargetUnit(this);
 
         targetUnit = result.orElse(null);
     }

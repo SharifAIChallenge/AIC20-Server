@@ -2,6 +2,7 @@ package ir.sharif.aichallenge.server.logic.map;
 
 import ir.sharif.aichallenge.server.logic.entities.TargetType;
 import ir.sharif.aichallenge.server.logic.entities.Unit;
+import jdk.nashorn.internal.runtime.options.Option;
 
 import java.util.*;
 import java.util.stream.IntStream;
@@ -70,10 +71,12 @@ public class Map {
                         .flatMap(j -> getUnits(centerRow + j, centerCol + i - Math.abs(j))));
     }
 
-    public Optional<Unit> getNearestTargetUnit(int centerRow, int centerCol, int range, TargetType targetType) {
-        Stream<Unit> units = getUnitsInRange(centerRow, centerCol, range);
+    public Optional<Unit> getNearestTargetUnit(Unit unit) {
+        Stream<Unit> units = getUnitsInRange(unit.getCell().getRow(), unit.getCell().getCol(), unit.getRange());
+        final TargetType targetType = unit.getTargetType();
         if (targetType != TargetType.BOTH)
-            units = units.filter(unit -> unit.getMoveType().value == targetType.value);
+            units = units.filter(u -> u.getMoveType().value == targetType.value);
+        units = units.filter(unit::isEnemy);
         return units.findFirst();
     }
 }

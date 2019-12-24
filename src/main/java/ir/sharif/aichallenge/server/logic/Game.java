@@ -1,5 +1,6 @@
 package ir.sharif.aichallenge.server.logic;
 
+import ir.sharif.aichallenge.server.logic.entities.ClonedUnit;
 import ir.sharif.aichallenge.server.logic.entities.Player;
 import ir.sharif.aichallenge.server.logic.entities.Spell;
 import ir.sharif.aichallenge.server.logic.entities.Unit;
@@ -7,6 +8,8 @@ import ir.sharif.aichallenge.server.logic.map.Map;
 import javafx.util.Pair;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -17,6 +20,7 @@ public class Game {
     List<Spell> spells = new ArrayList<>();
     List<Pair<Unit, Integer>> unitsToPut;
     Player[] players;
+    HashMap<Integer, Unit> unitWithId;
 
     public void init() {
         //make initial map and paths and players.
@@ -41,13 +45,18 @@ public class Game {
     }
 
     private void evaluateUnits() {
-        Stream<Unit> streamUnits = map.getUnitsInArea(0, 0, map.getHeight(), map.getWidth());
-        ArrayList<Unit> allUnits = streamUnits.collect(Collectors.toCollection(ArrayList::new));
+        ArrayList<Unit> allUnits = getAllUnits();
 
-        for (Unit unit : allUnits)
-            if(!unit.isAlive())
+        for (Unit unit : allUnits) {
+
+            if(unit instanceof ClonedUnit)
+                ((ClonedUnit) unit).decreaseRemainingTurns();
+
+            if (!unit.isAlive()) {
                 map.removeUnit(unit);
-
+                unitWithId.remove(unit.getUnitId());
+            }
+        }
     }
 
     private void updateDecks() {
@@ -61,9 +70,7 @@ public class Game {
 
     private void attack() {
         //iterate over all units.
-
-        Stream<Unit> streamUnits = map.getUnitsInArea(0, 0, map.getHeight(), map.getWidth());
-        ArrayList<Unit> allUnits = streamUnits.collect(Collectors.toCollection(ArrayList::new));
+        ArrayList<Unit> allUnits = getAllUnits();
 
         for (Unit unit : allUnits) {
             Unit targetUnit = unit.getTarget(map);
@@ -81,8 +88,7 @@ public class Game {
     }
 
     private void move() {
-        Stream<Unit> streamUnits = map.getUnitsInArea(0, 0, map.getHeight(), map.getWidth());
-        ArrayList<Unit> allUnits = streamUnits.collect(Collectors.toCollection(ArrayList::new));
+        ArrayList<Unit> allUnits = getAllUnits();
 
         for (Unit unit : allUnits) {
             if (unit.isAlive() && !unit.hasAttacked())
@@ -117,5 +123,10 @@ public class Game {
 
     private void readRequestsFromClient() {
         //network ....
+    }
+
+    private ArrayList<Unit> getAllUnits() {
+        Collection<Unit> units = unitWithId.values();
+        return new ArrayList<>(units);
     }
 }

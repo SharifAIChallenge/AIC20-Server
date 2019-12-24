@@ -6,7 +6,7 @@ public class PathCell {
 
     public PathCell(Path path, int numberOfCell) {
         this.path = path;
-        this.numberOfCell = numberOfCell;
+        this.numberOfCell = Math.min(numberOfCell, path.getCells().size() - 1);
     }
 
     public Path getPath() {

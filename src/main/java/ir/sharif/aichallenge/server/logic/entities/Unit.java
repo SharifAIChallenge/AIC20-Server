@@ -1,103 +1,56 @@
 package ir.sharif.aichallenge.server.logic.entities;
 
-import ir.sharif.aichallenge.server.logic.map.Cell;
 import ir.sharif.aichallenge.server.logic.map.Map;
 import ir.sharif.aichallenge.server.logic.map.PathCell;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Delegate;
 
-import java.util.Optional;
-
 @Getter
-public class Unit {
+public abstract class Unit {
     private int unitId;
     @Delegate
     private BaseUnit baseUnit;
+    private Player player;
     @Delegate()
     @Setter
     private PathCell position;
-    private int health;
-    private int damage;
-    private int speed;
-    private int remainingTime;
-    private int range;
-    private Player player;
-    private Unit targetUnit;
+
     private boolean hasAttacked;
 
     public Unit(int unitId, BaseUnit baseUnit, Player player) {
         this.unitId = unitId;
         this.baseUnit = baseUnit;
         this.player = player;
-        this.health = baseUnit.getBaseHealth();
-        this.damage = baseUnit.getBaseDamage();
-        this.speed = baseUnit.getBaseSpeed();
-        this.range = baseUnit.getRange();
-
-        this.remainingTime = -1;
-
     }
 
-    public Unit(int unitId, BaseUnit baseUnit, Player player, int remainingTime) {
-        this(unitId, baseUnit, player);
-        this.remainingTime = remainingTime;
+    public abstract int getHealth();
+
+    public abstract void decreaseHealth(int damage);
+
+    public boolean isAlive() {
+        return getHealth() > 0;
     }
 
-    boolean isEnemy(Unit other) {
+    public abstract int getDamage();
+
+    public abstract int getSpeed();
+
+    public PathCell getNextMoveCell() {
+        return position.nextCell(getSpeed());
+    }
+
+    public boolean isEnemy(Unit other) {
         return true;
     }
 
-    public boolean canAttack(Map map) {
-        return map.getNearestTargetUnit(position.getCell().getRow(), position.getCell().getCol(),
-                getRange(), baseUnit.getTargetType()).isPresent();
-    }
+    public abstract Unit getTarget(Map map);
 
-    public Unit getTarget(Map map) {
-        if (targetUnit == null || targetUnit.getHealth() <= 0 || getManhattanDistance(getCell(), targetUnit.getCell()) > getRange())
-            resetTargetUnit(map);
-        return targetUnit;
-
-    }
-
-    private int getManhattanDistance(Cell cell1, Cell cell2) {
-        return Math.abs(cell1.getRow() - cell2.getRow()) + Math.abs(cell1.getCol() - cell2.getCol());
-    }
-
-    private void resetTargetUnit(Map map) {
-        Optional<Unit> result = map.getNearestTargetUnit(position.getCell().getRow(), position.getCell().getCol(),
-                getRange(), baseUnit.getTargetType());
-
-        targetUnit = result.orElse(null);
-    }
-
-    Cell getNextCell() {
-        return null;
-    }
-
-    void move() {
-    }
-
-    public void decreaseHealth(int damage) {
-        health -= damage;
-        health = Math.max(0, health);
-    }
-
-    public void decreaseRemainingTime() {
-        if(remainingTime == -1) return ;
-        remainingTime --;
-    }
-
-    public boolean getHasAttacked(){
+    public boolean hasAttacked() {
         return hasAttacked;
     }
 
-    public void setHasAttacked(boolean status) {
-        hasAttacked = status;
+    public void setHasAttacked(boolean hasAttacked) {
+        this.hasAttacked = hasAttacked;
     }
-
-    public boolean isAlive() {
-        return health > 0 && remainingTime > 0;
-    }
-
 }

@@ -1,6 +1,7 @@
 package logic;
 
 import ir.sharif.aichallenge.server.logic.entities.BaseUnit;
+import ir.sharif.aichallenge.server.logic.entities.GeneralUnit;
 import ir.sharif.aichallenge.server.logic.entities.Unit;
 import ir.sharif.aichallenge.server.logic.map.Cell;
 import ir.sharif.aichallenge.server.logic.map.Map;
@@ -9,8 +10,6 @@ import ir.sharif.aichallenge.server.logic.map.Path;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 
 
@@ -42,9 +41,9 @@ public class MapBasicTest {
     }
 
     public void testPutUnit() {
-        map.putUnit(addUnit(new Unit(0, BaseUnit.getInstance(0, 0), null)), 0);
-        map.putUnit(addUnit(new Unit(1, BaseUnit.getInstance(1, 0), null)), 1);
-        map.putUnit(addUnit(new Unit(2, BaseUnit.getInstance(0, 0), null)), 2);
+        map.putUnit(addUnit(new GeneralUnit(0, BaseUnit.getInstance(0, 0), null)), 0);
+        map.putUnit(addUnit(new GeneralUnit(1, BaseUnit.getInstance(1, 0), null)), 1);
+        map.putUnit(addUnit(new GeneralUnit(2, BaseUnit.getInstance(0, 0), null)), 2);
 
         assertUnitIdsAt(0, 0, 0, 1);
         assertUnitIdsAt(0, 9, 2);

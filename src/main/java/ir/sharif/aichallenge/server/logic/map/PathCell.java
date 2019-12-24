@@ -30,6 +30,10 @@ public class PathCell {
     }
 
     public PathCell nextCell() {
-        return new PathCell(this.path, numberOfCell + 1);
+        return nextCell(1);
+    }
+
+    public PathCell nextCell(int speed) {
+        return new PathCell(this.path, numberOfCell + speed);
     }
 }

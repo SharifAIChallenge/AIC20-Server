@@ -42,7 +42,9 @@ public class Map {
         unitsInCell.add(unit);
     }
 
-    public void removeUnit(Unit unit) {}
+    public void removeUnit(Unit unit) {
+        unitsInCell.remove(unit);
+    }
 
     public Stream<Unit> getUnits(int row, int col) {
         return unitsInCell.getUnits(row, col);
@@ -63,20 +65,15 @@ public class Map {
     }
 
     public Stream<Unit> getUnitsInManhattanRange(int centerRow, int centerCol, int range) {
-        return IntStream.rangeClosed(Math.max(centerRow - range, 0), Math.min(centerRow + range, getHeight() - 1)).boxed()
-                .flatMap(r -> {
-                    int remaining = range - Math.abs(r - centerRow);
-                    return IntStream.rangeClosed(Math.max(centerCol - remaining, 0), Math.min(centerCol + remaining, getHeight() - 1))
-                            .boxed().flatMap(c -> unitsInCell.getUnits(r, c));
-                });
+        return IntStream.rangeClosed(0, range).boxed()
+                .flatMap(i -> IntStream.rangeClosed(-i, i).boxed()
+                        .flatMap(j -> getUnits(centerRow + j, centerCol + i - Math.abs(j))));
     }
 
     public Optional<Unit> getNearestTargetUnit(int centerRow, int centerCol, int range, TargetType targetType) {
         Stream<Unit> units = getUnitsInRange(centerRow, centerCol, range);
         if (targetType != TargetType.BOTH)
             units = units.filter(unit -> unit.getMoveType().value == targetType.value);
-        return units.min(Comparator.comparing(unit ->
-                Math.abs(unit.getCell().col - centerCol) + Math.abs(unit.getCell().row - centerRow))    //manhattan distance
-        );
+        return units.findFirst();
     }
 }

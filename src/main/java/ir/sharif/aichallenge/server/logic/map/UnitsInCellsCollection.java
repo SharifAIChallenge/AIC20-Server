@@ -3,9 +3,7 @@ package ir.sharif.aichallenge.server.logic.map;
 import ir.sharif.aichallenge.server.logic.entities.Unit;
 import lombok.Getter;
 
-import java.util.Collections;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.stream.Stream;
 
 public class UnitsInCellsCollection {
@@ -22,7 +20,12 @@ public class UnitsInCellsCollection {
     }
 
     public Stream<Unit> getUnits(int row, int col) {
-        final LinkedList<Unit> units = unitsInCell[row][col];
+        LinkedList<Unit> units;
+        try {
+            units = unitsInCell[row][col];
+        } catch (ArrayIndexOutOfBoundsException ignored) {
+            units = null;
+        }
         return units == null ? Stream.empty() : units.stream();
     }
 

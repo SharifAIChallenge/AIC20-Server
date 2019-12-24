@@ -73,7 +73,7 @@ public class Game {
         }
 
         for (Unit unit : allUnits) {
-            if (unit.getHasAttacked()) {
+            if (unit.hasAttacked()) {
                 Unit targetUnit = unit.getTarget(map);
                 targetUnit.decreaseHealth(unit.getDamage());
             }
@@ -85,8 +85,8 @@ public class Game {
         ArrayList<Unit> allUnits = streamUnits.collect(Collectors.toCollection(ArrayList::new));
 
         for (Unit unit : allUnits) {
-            if(unit.isAlive() && !unit.getHasAttacked())
-                map.moveUnit(unit, unit.nextCell());
+            if (unit.isAlive() && !unit.hasAttacked())
+                map.moveUnit(unit, unit.getNextMoveCell());
         }
 
     }

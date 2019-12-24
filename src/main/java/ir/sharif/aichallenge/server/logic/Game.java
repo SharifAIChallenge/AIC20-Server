@@ -45,7 +45,7 @@ public class Game {
         ArrayList<Unit> allUnits = streamUnits.collect(Collectors.toCollection(ArrayList::new));
 
         for (Unit unit : allUnits)
-            if(!unit.isPresent())
+            if(!unit.isAlive())
                 map.removeUnit(unit);
 
     }
@@ -85,7 +85,7 @@ public class Game {
         ArrayList<Unit> allUnits = streamUnits.collect(Collectors.toCollection(ArrayList::new));
 
         for (Unit unit : allUnits) {
-            if(unit.isPresent() && !unit.getHasAttacked())
+            if(unit.isAlive() && !unit.getHasAttacked())
                 map.moveUnit(unit, unit.nextCell());
         }
 

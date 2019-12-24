@@ -96,7 +96,7 @@ public class Unit {
         hasAttacked = status;
     }
 
-    public boolean isPresent() {
+    public boolean isAlive() {
         return health > 0 && remainingTime > 0;
     }
 

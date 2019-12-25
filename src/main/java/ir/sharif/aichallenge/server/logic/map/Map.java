@@ -41,7 +41,6 @@ public class Map {
     }
 
 
-
     public void moveUnit(Unit unit, PathCell target) {
         unitsInCell.remove(unit);
         unit.setPosition(target);

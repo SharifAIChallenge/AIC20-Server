@@ -1,7 +1,8 @@
 package ir.sharif.aichallenge.server.logic.map;
 
 import ir.sharif.aichallenge.server.logic.entities.TargetType;
-import ir.sharif.aichallenge.server.logic.entities.Unit;
+import ir.sharif.aichallenge.server.logic.entities.units.Unit;
+
 import java.util.*;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -54,9 +55,15 @@ public class Map {
         throw new UnsupportedOperationException();
     }
 
-    public Stream<Unit> getUnitsInArea(int startRow, int startCol, int endRow, int endCol) {
-        throw new UnsupportedOperationException();
+    public Stream<Unit> getUnitsInArea(int centerRow, int centerCol, int range) {
+        return getUnitsInAreaInclusive(centerRow - range, centerCol - range,
+                centerRow + range, centerCol + range);
+    }
 
+    public Stream<Unit> getUnitsInAreaInclusive(int startRow, int startCol, int endRow, int endCol) {
+        return IntStream.rangeClosed(startRow, endRow).boxed()
+                .flatMap(r -> IntStream.rangeClosed(startCol, endCol).boxed()
+                        .flatMap(c -> unitsInCell.getUnits(r, c)));
     }
 
     public Stream<Unit> getUnitsInManhattanRange(Cell cell, int range) {
@@ -66,7 +73,9 @@ public class Map {
     public Stream<Unit> getUnitsInManhattanRange(int centerRow, int centerCol, int range) {
         return IntStream.rangeClosed(0, range).boxed()
                 .flatMap(i -> IntStream.rangeClosed(-i, i).boxed()
-                        .flatMap(j -> getUnits(centerRow + j, centerCol + i - Math.abs(j))));
+                        .flatMap(j ->
+                                Stream.concat(getUnits(centerRow + j, centerCol + i - Math.abs(j)),
+                                        getUnits(centerRow + j, centerCol - i + Math.abs(j)))));
     }
 
     public Optional<Unit> getNearestTargetUnit(Unit unit) {

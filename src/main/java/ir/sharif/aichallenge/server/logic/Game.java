@@ -5,6 +5,7 @@ import ir.sharif.aichallenge.server.logic.entities.Player;
 import ir.sharif.aichallenge.server.logic.entities.spells.Spell;
 import ir.sharif.aichallenge.server.logic.entities.units.Unit;
 import ir.sharif.aichallenge.server.logic.map.Map;
+import ir.sharif.aichallenge.server.logic.map.Path;
 import javafx.util.Pair;
 
 import java.util.ArrayList;
@@ -16,9 +17,9 @@ public class Game {
 
     Map map;
     List<Spell> spells = new ArrayList<>();
-    List<Pair<Unit, Integer>> unitsToPut;
+    List<Pair<Unit, Integer>> unitsToPut = new ArrayList<>();
     Player[] players;
-    HashMap<Integer, Unit> unitWithId;
+    HashMap<Integer, Unit> unitWithId = new HashMap<>();
 
     public void init() {
         //make initial map and paths and players.
@@ -47,7 +48,7 @@ public class Game {
 
         for (Unit unit : allUnits) {
 
-            if(unit instanceof ClonedUnit)
+            if (unit instanceof ClonedUnit)
                 ((ClonedUnit) unit).decreaseRemainingTurns();
 
             if (!unit.isAlive()) {
@@ -58,6 +59,7 @@ public class Game {
     }
 
     private void updateDecks() {
+        if(players == null) return ;
         for (Player player : players)
             player.updateDeck();
     }
@@ -91,6 +93,7 @@ public class Game {
         for (Unit unit : allUnits) {
             if (unit.isAlive() && !unit.hasAttacked())
                 map.moveUnit(unit, unit.getNextMoveCell());
+
         }
 
     }
@@ -111,6 +114,7 @@ public class Game {
         for (Pair<Unit, Integer> X : unitsToPut) {
             map.putUnit(X.getKey(), X.getValue());
         }
+        unitsToPut.clear();
     }
 
     private void applySpells() {
@@ -126,5 +130,27 @@ public class Game {
     private ArrayList<Unit> getAllUnits() {
         Collection<Unit> units = unitWithId.values();
         return new ArrayList<>(units);
+    }
+
+    public void addUnit(Integer unitId, Integer pathId, Unit unit) {
+        unitWithId.put(unitId, unit);
+        unitsToPut.add(new Pair<>(unit, pathId));
+    }
+
+    public Map getMap() {
+        return map;
+    }
+
+    public void initializeMap(int size) {
+        map = new Map(size, size);
+    }
+
+    public HashMap<Integer, Unit> getUnitWithId(){
+        return unitWithId;
+    }
+
+
+    public void addPath(Path path) {
+        map.addPath(path);
     }
 }

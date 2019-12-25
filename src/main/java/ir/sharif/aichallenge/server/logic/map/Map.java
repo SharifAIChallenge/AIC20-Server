@@ -79,7 +79,7 @@ public class Map {
     }
 
     public Optional<Unit> getNearestTargetUnit(Unit unit) {
-        Stream<Unit> units = getUnitsInRange(unit.getCell().getRow(), unit.getCell().getCol(), unit.getRange());
+        Stream<Unit> units = getUnitsInManhattanRange(unit.getCell().getRow(), unit.getCell().getCol(), unit.getRange());
         final TargetType targetType = unit.getTargetType();
         if (targetType != TargetType.BOTH)
             units = units.filter(u -> u.getMoveType().value == targetType.value);

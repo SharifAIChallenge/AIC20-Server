@@ -38,7 +38,8 @@ public class BaseUnit {
         BaseUnit instance = instances.get(new BaseInfo(type, level));
         if (instance == null) {
             //create one or read from file or ...
-            instance = new BaseUnit(type, level, 0, 100, 0, 2, 0, MoveType.GROUND, TargetType.BOTH);
+            if(type == 0) instance = new BaseUnit(type, level, 10, 100,7, 2, 1, MoveType.GROUND, TargetType.BOTH);
+            else if(type == 1) instance = new BaseUnit(type, level, 15, 100,9, 2, 1, MoveType.GROUND, TargetType.BOTH);
         }
 
         return instance;

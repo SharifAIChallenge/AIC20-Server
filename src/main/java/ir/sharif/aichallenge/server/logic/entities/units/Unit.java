@@ -25,6 +25,11 @@ public abstract class Unit extends Entity {
         this.baseUnit = baseUnit;
     }
 
+    @Override
+    public boolean isEnemy(Entity other) {
+        return getId() != other.getId();
+    }
+
     public abstract int getHealth();
 
     public abstract void increaseHealth(int heal);

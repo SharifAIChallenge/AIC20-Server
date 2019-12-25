@@ -1,11 +1,13 @@
 package ir.sharif.aichallenge.server.logic.map;
 
 public class PathCell {
-    Path path;
-    int numberOfCell;
+    private final Path path;
+    private boolean reversed;
+    private int numberOfCell;
 
-    public PathCell(Path path, int numberOfCell) {
+    public PathCell(Path path, boolean reversed, int numberOfCell) {
         this.path = path;
+        this.reversed = reversed;
         this.numberOfCell = Math.min(numberOfCell, path.getCells().size() - 1);
     }
 
@@ -13,20 +15,12 @@ public class PathCell {
         return path;
     }
 
-    public void setPath(Path path) {
-        this.path = path;
-    }
-
     public int getNumberOfCell() {
         return numberOfCell;
     }
 
-    public void setNumberOfCell(int numberOfCell) {
-        this.numberOfCell = numberOfCell;
-    }
-
     public Cell getCell() {
-        return path.getCellAt(numberOfCell);
+        return path.getCellAt(reversed ? path.getLength() - numberOfCell : numberOfCell);
     }
 
     public PathCell nextCell() {
@@ -34,12 +28,12 @@ public class PathCell {
     }
 
     public PathCell nextCell(int speed) {
-        return new PathCell(this.path, numberOfCell + speed);
+        return new PathCell(this.path, this.reversed, numberOfCell + speed);
     }
 
     @Override
     public String toString() {
-        return "PathCell{" +
+        return "{" +
                 "pathId=" + path.getId() +
                 ", numberOfCell=" + numberOfCell +
                 '}';

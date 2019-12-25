@@ -63,6 +63,14 @@ public class Game {
         }
     }
 
+    private void upgradeUnitRange(Unit unit) {
+        unit.upgradeRange();
+    }
+
+    private void upgradeUnitDamage(Unit unit) {
+        unit.upgradeDamage();
+    }
+
     private void updateDecks() {
         if(players == null) return ;
         for (Player player : players)

@@ -18,6 +18,16 @@ public abstract class Unit extends Entity {
 
     private int speedIncrease;
 
+    private int damageLevel = 0, rangeLevel = 0;
+
+    public void upgradeDamage(){
+        damageLevel++;
+    }
+
+    public void upgradeRange(){
+        rangeLevel++;
+    }
+
     private boolean hasAttacked;
 
     public Unit(int id, BaseUnit baseUnit, Player player) {
@@ -40,7 +50,13 @@ public abstract class Unit extends Entity {
         return getHealth() > 0;
     }
 
-    public abstract int getDamage();
+    public int getDamage(){
+        return this.baseUnit.getBaseDamage() + damageLevel * this.baseUnit.getDeltaDamage();
+    }
+
+    public int getRange() {
+        return this.baseUnit.getBaseDamageRange() + rangeLevel + this.baseUnit.getDeltaDamageRange();
+    }
 
     public abstract int getSpeed();
 

@@ -8,7 +8,7 @@ import lombok.experimental.Delegate;
 
 @Getter
 public abstract class Unit {
-    private int unitId;
+    private int id;
     @Delegate
     private BaseUnit baseUnit;
     private Player player;
@@ -18,8 +18,8 @@ public abstract class Unit {
 
     private boolean hasAttacked;
 
-    public Unit(int unitId, BaseUnit baseUnit, Player player) {
-        this.unitId = unitId;
+    public Unit(int id, BaseUnit baseUnit, Player player) {
+        this.id = id;
         this.baseUnit = baseUnit;
         this.player = player;
     }

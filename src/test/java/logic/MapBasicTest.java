@@ -97,16 +97,16 @@ public class MapBasicTest {
 
     public void assertUnitIdsAt(int row, int col, Integer... ids) {
         assertEquals(new HashSet<>(Arrays.asList(ids)),
-                map.getUnits(row, col).map(Unit::getUnitId).collect(Collectors.toSet()));
+                map.getUnits(row, col).map(Unit::getId).collect(Collectors.toSet()));
     }
 
     public void assertUnitIdsInRange(Unit unit, Integer... ids) {
         assertEquals(new HashSet<>(Arrays.asList(ids)),
-                map.getUnitsInManhattanRange(unit.getCell(), unit.getRange()).map(Unit::getUnitId).collect(Collectors.toSet()));
+                map.getUnitsInManhattanRange(unit.getCell(), unit.getRange()).map(Unit::getId).collect(Collectors.toSet()));
     }
 
     private Unit addUnit(Unit unit) {
-        units.put(unit.getUnitId(), unit);
+        units.put(unit.getId(), unit);
         return unit;
     }
 }

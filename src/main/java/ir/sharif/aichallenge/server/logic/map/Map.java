@@ -2,8 +2,6 @@ package ir.sharif.aichallenge.server.logic.map;
 
 import ir.sharif.aichallenge.server.logic.entities.TargetType;
 import ir.sharif.aichallenge.server.logic.entities.Unit;
-import jdk.nashorn.internal.runtime.options.Option;
-
 import java.util.*;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;

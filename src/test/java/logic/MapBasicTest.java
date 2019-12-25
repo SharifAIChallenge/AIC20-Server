@@ -1,8 +1,8 @@
 package logic;
 
-import ir.sharif.aichallenge.server.logic.entities.BaseUnit;
-import ir.sharif.aichallenge.server.logic.entities.GeneralUnit;
-import ir.sharif.aichallenge.server.logic.entities.Unit;
+import ir.sharif.aichallenge.server.logic.entities.units.BaseUnit;
+import ir.sharif.aichallenge.server.logic.entities.units.GeneralUnit;
+import ir.sharif.aichallenge.server.logic.entities.units.Unit;
 import ir.sharif.aichallenge.server.logic.map.Cell;
 import ir.sharif.aichallenge.server.logic.map.Map;
 import ir.sharif.aichallenge.server.logic.map.Path;
@@ -37,7 +37,9 @@ public class MapBasicTest {
         testPutUnit();
         testUnitsInRangePart0();
         testMoveUnitPart0();
+        testUnitsInRangePart1();
         testMoveUnitPart1();
+        testUnitsInRangePart2();
     }
 
     public void testPutUnit() {

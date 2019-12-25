@@ -1,9 +1,9 @@
-package ir.sharif.aichallenge.server.logic.entities;
+package ir.sharif.aichallenge.server.logic.entities.units;
 
+import ir.sharif.aichallenge.server.logic.entities.TargetType;
 import lombok.Getter;
 
 import java.util.HashMap;
-import java.util.Objects;
 
 @Getter
 public class BaseUnit {
@@ -38,7 +38,7 @@ public class BaseUnit {
         BaseUnit instance = instances.get(new BaseInfo(type, level));
         if (instance == null) {
             //create one or read from file or ...
-            instance = new BaseUnit(type, level, 0, 0, 2, 0, MoveType.GROUND, TargetType.BOTH);
+            instance = new BaseUnit(type, level, 0, 100, 0, 2, 0, MoveType.GROUND, TargetType.BOTH);
         }
 
         return instance;
@@ -48,6 +48,7 @@ public class BaseUnit {
     private final int level;
 
     private final int baseHealth;
+    private final int baseMaxHealth;
     private final int baseDamage;
     private final int baseDamageRange;
     private final int baseSpeed;
@@ -55,10 +56,11 @@ public class BaseUnit {
     private final MoveType moveType;
     private final TargetType targetType;
 
-    public BaseUnit(int type, int level, int baseHealth, int baseDamage, int baseDamageRange, int baseSpeed, MoveType moveType, TargetType targetType) {
+    public BaseUnit(int type, int level, int baseHealth, int baseMaxHealth, int baseDamage, int baseDamageRange, int baseSpeed, MoveType moveType, TargetType targetType) {
         this.type = type;
         this.level = level;
         this.baseHealth = baseHealth;
+        this.baseMaxHealth = baseMaxHealth;
         this.baseDamage = baseDamage;
         this.baseDamageRange = baseDamageRange;
         this.baseSpeed = baseSpeed;

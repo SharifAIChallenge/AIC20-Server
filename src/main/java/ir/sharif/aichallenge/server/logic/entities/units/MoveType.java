@@ -1,4 +1,4 @@
-package ir.sharif.aichallenge.server.logic.entities;
+package ir.sharif.aichallenge.server.logic.entities.units;
 
 public enum MoveType {
     GROUND(1),

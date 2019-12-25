@@ -1,9 +1,9 @@
 package ir.sharif.aichallenge.server.logic;
 
-import ir.sharif.aichallenge.server.logic.entities.ClonedUnit;
+import ir.sharif.aichallenge.server.logic.entities.units.ClonedUnit;
 import ir.sharif.aichallenge.server.logic.entities.Player;
-import ir.sharif.aichallenge.server.logic.entities.Spell;
-import ir.sharif.aichallenge.server.logic.entities.Unit;
+import ir.sharif.aichallenge.server.logic.entities.spells.Spell;
+import ir.sharif.aichallenge.server.logic.entities.units.Unit;
 import ir.sharif.aichallenge.server.logic.map.Map;
 import javafx.util.Pair;
 
@@ -99,7 +99,7 @@ public class Game {
         List<Spell> removeSpells = new ArrayList<>();
 
         for (Spell spell : spells) {
-            spell.decreaseTime();
+            spell.decreaseRemainingTurns();
             if (spell.shouldRemove()) removeSpells.add(spell);
         }
 

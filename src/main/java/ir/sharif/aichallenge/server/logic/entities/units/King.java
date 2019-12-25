@@ -1,5 +1,6 @@
-package ir.sharif.aichallenge.server.logic.entities;
+package ir.sharif.aichallenge.server.logic.entities.units;
 
+import ir.sharif.aichallenge.server.logic.entities.Player;
 import ir.sharif.aichallenge.server.logic.map.Map;
 
 public class King extends Unit {
@@ -14,6 +15,10 @@ public class King extends Unit {
     @Override
     public int getHealth() {
         return health.getHealth();
+    }
+
+    @Override
+    public void increaseHealth(int heal) {
     }
 
     @Override

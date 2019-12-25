@@ -36,4 +36,12 @@ public class PathCell {
     public PathCell nextCell(int speed) {
         return new PathCell(this.path, numberOfCell + speed);
     }
+
+    @Override
+    public String toString() {
+        return "PathCell{" +
+                "pathId=" + path.getId() +
+                ", numberOfCell=" + numberOfCell +
+                '}';
+    }
 }

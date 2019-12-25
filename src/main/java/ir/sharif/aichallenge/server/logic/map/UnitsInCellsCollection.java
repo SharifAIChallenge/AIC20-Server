@@ -1,6 +1,6 @@
 package ir.sharif.aichallenge.server.logic.map;
 
-import ir.sharif.aichallenge.server.logic.entities.Unit;
+import ir.sharif.aichallenge.server.logic.entities.units.Unit;
 import lombok.Getter;
 
 import java.util.LinkedList;

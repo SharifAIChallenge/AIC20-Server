@@ -15,4 +15,9 @@ public class Cell {
     public int getCol() {
         return col;
     }
+
+    @Override
+    public String toString() {
+        return String.format("(%d, %d)", row, col);
+    }
 }

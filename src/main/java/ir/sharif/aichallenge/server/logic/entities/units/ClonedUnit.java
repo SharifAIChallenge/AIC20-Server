@@ -1,4 +1,4 @@
-package ir.sharif.aichallenge.server.logic.entities;
+package ir.sharif.aichallenge.server.logic.entities.units;
 
 public class ClonedUnit extends GeneralUnit {
     private Unit innerUnit;
@@ -6,7 +6,7 @@ public class ClonedUnit extends GeneralUnit {
     private int remainingTurns;
 
     public ClonedUnit(int unitId, GeneralUnit source, int remainingTurns) {
-        super(unitId, source.getBaseUnit(), source.getPlayer(), source.getHealth(), source.getDamage(), source.getSpeed());
+        super(unitId, source.getBaseUnit(), source.getPlayer(), source.getHealth(), source.getDamage());
         this.remainingTurns = remainingTurns;
     }
 

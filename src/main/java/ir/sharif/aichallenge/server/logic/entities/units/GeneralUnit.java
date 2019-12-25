@@ -1,6 +1,6 @@
-package ir.sharif.aichallenge.server.logic.entities;
+package ir.sharif.aichallenge.server.logic.entities.units;
 
-import ir.sharif.aichallenge.server.logic.map.Cell;
+import ir.sharif.aichallenge.server.logic.entities.Player;
 import ir.sharif.aichallenge.server.logic.map.Map;
 import ir.sharif.aichallenge.server.logic.map.MapUtils;
 import lombok.Getter;
@@ -11,21 +11,19 @@ import java.util.Optional;
 public class GeneralUnit extends Unit {
     private int health;
     private int damage;
-    private int speed;
     private Unit targetUnit;
     private boolean hasAttacked;
 
     public GeneralUnit(int unitId, BaseUnit baseUnit, Player player,
-                       int health, int damage, int speed) {
+                       int health, int damage) {
         super(unitId, baseUnit, player);
         this.health = health;
         this.damage = damage;
-        this.speed = speed;
     }
 
     public GeneralUnit(int unitId, BaseUnit baseUnit, Player player) {
         this(unitId, baseUnit, player,
-                baseUnit.getBaseHealth(), baseUnit.getBaseDamage(), baseUnit.getBaseSpeed());
+                baseUnit.getBaseHealth(), baseUnit.getBaseDamage());
     }
 
 
@@ -42,6 +40,17 @@ public class GeneralUnit extends Unit {
     }
 
     void move() {
+    }
+
+    @Override
+    public int getSpeed() {
+        return getBaseSpeed() + getSpeedIncrease();
+    }
+
+    @Override
+    public void increaseHealth(int heal) {
+        this.health += heal;
+        this.health = Math.min(getBaseMaxHealth(), this.health);
     }
 
     @Override

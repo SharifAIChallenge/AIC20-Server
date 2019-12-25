@@ -43,6 +43,8 @@ public class Player {
 
         for (int i=0; i<DECK_SIZE; i++)
             baseUnitId.put(deck.get(i), i);
+
+        upgradeUsed = putUsed = spellUsed = false;
     }
 
     public void addUpgradeRangeToken(){
@@ -53,13 +55,13 @@ public class Player {
         numberOfDamageUpgrades ++;
     }
 
-    public void usedUpgradeDamage() {
+    public void useUpgradeDamage() {
         if(numberOfDamageUpgrades == 0) throw new UpgradeNotHaveException();
         numberOfDamageUpgrades --;
         setUpgradeUsed(true);
     }
 
-    public void usedUpgradeRange() {
+    public void useUpgradeRange() {
         if(numberOfRangeUpgrades == 0) throw new UpgradeNotHaveException();
         numberOfRangeUpgrades --;
         setUpgradeUsed(true);
@@ -112,11 +114,12 @@ public class Player {
         setSpellUsed(false);
         setUpgradeUsed(false);
 
+        if(currentPutUnit == null) return ;
+
         ArrayList<BaseUnit> chances = new ArrayList<>();
         ArrayList<Double> probs = new ArrayList<>();
         double normalize = 0;
 
-        if(currentPutUnit == null) return ;
         for (BaseUnit baseUnit : deck) {
             if (hand.contains(baseUnit)) continue;
             chances.add(baseUnit);

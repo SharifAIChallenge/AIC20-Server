@@ -74,7 +74,7 @@ public class Game {
     private void updateDecks() {
         if(players == null) return ;
         for (Player player : players)
-            player.updateDeck();
+            player.updateHand();
     }
 
     private void sendDataToClient() {

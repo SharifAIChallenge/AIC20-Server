@@ -88,7 +88,7 @@ public class GameBasicTest {
     }
 
     private void testPutUnit2() {
-        game.addUnit(1, new GeneralUnit(2, BaseUnit.getInstance(1, 0), null));
+        game.addUnit(1, new GeneralUnit(2, BaseUnit.getInstance(1), null));
         game.turn();
 
         assertUnitIdsAt(8, 0, 2);
@@ -97,8 +97,8 @@ public class GameBasicTest {
     }
 
     private void testPutUnit1() {
-        game.addUnit(0, new GeneralUnit(0, BaseUnit.getInstance(0, 0), null));
-        game.addUnit(1, new GeneralUnit(1, BaseUnit.getInstance(1, 0), null));
+        game.addUnit(0, new GeneralUnit(0, BaseUnit.getInstance(0), null));
+        game.addUnit(1, new GeneralUnit(1, BaseUnit.getInstance(1), null));
 
         game.turn();
 

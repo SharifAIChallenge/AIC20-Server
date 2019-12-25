@@ -43,9 +43,9 @@ public class MapBasicTest {
     }
 
     public void testPutUnit() {
-        map.putUnit(addUnit(new GeneralUnit(0, BaseUnit.getInstance(0, 0), null)), 0);
-        map.putUnit(addUnit(new GeneralUnit(1, BaseUnit.getInstance(1, 0), null)), 1);
-        map.putUnit(addUnit(new GeneralUnit(2, BaseUnit.getInstance(0, 0), null)), 2);
+        map.putUnit(addUnit(new GeneralUnit(0, BaseUnit.getInstance(0), null)), 0);
+        map.putUnit(addUnit(new GeneralUnit(1, BaseUnit.getInstance(1), null)), 1);
+        map.putUnit(addUnit(new GeneralUnit(2, BaseUnit.getInstance(0), null)), 2);
 
         assertUnitIdsAt(0, 0, 0, 1);
         assertUnitIdsAt(0, 9, 2);

@@ -1,5 +1,6 @@
 package ir.sharif.aichallenge.server.logic.entities.spells;
 
+import ir.sharif.aichallenge.server.logic.Game;
 import ir.sharif.aichallenge.server.logic.entities.Disposable;
 import ir.sharif.aichallenge.server.logic.entities.Entity;
 import ir.sharif.aichallenge.server.logic.entities.Player;
@@ -26,7 +27,7 @@ public abstract class Spell extends Entity implements Disposable {
         this.position = position;
     }
 
-    public abstract void applyTo(Map map);
+    public abstract void applyTo(Game game);
 
     protected abstract void applyEffectOn(Unit unit);
 

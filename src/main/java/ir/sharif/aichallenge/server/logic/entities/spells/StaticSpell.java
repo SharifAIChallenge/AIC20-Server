@@ -1,8 +1,8 @@
 package ir.sharif.aichallenge.server.logic.entities.spells;
 
+import ir.sharif.aichallenge.server.logic.Game;
 import ir.sharif.aichallenge.server.logic.entities.Player;
 import ir.sharif.aichallenge.server.logic.map.Cell;
-import ir.sharif.aichallenge.server.logic.map.Map;
 
 public abstract class StaticSpell extends Spell {
 
@@ -11,10 +11,10 @@ public abstract class StaticSpell extends Spell {
     }
 
     @Override
-    public void applyTo(Map map) {
+    public void applyTo(Game game) {
         if (isDisposed())
             return;
 
-        getTargetUnitsInRange(map).forEach(this::applyEffectOn);
+        getTargetUnitsInRange(game.getMap()).forEach(this::applyEffectOn);
     }
 }

@@ -130,7 +130,7 @@ public class Game {
 
     private void applySpells() {
         for (Spell spell : spells) {
-            spell.applyTo(map);
+            spell.applyTo(this);
         }
     }
 
@@ -148,14 +148,14 @@ public class Game {
         unitsToPut.add(new Pair<>(unit, pathId));
     }
 
-    public void cloneUnit(Unit unit, int rateOfHealthOfCloneUnit, int rateOfDamageCloneUnit) {
-        Unit clonedUnit = new GeneralUnit(numberOfUnits, unit.getBaseUnit(), unit.getPlayer(),
+    public GeneralUnit cloneUnit(Unit unit, int rateOfHealthOfCloneUnit, int rateOfDamageCloneUnit) {
+        GeneralUnit clonedUnit = new GeneralUnit(numberOfUnits, unit.getBaseUnit(), unit.getPlayer(),
                 unit.getHealth() / rateOfHealthOfCloneUnit, unit.getDamage() / rateOfDamageCloneUnit);
         unitWithId.put(clonedUnit.getId(), clonedUnit);
         clonedUnitToPut.add(clonedUnit);
-        numberOfUnits ++;
+        numberOfUnits++;
+        return clonedUnit;
     }
-
 
 
     public Map getMap() {

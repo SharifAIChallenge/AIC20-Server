@@ -3,6 +3,7 @@ package ir.sharif.aichallenge.server.logic;
 import ir.sharif.aichallenge.server.logic.entities.units.ClonedUnit;
 import ir.sharif.aichallenge.server.logic.entities.Player;
 import ir.sharif.aichallenge.server.logic.entities.spells.Spell;
+import ir.sharif.aichallenge.server.logic.entities.units.GeneralUnit;
 import ir.sharif.aichallenge.server.logic.entities.units.Unit;
 import ir.sharif.aichallenge.server.logic.map.Map;
 import ir.sharif.aichallenge.server.logic.map.Path;
@@ -18,8 +19,12 @@ public class Game {
     Map map;
     List<Spell> spells = new ArrayList<>();
     List<Pair<Unit, Integer>> unitsToPut = new ArrayList<>();
+    List<Unit> clonedUnitToPut = new ArrayList<>();
+
     Player[] players;
     HashMap<Integer, Unit> unitWithId = new HashMap<>();
+
+    private int numberOfUnits = 0;
 
     public void init() {
         //make initial map and paths and players.
@@ -115,6 +120,12 @@ public class Game {
             map.putUnit(X.getKey(), X.getValue());
         }
         unitsToPut.clear();
+
+        for (Unit unit : clonedUnitToPut) {
+            map.putUnit(unit);
+        }
+        clonedUnitToPut.clear();
+
     }
 
     private void applySpells() {
@@ -132,10 +143,20 @@ public class Game {
         return new ArrayList<>(units);
     }
 
-    public void addUnit(Integer unitId, Integer pathId, Unit unit) {
-        unitWithId.put(unitId, unit);
+    public void addUnit(Integer pathId, Unit unit) {
+        unitWithId.put(unit.getId(), unit);
         unitsToPut.add(new Pair<>(unit, pathId));
     }
+
+    public void cloneUnit(Unit unit, int rateOfHealthOfCloneUnit, int rateOfDamageCloneUnit) {
+        Unit clonedUnit = new GeneralUnit(numberOfUnits, unit.getBaseUnit(), unit.getPlayer(),
+                unit.getHealth() / rateOfHealthOfCloneUnit, unit.getDamage() / rateOfDamageCloneUnit);
+        unitWithId.put(clonedUnit.getId(), clonedUnit);
+        clonedUnitToPut.add(clonedUnit);
+        numberOfUnits ++;
+    }
+
+
 
     public Map getMap() {
         return map;

@@ -40,7 +40,6 @@ public class Map {
         unitsInCell.add(unit);
     }
 
-
     public void moveUnit(Unit unit, PathCell target) {
         unitsInCell.remove(unit);
         unit.setPosition(target);

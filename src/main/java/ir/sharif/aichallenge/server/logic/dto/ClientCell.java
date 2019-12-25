@@ -1,4 +1,4 @@
-package ir.sharif.aichallenge.server.logic.dto.init;
+package ir.sharif.aichallenge.server.logic.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

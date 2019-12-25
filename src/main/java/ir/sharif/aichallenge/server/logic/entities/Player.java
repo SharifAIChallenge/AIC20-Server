@@ -2,10 +2,9 @@ package ir.sharif.aichallenge.server.logic.entities;
 
 import ir.sharif.aichallenge.server.logic.entities.spells.Spell;
 import ir.sharif.aichallenge.server.logic.entities.units.BaseUnit;
-import ir.sharif.aichallenge.server.logic.exceptions.APNotEnoughException;
-import ir.sharif.aichallenge.server.logic.exceptions.SpellNotHaveException;
-import ir.sharif.aichallenge.server.logic.exceptions.UnitNotInHandException;
+import ir.sharif.aichallenge.server.logic.exceptions.*;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,6 +21,12 @@ public class Player {
     private ArrayList<BaseUnit> deck;
     private ArrayList<BaseUnit> hand = new ArrayList<>();
     private int[] numberOfUse = new int[DECK_SIZE];
+
+    private int numberOfDamageUpgrades = 0;
+    private int numberOfRangeUpgrades = 0;
+
+    @Setter
+    private boolean upgradeUsed, spellUsed, putUsed;
 
     HashMap<BaseUnit, Integer> baseUnitId = new HashMap<>();
 
@@ -40,12 +45,35 @@ public class Player {
             baseUnitId.put(deck.get(i), i);
     }
 
+    public void addUpgradeRangeToken(){
+        numberOfRangeUpgrades ++;
+    }
+
+    public void addUpgradeDamageToken(){
+        numberOfDamageUpgrades ++;
+    }
+
+    public void usedUpgradeDamage() {
+        if(numberOfDamageUpgrades == 0) throw new UpgradeNotHaveException();
+        numberOfDamageUpgrades --;
+        setUpgradeUsed(true);
+    }
+
+    public void usedUpgradeRange() {
+        if(numberOfRangeUpgrades == 0) throw new UpgradeNotHaveException();
+        numberOfRangeUpgrades --;
+        setUpgradeUsed(true);
+    }
+
     public void putUnit(BaseUnit baseUnit) {
 
         currentPutUnit = null;
 
         if (!hand.contains(baseUnit)) throw new UnitNotInHandException();
         if(AP < baseUnit.getAP()) throw new APNotEnoughException();
+        if(putUsed) throw new PutMoreThanOneUnitException();
+
+        setPutUsed(true);
 
         numberOfUse[baseUnitId.get(baseUnit)] ++;
 
@@ -58,6 +86,10 @@ public class Player {
         int currentCount = getSpellCount(type);
         if(currentCount == 0)
             throw new SpellNotHaveException();
+
+        if(spellUsed) throw new UseMoreThanOneSpellException();
+        setSpellUsed(true);
+
         currentCount --;
         spellCount.put(type, currentCount);
     }
@@ -75,6 +107,10 @@ public class Player {
     }
 
     public void updateHand() {
+
+        setPutUsed(false);
+        setSpellUsed(false);
+        setUpgradeUsed(false);
 
         ArrayList<BaseUnit> chances = new ArrayList<>();
         ArrayList<Double> probs = new ArrayList<>();

@@ -25,6 +25,10 @@ public class Path {
         return this.cells.get(index);
     }
 
+    public int getLength() {
+        return cells.size();
+    }
+
     public List<Cell> getCells() {
         return Collections.unmodifiableList(cells);
     }

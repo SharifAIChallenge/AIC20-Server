@@ -32,13 +32,14 @@ public class Map {
 
     public void putUnit(Unit unit, int pathId) {
         final Path path = this.paths.get(pathId);
-        unit.setPosition(new PathCell(path, 0));
+        unit.setPosition(new PathCell(path, unit.getPlayer().getTeam() == 0, 0));
         unitsInCell.add(unit);
     }
 
     public void putUnit(Unit unit) {
         unitsInCell.add(unit);
     }
+
 
     public void moveUnit(Unit unit, PathCell target) {
         unitsInCell.remove(unit);

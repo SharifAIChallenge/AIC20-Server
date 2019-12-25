@@ -10,11 +10,19 @@ public class Player {
         //update deck.
     }
 
+    public int getTeam() {
+        return getId() % 2;
+    }
+
     public boolean isEnemy(Player other) {
-        return false;
+        return this.getTeam() != other.getTeam();
+    }
+
+    public boolean isAlly(Player other) {
+        return this.getTeam() == other.getTeam();
     }
 
     public boolean isAllyExclusive(Player other) {
-        return false;
+        return this.getId() != other.getId() && this.getTeam() == other.getTeam();
     }
 }

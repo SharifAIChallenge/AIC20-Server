@@ -18,7 +18,7 @@ public class Entity {
     }
 
     public boolean isAlly(Entity other) {
-        return isSelfEntity(other) || this.getPlayer().isAllyExclusive(other.getPlayer());
+        return this.getPlayer().isAlly(other.getPlayer());
     }
 
     public boolean isSelfEntity(Entity other) {

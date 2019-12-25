@@ -1,7 +1,16 @@
 package ir.sharif.aichallenge.server.logic.dto.turn;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.util.List;
 
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class ClientTurnMessage {
     private int currTurn;
     private List<Integer> deck;

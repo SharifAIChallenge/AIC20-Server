@@ -79,8 +79,7 @@ public class GameServer {
         initGame();
     }
 
-    public GameServer(GameLogic gameLogic, String[] cmdArgs, AtomicInteger currentTurn,
-                      AtomicInteger currentMovePhase) {
+    public GameServer(GameLogic gameLogic, String[] cmdArgs, AtomicInteger currentTurn) {
         Configs.handleCMDArgs(cmdArgs);
         mGameLogic = gameLogic;
         mGameLogic.init();
@@ -89,7 +88,7 @@ public class GameServer {
 
         serverSemaphore = new Semaphore(0);
         simulationSemaphore = new Semaphore(0);
-        mClientNetwork = new ClientNetwork(serverSemaphore, currentTurn, currentMovePhase);
+        mClientNetwork = new ClientNetwork(serverSemaphore, currentTurn);
 
         mUINetwork = new UINetwork();
         mOutputController = new OutputController(mUINetwork);

@@ -8,8 +8,10 @@ import ir.sharif.aichallenge.server.logic.map.Cell;
 import java.util.stream.Collectors;
 
 public class DuplicateSpell extends StickySpell {
-    public DuplicateSpell(int id, BaseSpell baseSpell, Player player, Cell position) {
-        super(id, baseSpell, player, position);
+    public static final int TYPE = 4;
+
+    public DuplicateSpell(int id, Player player, Cell position) {
+        super(id, BaseSpell.getInstance(TYPE), player, position);
     }
 
     @Override

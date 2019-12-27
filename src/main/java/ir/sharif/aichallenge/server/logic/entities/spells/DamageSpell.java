@@ -5,8 +5,10 @@ import ir.sharif.aichallenge.server.logic.entities.units.Unit;
 import ir.sharif.aichallenge.server.logic.map.Cell;
 
 public class DamageSpell extends StaticSpell {
-    public DamageSpell(int id, BaseSpell baseSpell, Player player, Cell position) {
-        super(id, baseSpell, player, position);
+    public static final int TYPE = 1;
+
+    public DamageSpell(int id, Player player, Cell position) {
+        super(id, BaseSpell.getInstance(TYPE), player, position);
     }
 
     @Override

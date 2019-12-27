@@ -80,7 +80,7 @@ public class ClientNetwork extends NetServer {
         receiveExecutor = Executors.newCachedThreadPool();
     }
 
-    public ClientNetwork(Semaphore simulationSemaphore, AtomicInteger currentTurn, AtomicInteger currentMovePhase) {
+    public ClientNetwork(Semaphore simulationSemaphore, AtomicInteger currentTurn) {
         mTokens = new HashMap<>();
         mClients = new ArrayList<>();
         endReceivedFlags = new ArrayList<>();

@@ -1,5 +1,11 @@
 package ir.sharif.aichallenge.server.logic;
 
+import ir.sharif.aichallenge.server.common.network.data.CastSpellInfo;
+import ir.sharif.aichallenge.server.common.network.data.ClientMessageInfo;
+import ir.sharif.aichallenge.server.common.network.data.MessageTypes;
+import ir.sharif.aichallenge.server.common.network.data.PutUnitInfo;
+import ir.sharif.aichallenge.server.logic.entities.spells.SpellFactory;
+import ir.sharif.aichallenge.server.logic.entities.units.BaseUnit;
 import ir.sharif.aichallenge.server.logic.entities.units.ClonedUnit;
 import ir.sharif.aichallenge.server.logic.entities.Player;
 import ir.sharif.aichallenge.server.logic.entities.spells.Spell;
@@ -9,16 +15,15 @@ import ir.sharif.aichallenge.server.logic.map.Map;
 import ir.sharif.aichallenge.server.logic.map.Path;
 import ir.sharif.aichallenge.server.logic.map.PathCell;
 import javafx.util.Pair;
+import lombok.Getter;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Game {
 
     Map map;
-    List<Spell> spells = new ArrayList<>();
+    SortedSet<Spell> spells = new TreeSet<Spell>(Comparator.comparing(Spell::getPriority));
     List<Pair<Unit, Integer>> unitsToPut = new ArrayList<>();
     List<Unit> clonedUnitToPut = new ArrayList<>();
 
@@ -27,15 +32,21 @@ public class Game {
 
     private int numberOfUnits = 0;
 
+    @Getter
+    private AtomicInteger currentTurn = new AtomicInteger(0);
+
     public void init() {
         //make initial map and paths and players.
     }
 
-    public void turn() {
-        readRequestsFromClient();
+    public void pick(java.util.Map<String, List<ClientMessageInfo>> messages) {
+        //TODO: to be implemented
+        currentTurn.incrementAndGet();
+    }
 
-        applySpells();
-        applyPutUnits();
+    public void turn(java.util.Map<String, List<ClientMessageInfo>> messages) {
+        applySpells(messages.get(MessageTypes.CAST_SPELL));
+        applyPutUnits(messages.get(MessageTypes.PUT_UNIT));
 
         evaluateSpells();
 
@@ -47,6 +58,8 @@ public class Game {
         updateDecks();
 
         sendDataToClient();
+
+        currentTurn.incrementAndGet();
     }
 
     private void evaluateUnits() {
@@ -124,23 +137,31 @@ public class Game {
             spells.remove(spell);
     }
 
-    private void applyPutUnits() {
-        for (Pair<Unit, Integer> X : unitsToPut) {
-            map.putUnit(X.getKey(), X.getValue());
-        }
-        unitsToPut.clear();
+    private void applyPutUnits(List<ClientMessageInfo> putUnitMessages) {
+        putUnitMessages.stream().map(message -> (PutUnitInfo) message).forEach(info -> {
+            try {
+                Player player = players[info.getPathId()];
+                BaseUnit baseUnit = BaseUnit.getInstance(info.getTypeId());
+                player.putUnit(baseUnit);
+                int id = numberOfUnits++;
+                unitsWithId.put(id, new GeneralUnit(id, baseUnit, player));
+            } catch (Exception ex) {
 
-        for (Unit unit : clonedUnitToPut) {
-            map.putUnit(unit);
-        }
-        clonedUnitToPut.clear();
-
+            }
+        });
     }
 
-    private void applySpells() {
-        for (Spell spell : spells) {
-            spell.applyTo(this);
-        }
+    private void applySpells(List<ClientMessageInfo> castSpellMessages) {
+        castSpellMessages.stream().map(info -> (CastSpellInfo) info).forEach(info -> {
+            try {
+                final Player player = players[info.getPlayerId()];
+                player.castSpell(info.getTypeId());
+                spells.add(SpellFactory.createSpell(info.getTypeId(), player, info.getCell(), info.getUnitId(), map.getPath(info.getPathId())));
+            } catch (Exception ex) {
+            }
+        });
+
+        spells.forEach(spell -> spell.applyTo(this));
     }
 
     private void readRequestsFromClient() {

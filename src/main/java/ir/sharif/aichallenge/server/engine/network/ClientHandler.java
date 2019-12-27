@@ -1,13 +1,16 @@
 package ir.sharif.aichallenge.server.engine.network;
 
-import ir.sharif.aichallenge.server.common.model.Event;
 import ir.sharif.aichallenge.server.common.network.Json;
 import ir.sharif.aichallenge.server.common.network.JsonSocket;
+import ir.sharif.aichallenge.server.common.network.data.ClientMessage;
+import ir.sharif.aichallenge.server.common.network.data.ClientMessageInfo;
 import ir.sharif.aichallenge.server.common.network.data.Message;
+import ir.sharif.aichallenge.server.common.network.data.MessageTypes;
 import ir.sharif.aichallenge.server.utils.Log;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -61,12 +64,12 @@ public class ClientHandler {
     /**
      * Last valid message which is arrived on time.
      */
-    private final ArrayList<Message> receivedMessages;
+    private final ArrayList<ClientMessage> receivedMessages;
 
     /**
      * Last message received from client.
      */
-    private Message lastReceivedMessage;
+    private ClientMessage lastReceivedMessage;
 
     /**
      * This object is notified when a message is received.
@@ -104,11 +107,6 @@ public class ClientHandler {
     private AtomicBoolean endReceived;
 
     /**
-     * Current move phase in game
-     */
-    private AtomicInteger currentMovePhase;
-
-    /**
      * Constructor.
      */
     public ClientHandler() {
@@ -119,8 +117,7 @@ public class ClientHandler {
         messageNotifier = new Object();
     }
 
-    public ClientHandler(Semaphore simulationSemaphore, AtomicInteger currentTurn, AtomicInteger currentMovePhase,
-                         AtomicBoolean endReceived) {
+    public ClientHandler(Semaphore simulationSemaphore, AtomicInteger currentTurn, AtomicBoolean endReceived) {
         messagesToSend = new LinkedBlockingDeque<>();
         receivedMessages = new ArrayList<>();
         messagesQueued = new ArrayList<>();
@@ -129,7 +126,6 @@ public class ClientHandler {
 
         this.simulationSemaphore = simulationSemaphore;
         this.currentTurn = currentTurn;
-        this.currentMovePhase = currentMovePhase;
         this.endReceived = endReceived;
     }
 
@@ -188,10 +184,10 @@ public class ClientHandler {
      * @return last validated message.
      * @see #getReceiver
      */
-    public Message[] getReceivedMessages() {
-        Message[] messages;
+    public List<ClientMessage> getReceivedMessages() {
+        ArrayList<ClientMessage> messages;
         synchronized (receivedMessages) {
-            messages = receivedMessages.toArray(new Message[receivedMessages.size()]);
+            messages = new ArrayList<>(receivedMessages);
             receivedMessages.clear();
         }
         return messages;
@@ -236,32 +232,25 @@ public class ClientHandler {
             while (!receiveTerminateFlag) {
                 try {
                     receive();
-                    if (lastReceivedMessage != null) {
-                        Event lastReceivedEvent = Json.GSON.fromJson(lastReceivedMessage.args.get(0), Event.class);
-                        String type = lastReceivedEvent.getType();
-                        String[] args = lastReceivedEvent.getArgs();
+                    if (timeValidator.get() && lastReceivedMessage == null)
+                        continue;
 
-                        if (type.endsWith("end")) {
-                            if (isValidEnd(type, args))
-                            {
-                                simulationSemaphore.release();
-                                endReceived.set(true);
-                                continue;
-                            }
-                            System.err.println(lastReceivedEvent.getType() + " rejected.");
-                            continue;
-                        }
-                        int turn = extractTurn(type, args);
-                        int movePhase = extractMovePhase(type, args);
-
-                        if (timeValidator.get() && turn == currentTurn.get() && movePhase == currentMovePhase.get()) {
-                            synchronized (receivedMessages) {
-                                receivedMessages.add(lastReceivedMessage);
-                            }
-                        } else {
-                            Log.i(TAG, "Message received late.");
-                        }
+                    if (lastReceivedMessage.getTurn() != currentTurn.get())  //Invalid message
+                    {
+                        Log.i(TAG, "Message received late.");
+                        continue;
                     }
+
+                    if (lastReceivedMessage.getType().equals(MessageTypes.END_TURN)) {
+                        simulationSemaphore.release();
+                        endReceived.set(true);
+                        continue;
+                    }
+
+                    synchronized (receivedMessages) {
+                        receivedMessages.add(lastReceivedMessage);
+                    }
+
                 } catch (IOException e) {
                     Log.i(TAG, "message receiving failure", e);
                     handleIOE(e);
@@ -275,60 +264,6 @@ public class ClientHandler {
         };
     }
 
-    private int extractMovePhase(String type, String[] args)
-    {
-        if (!type.equals("move") || args.length == 2)
-            return currentMovePhase.get();
-
-        return Integer.parseInt(args[args.length - 1]);
-    }
-
-    private int extractTurn(String type, String[] args)
-    {
-        if ((type.equals("pick") && args.length == 1) || (type.equals("move") && args.length == 2) ||
-                (type.equals("cast") && args.length == 4))
-            return currentTurn.get();
-
-        if (type.equals("move"))
-            return Integer.parseInt(args[args.length - 2]);
-        return Integer.parseInt(args[args.length - 1]);
-    }
-
-    private boolean isValidEnd(String type, String[] args)
-    {
-        int turnNum;
-        int movePhaseNum;
-
-        if (type.equals("init-end") && args.length == 0 && !endReceived.get())
-        {
-            System.err.println("init received");
-            return true;
-        }
-        else if (type.equals("pick-end") && args.length == 1 && !endReceived.get())
-        {
-            turnNum = Integer.parseInt(args[0]);
-            System.err.println("pick received, turn: " + currentTurn.get());
-            return turnNum == currentTurn.get();
-        } else if (type.equals("move-end") && args.length == 2 && !endReceived.get())
-        {
-            turnNum = Integer.parseInt(args[0]);
-            movePhaseNum = Integer.parseInt(args[1]);
-            System.err.println("move received, turn: " + currentTurn.get() + ", phase: " + currentMovePhase.get());
-            return turnNum == currentTurn.get() && movePhaseNum == currentMovePhase.get();
-        } else if (type.equals("action-end") && args.length == 1 && !endReceived.get())
-        {
-            turnNum = Integer.parseInt(args[0]);
-            System.err.println("action received, turn: " + currentTurn.get());
-            return turnNum == currentTurn.get();
-        } else if (type.equals("end") && args.length == 1 && !endReceived.get())
-        {
-            turnNum = Integer.parseInt(args[0]);
-            return turnNum == currentTurn.get();
-        }
-
-        return false;
-    }
-
     /**
      * Receives a message from client.
      *
@@ -339,7 +274,7 @@ public class ClientHandler {
         lastReceivedMessage = null;
         if (receiveTerminateFlag)
             return;
-        lastReceivedMessage = client.get(Message.class);
+        lastReceivedMessage = client.get(ClientMessage.class);
         synchronized (messageNotifier) {
             messageNotifier.notifyAll();
         }

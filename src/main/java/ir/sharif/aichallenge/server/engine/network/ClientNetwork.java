@@ -1,17 +1,22 @@
 package ir.sharif.aichallenge.server.engine.network;
 
-import ir.sharif.aichallenge.server.common.model.Event;
+import com.google.gson.JsonObject;
 import ir.sharif.aichallenge.server.common.network.Json;
 import ir.sharif.aichallenge.server.common.network.JsonSocket;
+import ir.sharif.aichallenge.server.common.network.data.ClientMessage;
+import ir.sharif.aichallenge.server.common.network.data.ClientMessageInfo;
 import ir.sharif.aichallenge.server.common.network.data.Message;
+import ir.sharif.aichallenge.server.common.network.data.MessageTypes;
 import ir.sharif.aichallenge.server.utils.Log;
 import ir.sharif.aichallenge.server.engine.config.Configs;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 /**
  * {@link ClientNetwork} is a engine which is responsible for
@@ -61,9 +66,6 @@ public class ClientNetwork extends NetServer {
     //Current Turn of game
     private AtomicInteger currentTurn;
 
-    //Current move phase of game
-    private AtomicInteger currentMovePhase;
-
     //End flags for clients
     private ArrayList<AtomicBoolean> endReceivedFlags;
 
@@ -87,7 +89,6 @@ public class ClientNetwork extends NetServer {
 
         this.simulationSemaphore = simulationSemaphore;
         this.currentTurn = currentTurn;
-        this.currentMovePhase = currentMovePhase;
     }
 
     /**
@@ -127,7 +128,7 @@ public class ClientNetwork extends NetServer {
      */
     private ClientHandler newClient() {
         AtomicBoolean endReceivedFlag = new AtomicBoolean(false);
-        ClientHandler client = new ClientHandler(simulationSemaphore, currentTurn, currentMovePhase, endReceivedFlag);
+        ClientHandler client = new ClientHandler(simulationSemaphore, currentTurn, endReceivedFlag);
         sendExecutor.submit(client.getSender());
         endReceivedFlags.add(endReceivedFlag);
         return client;
@@ -179,8 +180,7 @@ public class ClientNetwork extends NetServer {
 //        CyclicBarrier sendBarrier = new CyclicBarrier(mClients.size() + 1);
         CyclicBarrier sendBarrier = new CyclicBarrier(getNumberOfConnected() + 1);
         for (ClientHandler client : mClients) {
-            if (!client.isConnected())
-            {
+            if (!client.isConnected()) {
                 continue;
             }
             sendExecutor.submit(() -> {
@@ -199,11 +199,9 @@ public class ClientNetwork extends NetServer {
         } catch (Exception e) {
             Log.d(TAG, "waiting barrier interrupted.", e);
         }
-        try
-        {
+        try {
             Thread.sleep(10);
-        } catch (InterruptedException e)
-        {
+        } catch (InterruptedException e) {
             System.err.println("I don't feel so good...");
             e.printStackTrace();
         }
@@ -241,7 +239,7 @@ public class ClientNetwork extends NetServer {
      * @return last valid message or <code>null</code> if there is no valid msg
      * @see {@link #defineClient}
      */
-    public Message[] getReceivedMessages(int clientID) {
+    public List<ClientMessage> getReceivedMessages(int clientID) {
         return mClients.get(clientID).getReceivedMessages();
     }
 
@@ -252,24 +250,10 @@ public class ClientNetwork extends NetServer {
      * @return last valid event or <code>null</code> if there is no valid event
      * @see {@link #getReceivedMessages}
      */
-    public Event[] getReceivedEvents(int clientID) {
-        Message[] messages = getReceivedMessages(clientID);
-        ArrayList<Event> allEvents = new ArrayList<>();
-        for (Message msg : messages) {
-            try {
-            /*JsonArray eventArray = ((JsonElement)msg.args[0]).getAsJsonArray();
-            events = new Event[eventArray.size()];
-            for (int i = 0; i < events.length; i++)
-                events[i] = gson.fromJson(eventArray.get(i), Event.class);*/
-                int size = msg.args.size();
-                for (int i = 0; i < size; i++) {
-                    allEvents.add(Json.GSON.fromJson(msg.args.get(i), Event.class));
-                }
-            } catch (Exception e) {
-                Log.i(TAG, "Error getting received messages.", e);
-            }
-        }
-        return allEvents.toArray(new Event[allEvents.size()]);
+    public List<ClientMessageInfo> getReceivedEvents(int clientID) {
+        return getReceivedMessages(clientID).stream()
+                .map(ClientMessage::getParsedInfo)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -293,11 +277,10 @@ public class ClientNetwork extends NetServer {
         // get the token, timeout is 2000 seconds
         Future<Message> futureMessage
                 = acceptExecutor.submit(() -> client.get(Message.class));
-        Message token = futureMessage.get(2000, TimeUnit.SECONDS);
+        Message message = futureMessage.get(2000, TimeUnit.SECONDS);
         // check the token
-        if (token != null && "token".equals(token.name) && token.args != null
-                && token.args.size() >= 1) {
-            String clientToken = token.args.get(0).getAsString();
+        if (message != null && message.getType().equals(MessageTypes.TOKEN) && message.getInfo().has("token")) {
+            String clientToken = message.getInfo().get("token").getAsString();
             ArrayList<Integer> ids = mTokens.get(clientToken);
             if (ids != null) {
                 for (int clientID : ids) {
@@ -429,7 +412,7 @@ public class ClientNetwork extends NetServer {
 
     public void shutdownAll() {
         mClients.forEach(ClientHandler::terminateReceiving);
-        Message shutdown = new Message(Message.NAME_SHUTDOWN, new Object[]{});
+        Message shutdown = new Message(MessageTypes.SHUTDOWN, new JsonObject());
         mClients.forEach(c -> c.queue(shutdown));
         sendAllBlocking();
         mClients.forEach(ClientHandler::terminateSending);

@@ -58,12 +58,12 @@ public class GameBasicTest {
     private void testAttack2() {
         game.turn();
 
-        assertEquals(game.getUnitWithId().size(), 1);
+        assertEquals(game.getUnitsWithId().size(), 1);
 
         assertUnitIdsAt(2, 0, 2);
         assertUnitIdsAt(0, 0);
 
-        Unit unit2 = game.getUnitWithId().get(2);
+        Unit unit2 = game.getUnitById(2);
         assertEquals(unit2.getHealth(), 6);
 
         System.out.println("Tests Done");
@@ -125,8 +125,8 @@ public class GameBasicTest {
 
     private void testAttack1() {
 
-        Unit unit0 = game.getUnitWithId().get(0);
-        Unit unit1 = game.getUnitWithId().get(1);
+        Unit unit0 = game.getUnitById(0);
+        Unit unit1 = game.getUnitById(1);
 
         game.turn();
 
@@ -142,7 +142,7 @@ public class GameBasicTest {
     private void testRemoved() {
         game.turn();
 
-        assertEquals(game.getUnitWithId().size(), 1);
+        assertEquals(game.getUnitsWithId().size(), 1);
 
         //System.out.println(g);
 

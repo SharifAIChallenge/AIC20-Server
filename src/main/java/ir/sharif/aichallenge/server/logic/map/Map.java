@@ -30,6 +30,10 @@ public class Map {
         this.paths.put(path.getId(), path);
     }
 
+    public Path getPath(int pathId) {
+        return this.paths.get(pathId);
+    }
+
     public void putUnit(Unit unit, int pathId) {
         final Path path = this.paths.get(pathId);
         unit.setPosition(new PathCell(path, unit.getPlayer().getTeam() == 0, 0));

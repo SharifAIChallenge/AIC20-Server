@@ -9,12 +9,13 @@ import ir.sharif.aichallenge.server.logic.map.PathCell;
 import java.util.function.BiConsumer;
 
 public class TeleportSpell extends Spell {
+    public static final int TYPE = 3;
 
     private int targetUnitId;
     private PathCell targetCell;
 
-    public TeleportSpell(int id, BaseSpell baseSpell, Player player, Cell position, int targetUnitId, PathCell targetCell) {
-        super(id, baseSpell, player, position);
+    public TeleportSpell(int id, Player player, Cell position, int targetUnitId, PathCell targetCell) {
+        super(id, BaseSpell.getInstance(TYPE), player, position);
         this.targetUnitId = targetUnitId;
         this.targetCell = targetCell;
     }

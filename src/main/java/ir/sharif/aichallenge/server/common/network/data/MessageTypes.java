@@ -12,7 +12,7 @@ public class MessageTypes {
 
     public static final String PICK = "pick";
 
-    public static final String PUT = "putUnit";
+    public static final String PUT_UNIT = "putUnit";
     public static final String CAST_SPELL = "castSpell";
     public static final String UPGRADE_RANGE = "rangeUpgrade";
     public static final String UPGRADE_DAMAGE = "damageUpgrade";

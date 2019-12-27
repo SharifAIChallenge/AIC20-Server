@@ -7,6 +7,7 @@ import ir.sharif.aichallenge.server.logic.entities.units.GeneralUnit;
 import ir.sharif.aichallenge.server.logic.entities.units.Unit;
 import ir.sharif.aichallenge.server.logic.map.Map;
 import ir.sharif.aichallenge.server.logic.map.Path;
+import ir.sharif.aichallenge.server.logic.map.PathCell;
 import javafx.util.Pair;
 
 import java.util.ArrayList;
@@ -22,7 +23,7 @@ public class Game {
     List<Unit> clonedUnitToPut = new ArrayList<>();
 
     Player[] players;
-    HashMap<Integer, Unit> unitWithId = new HashMap<>();
+    HashMap<Integer, Unit> unitsWithId = new HashMap<>();
 
     private int numberOfUnits = 0;
 
@@ -58,7 +59,7 @@ public class Game {
 
             if (!unit.isAlive()) {
                 map.removeUnit(unit);
-                unitWithId.remove(unit.getId());
+                unitsWithId.remove(unit.getId());
             }
         }
     }
@@ -72,7 +73,7 @@ public class Game {
     }
 
     private void updateDecks() {
-        if(players == null) return ;
+        if (players == null) return;
         for (Player player : players)
             player.updateHand();
     }
@@ -147,24 +148,27 @@ public class Game {
     }
 
     private ArrayList<Unit> getAllUnits() {
-        Collection<Unit> units = unitWithId.values();
+        Collection<Unit> units = unitsWithId.values();
         return new ArrayList<>(units);
     }
 
     public void addUnit(Integer pathId, Unit unit) {
-        unitWithId.put(unit.getId(), unit);
+        unitsWithId.put(unit.getId(), unit);
         unitsToPut.add(new Pair<>(unit, pathId));
     }
 
     public GeneralUnit cloneUnit(Unit unit, int rateOfHealthOfCloneUnit, int rateOfDamageCloneUnit) {
         GeneralUnit clonedUnit = new GeneralUnit(numberOfUnits, unit.getBaseUnit(), unit.getPlayer(),
                 unit.getHealth() / rateOfHealthOfCloneUnit, unit.getDamage() / rateOfDamageCloneUnit);
-        unitWithId.put(clonedUnit.getId(), clonedUnit);
+        unitsWithId.put(clonedUnit.getId(), clonedUnit);
         clonedUnitToPut.add(clonedUnit);
         numberOfUnits++;
         return clonedUnit;
     }
 
+    public void teleportUnit(Unit unit, PathCell targetCell) {
+        getMap().moveUnit(unit, targetCell);
+    }
 
     public Map getMap() {
         return map;
@@ -174,8 +178,12 @@ public class Game {
         map = new Map(size, size);
     }
 
-    public HashMap<Integer, Unit> getUnitWithId(){
-        return unitWithId;
+    public HashMap<Integer, Unit> getUnitsWithId() {
+        return unitsWithId;
+    }
+
+    public Unit getUnitById(int id) {
+        return this.unitsWithId.get(id);
     }
 
 

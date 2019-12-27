@@ -2,6 +2,7 @@ package ir.sharif.aichallenge.server.engine.network;
 
 import ir.sharif.aichallenge.server.common.network.JsonSocket;
 import ir.sharif.aichallenge.server.common.network.data.Message;
+import ir.sharif.aichallenge.server.common.network.data.MessageTypes;
 import ir.sharif.aichallenge.server.utils.Log;
 import ir.sharif.aichallenge.server.engine.config.Configs;
 
@@ -128,8 +129,9 @@ public final class UINetwork extends NetServer {
         Future<Message> futureMessage
                 = executor.submit(() -> client.get(Message.class));
         Message token = futureMessage.get(1000, TimeUnit.SECONDS);
-        return token != null && "token".equals(token.name) && token.args != null
-                && token.args.size() >= 1 && mToken.equals(token.args.get(0).getAsString());
+        return token != null && MessageTypes.TOKEN.equals(token.getType()) &&
+                token.getInfo().has("token") &&
+                mToken.equals(token.getInfo().get("token").getAsString());
     }
 
     /**

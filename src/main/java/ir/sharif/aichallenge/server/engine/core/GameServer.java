@@ -1,18 +1,23 @@
 package ir.sharif.aichallenge.server.engine.core;
 
-//import Swarm.SwarmGameLogic;
-
-import ir.sharif.aichallenge.server.common.model.Event;
+import com.google.gson.JsonObject;
+import ir.sharif.aichallenge.server.common.network.data.ClientMessageInfo;
 import ir.sharif.aichallenge.server.common.network.data.Message;
+import ir.sharif.aichallenge.server.common.network.data.MessageTypes;
 import ir.sharif.aichallenge.server.utils.Log;
 import ir.sharif.aichallenge.server.engine.network.ClientNetwork;
 import ir.sharif.aichallenge.server.engine.network.UINetwork;
 import ir.sharif.aichallenge.server.engine.config.ClientConfig;
 import ir.sharif.aichallenge.server.engine.config.Configs;
+
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Core controller of the framework, controls the {@link GameLogic GameLogic}, Swarm.main loop of the game and
@@ -211,8 +216,7 @@ public class GameServer {
 
         private boolean shutdownRequest = false;
 
-        private Event[] environmentEvents;
-        private Event[][] clientEvents;
+        private Map<String, List<ClientMessageInfo>> clientEvents;
 
         /**
          * The run method of the {@link Runnable Run    nable} interface which will create a
@@ -222,54 +226,14 @@ public class GameServer {
          */
         @Override
         public void run() {
-            clientEvents = new Event[mClientsNum][];
-            for (int i = 0; i < clientEvents.length; i++) {
-                clientEvents[i] = new Event[0];
-            }
 
             Runnable simulate = () -> {
-//                try {
-//                    mGameLogic.simulateEvents(environmentEvents, clientEvents);
-//                } catch (Exception e) {
-//                    err("Simulation", e);
-//                }
-//                try {
-//                    mGameLogic.generateOutputs();
-//                } catch (Exception e) {
-//                    err("Generating outputs", e);
-//                }
-
-//                mOutputController.putMessage(mGameLogic.getUIMessage());
-//                mOutputController.putMessage(mGameLogic.getStatusMessage());
                 long start, end;
                 start = System.currentTimeMillis();
                 Message[] output = mGameLogic.getClientMessages();
-//                mOutputController.putMessage(mGameLogic.getStatusMessage());
                 for (int i = 0; i < output.length; ++i) {
                     mClientNetwork.queue(i, output[i]);
                 }
-
-//                if (mGameLogic.isGameFinished()) {
-//                    mClientNetwork.sendAllBlocking();
-//                    mGameLogic.terminate();
-//                    mClientNetwork.shutdownAll();
-//                    mLoop.shutdown();
-//                    mOutputController.shutdown();
-//                    return;
-//                }
-
-
-//                long elapsedTime = System.currentTimeMillis();
-//                environmentEvents = mGameLogic.makeEnvironmentEvents();
-//                elapsedTime = System.currentTimeMillis() - elapsedTime;
-
-//                if (timeout - elapsedTime > 0) {
-//                    try {
-//                        Thread.sleep(timeout - elapsedTime);
-//                    } catch (InterruptedException e) {
-//                        throw new RuntimeException("Waiting for clients interrupted");
-//                    }
-//                }
 
                 mClientNetwork.startReceivingAll();
                 mClientNetwork.sendAllBlocking();
@@ -278,8 +242,7 @@ public class GameServer {
                 long timeout = mGameLogic.getClientResponseTimeout();
                 start = System.currentTimeMillis();
                 try {
-                    if (mClientNetwork.getNumberOfConnected() != 0)
-                    {
+                    if (mClientNetwork.getNumberOfConnected() != 0) {
                         serverSemaphore.tryAcquire(mClientNetwork.getNumberOfConnected(), timeout, TimeUnit.MILLISECONDS);
                     }
                 } catch (InterruptedException e) {
@@ -288,25 +251,20 @@ public class GameServer {
                 end = System.currentTimeMillis();
                 System.err.println(end - start + " time spent to receive client messages with timeout " + timeout);
                 mClientNetwork.stopReceivingAll();
-                if (mClientNetwork.getNumberOfConnected() != 0)
-                {
+                if (mClientNetwork.getNumberOfConnected() != 0) {
                     serverSemaphore.drainPermits();
                 }
 
-                clientEvents = new Event[mClientsNum][];
-                for (int i = 0; i < mClientsNum; ++i) {
-                    Event[] events = mClientNetwork.getReceivedEvents(i);
-                    clientEvents[i] = events;
-                }
+                clientEvents = IntStream.range(0, mClientsNum).boxed()
+                        .flatMap(i -> mClientNetwork.getReceivedEvents(i).stream().peek(info -> info.setPlayerId(i)))
+                        .collect(Collectors.groupingBy(ClientMessageInfo::getType));
 
                 try {
                     Thread.sleep(10);
                     start = System.currentTimeMillis();
-                    mGameLogic.simulateEvents(environmentEvents, clientEvents);
+                    mGameLogic.simulateEvents(clientEvents);
                     end = System.currentTimeMillis();
                     System.err.println(end - start + " time spent to simulate events.");
-//                    mOutputController.putMessage(mGameLogic.getUIMessage()); TODO don't forget these
-//                    mOutputController.putMessage(mGameLogic.getStatusMessage());
                 } catch (Exception e) {
                     err("Simulation", e);
                     e.printStackTrace();
@@ -316,15 +274,10 @@ public class GameServer {
                     try {
                         mGameLogic.generateOutputs(); // added at AIC 2019
                         mGameLogic.terminate();
-//                        Message shutdown = new Message(Message.NAME_SHUTDOWN, new Object[]{});
-//                        for (int i = 0; i < mClientsNum; i++) {
-//                            mClientNetwork.queue(i, shutdown);
-//                        }
-//                        mClientNetwork.sendAllBlocking();
                         mClientNetwork.shutdownAll();
                         Thread.sleep(1000); // wait for clients to shutdown
                         mClientNetwork.terminate();
-                        Message uiShutdown = new Message(Message.NAME_SHUTDOWN, new Object[]{});
+                        Message uiShutdown = new Message(MessageTypes.SHUTDOWN, new JsonObject());
                         mOutputController.putMessage(uiShutdown);
                         mOutputController.waitToSend();
                         mLoop.shutdown();
@@ -338,10 +291,7 @@ public class GameServer {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    // TODO add params to game logic
-//                    if(SwarmGameLogic.PARAM_SHOW_DEBUG_UI.equals(false)) {
                     System.exit(0);
-//                    }
                     return;
                 }
                 simulationSemaphore.release();

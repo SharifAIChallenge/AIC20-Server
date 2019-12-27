@@ -1,41 +1,19 @@
 package ir.sharif.aichallenge.server.common.network.data;
 
-import com.google.gson.JsonArray;
-import ir.sharif.aichallenge.server.common.network.Json;
+import com.google.gson.JsonObject;
+import lombok.Getter;
 
 /**
- * Message class
+ * Message is the data that is transferred in network between clients and server
  */
+@Getter
 public class Message {
 
-    public static final String NAME_PICK = "pick";
-    public static final String NAME_TURN = "turn";
-    public static final String NAME_MOVE = "move";
-    public static final String NAME_ACTION = "action";
-    public static final String NAME_INIT = "init";
-    public static final String NAME_STATUS = "status";
-    public static final String NAME_SHUTDOWN = "shutdown";
-    public static final String NAME_END = "end";
-    public static final String NAME_WRONG_TOKEN = "wrong token";
+    private final String type;
+    private final JsonObject info;
 
-    public final String name;
-    public final JsonArray args;
-
-    public Message(String name, JsonArray args) {
-        this.name = name;
-        this.args = args;
+    public Message(String type, JsonObject info) {
+        this.type = type;
+        this.info = info;
     }
-
-    public Message(String name, Object[] args) {
-        this(name, Json.GSON.toJsonTree(args).getAsJsonArray());
-    }
-
-//    public void setName(String name) {
-//        this.name = name;
-//    }
-
-//    public void setArgs(Object[] args) {
-//        this.args = args;
-//    }
-
 }

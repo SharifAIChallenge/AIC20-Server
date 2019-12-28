@@ -24,6 +24,8 @@ public class TurnUnit {
     private boolean wasRangeUpgraded;
     private boolean isHasted;
     private boolean isClone;
+    private boolean activePoisons;
     private int range;
     private int attack;
+    private boolean wasPlayedThisTurn;
 }

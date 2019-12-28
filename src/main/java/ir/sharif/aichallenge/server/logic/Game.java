@@ -1,7 +1,9 @@
 package ir.sharif.aichallenge.server.logic;
 
+import com.sun.security.ntlm.Client;
 import ir.sharif.aichallenge.server.common.network.data.*;
-import ir.sharif.aichallenge.server.logic.dto.init.InitialMessage;
+import ir.sharif.aichallenge.server.logic.dto.ClientCell;
+import ir.sharif.aichallenge.server.logic.dto.init.*;
 import ir.sharif.aichallenge.server.logic.entities.spells.SpellFactory;
 import ir.sharif.aichallenge.server.logic.entities.units.*;
 import ir.sharif.aichallenge.server.logic.entities.Player;
@@ -19,6 +21,7 @@ import lombok.Getter;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 public class Game {
 
@@ -26,15 +29,56 @@ public class Game {
     private SortedSet<Spell> spells = new TreeSet<Spell>(Comparator.comparing(Spell::getPriority));
     private List<Pair<Unit, Integer>> unitsToPut = new ArrayList<>();
     private List<Unit> clonedUnitToPut = new ArrayList<>();
-    private Player[] players;
+    private Player[] players = new Player[4];
     private HashMap<Integer, Unit> unitsWithId = new HashMap<>();
     private ArrayList<King> kings = new ArrayList<>();
+    private GameConstants gameConstants;
+
 
     @Getter
     private AtomicInteger currentTurn = new AtomicInteger(0);
 
     public void init(InitialMessage initialMessage) {
+        gameConstants = initialMessage.getGameConstants();
+
+        //init players
+        for (int i=0; i<4; i++)
+            players[i] = new Player(i, gameConstants.getMaxAP(), null);
+
+        initMap(initialMessage.getMap());
+
+        initBaseUnits(initialMessage.getBaseUnits());
+
+
+
         //make initial map and paths and players.
+    }
+
+    private void initBaseUnits(List<ClientBaseUnit> baseUnits) {
+        for (ClientBaseUnit cBU : baseUnits) {
+            BaseUnit.initBaseUnits(cBU, gameConstants.getDamageUpgradeAddition(), gameConstants.getRangeUpgradeAddition())
+        }
+    }
+
+    private void initMap(ClientMap clientMap) {
+        map = new Map(clientMap.getRows(), clientMap.getCols());
+        List<ClientPath> clientPaths = clientMap.getPaths();
+
+        for (ClientPath clientPath : clientPaths)
+        {
+            List<Cell> cells = new ArrayList<>();
+            for (ClientCell clientCell : clientPath.getCells())
+                cells.add(new Cell(clientCell.getRow(), clientCell.getCol()));
+
+            addPath(new Path(clientPath.getId(), cells));
+        }
+
+        for (ClientBaseKing clientBaseKing : clientMap.getKings()) {
+            int id = clientBaseKing.getPlayerId();
+            addKing(players[id], new Cell(clientBaseKing.getCenter().getRow(), clientBaseKing.getCenter().getCol()),
+                    clientBaseKing.getHp(), clientBaseKing.getAttack(), clientBaseKing.getRange());
+        }
+
     }
 
     public void pick(java.util.Map<String, List<ClientMessageInfo>> messages) {
@@ -261,6 +305,7 @@ public class Game {
             unitsWithId.put(kingUnit.getId(), kingUnit);
             map.putUnit(kingUnit);
         }
+        kings.add(king);
     }
 
 }

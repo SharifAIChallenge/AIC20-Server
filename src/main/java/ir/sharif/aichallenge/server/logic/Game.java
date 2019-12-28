@@ -1,9 +1,6 @@
 package ir.sharif.aichallenge.server.logic;
 
-import ir.sharif.aichallenge.server.common.network.data.CastSpellInfo;
-import ir.sharif.aichallenge.server.common.network.data.ClientMessageInfo;
-import ir.sharif.aichallenge.server.common.network.data.MessageTypes;
-import ir.sharif.aichallenge.server.common.network.data.PutUnitInfo;
+import ir.sharif.aichallenge.server.common.network.data.*;
 import ir.sharif.aichallenge.server.logic.dto.init.InitialMessage;
 import ir.sharif.aichallenge.server.logic.entities.spells.SpellFactory;
 import ir.sharif.aichallenge.server.logic.entities.units.BaseUnit;
@@ -12,6 +9,8 @@ import ir.sharif.aichallenge.server.logic.entities.Player;
 import ir.sharif.aichallenge.server.logic.entities.spells.Spell;
 import ir.sharif.aichallenge.server.logic.entities.units.GeneralUnit;
 import ir.sharif.aichallenge.server.logic.entities.units.Unit;
+import ir.sharif.aichallenge.server.logic.exceptions.UnitNotInMapException;
+import ir.sharif.aichallenge.server.logic.exceptions.UpgradeOtherPlayerUnitException;
 import ir.sharif.aichallenge.server.logic.map.Map;
 import ir.sharif.aichallenge.server.logic.map.Path;
 import ir.sharif.aichallenge.server.logic.map.PathCell;
@@ -46,6 +45,9 @@ public class Game {
     }
 
     public void turn(java.util.Map<String, List<ClientMessageInfo>> messages) {
+
+        applyRangeUpgrades(messages.get(MessageTypes.UPGRADE_RANGE));
+        applyDamageUpgrades(messages.get(MessageTypes.UPGRADE_DAMAGE));
         applySpells(messages.get(MessageTypes.CAST_SPELL));
         applyPutUnits(messages.get(MessageTypes.PUT_UNIT));
 
@@ -137,6 +139,37 @@ public class Game {
         for (Spell spell : removeSpells)
             spells.remove(spell);
     }
+
+    private void applyDamageUpgrades(List<ClientMessageInfo> clientMessageInfos) {
+        for (ClientMessageInfo msg : clientMessageInfos) {
+            try {
+                Unit unit = unitsWithId.get(((DamageUpgradeInfo)msg).getUnitId());
+                if(unit == null) throw new UnitNotInMapException();
+                if(unit.getPlayer().getId() != msg.getPlayerId()) throw new UpgradeOtherPlayerUnitException();
+                Player player = players[unit.getPlayer().getId()];
+                player.useUpgradeDamage();
+                unit.upgradeDamage();
+            }catch(Exception ex) {
+
+            }
+        }
+    }
+
+
+    private void applyRangeUpgrades(List<ClientMessageInfo> clientMessageInfos) {
+        for (ClientMessageInfo msg : clientMessageInfos) {
+            try {
+                Unit unit = unitsWithId.get(((RangeUpgradeInfo)msg).getUnitId());
+                if(unit == null) throw new UnitNotInMapException();
+                if(unit.getPlayer().getId() != msg.getPlayerId()) throw new UpgradeOtherPlayerUnitException();
+                Player player = players[unit.getPlayer().getId()];
+                player.useUpgradeRange();
+                unit.upgradeRange();
+            }catch (Exception ex) { }
+        }
+    }
+
+
 
     private void applyPutUnits(List<ClientMessageInfo> putUnitMessages) {
         putUnitMessages.stream().map(message -> (PutUnitInfo) message).forEach(info -> {

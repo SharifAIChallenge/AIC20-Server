@@ -56,12 +56,14 @@ public class Player {
     }
 
     public void useUpgradeDamage() {
+        if(upgradeUsed) throw new UseMoreThanOneUpgradeException();
         if(numberOfDamageUpgrades == 0) throw new UpgradeNotHaveException();
         numberOfDamageUpgrades --;
         setUpgradeUsed(true);
     }
 
     public void useUpgradeRange() {
+        if(upgradeUsed) throw new UseMoreThanOneUpgradeException();
         if(numberOfRangeUpgrades == 0) throw new UpgradeNotHaveException();
         numberOfRangeUpgrades --;
         setUpgradeUsed(true);

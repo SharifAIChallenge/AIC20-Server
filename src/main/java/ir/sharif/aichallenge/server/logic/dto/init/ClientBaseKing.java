@@ -12,8 +12,6 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ClientBaseKing {
     private int playerId;
-    private boolean isYou;
-    private boolean isYourFriend;
     private ClientCell center;
     private int hp;
     private int attack;

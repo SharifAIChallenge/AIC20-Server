@@ -7,8 +7,8 @@ public class King extends Unit {
 
     private HealthComponent health;
 
-    public King(int unitId, BaseUnit baseUnit, Player player, HealthComponent health) {
-        super(unitId, baseUnit, player);
+    public King(BaseUnit baseUnit, Player player, HealthComponent health) {
+        super(baseUnit, player);
         this.health = health;
     }
 

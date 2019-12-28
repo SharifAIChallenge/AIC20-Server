@@ -40,7 +40,7 @@ public class Game {
         gameConstants = initialMessage.getGameConstants();
 
         //init players
-        for (int i=0; i<4; i++)
+        for (int i = 0; i < 4; i++)
             players[i] = new Player(i, gameConstants.getMaxAP());
 
         initMap(initialMessage.getMap());
@@ -48,13 +48,12 @@ public class Game {
         initBaseUnits(initialMessage.getBaseUnits());
 
 
-
         //make initial map and paths and players.
     }
 
     private void initBaseUnits(List<ClientBaseUnit> baseUnits) {
         for (ClientBaseUnit cBU : baseUnits) {
-            BaseUnit.initBaseUnits(cBU, gameConstants.getDamageUpgradeAddition(), gameConstants.getRangeUpgradeAddition())
+            BaseUnit.initBaseUnits(cBU, gameConstants.getDamageUpgradeAddition(), gameConstants.getRangeUpgradeAddition());
         }
     }
 
@@ -62,8 +61,7 @@ public class Game {
         map = new Map(clientMap.getRows(), clientMap.getCols());
         List<ClientPath> clientPaths = clientMap.getPaths();
 
-        for (ClientPath clientPath : clientPaths)
-        {
+        for (ClientPath clientPath : clientPaths) {
             List<Cell> cells = new ArrayList<>();
             for (ClientCell clientCell : clientPath.getCells())
                 cells.add(new Cell(clientCell.getRow(), clientCell.getCol()));
@@ -144,16 +142,17 @@ public class Game {
 
         for (Unit unit : allUnits) {
             Unit targetUnit = unit.getTarget(map);
-            if (targetUnit != null)
+            if (targetUnit != null) {
                 unit.setHasAttacked(true);
-            else unit.setHasAttacked(false);
-        }
 
-        for (Unit unit : allUnits) {
-            if (unit.hasAttacked()) {
-                Unit targetUnit = unit.getTarget(map);
-                targetUnit.decreaseHealth(unit.getDamage());
-            }
+                if (unit.isMultiTarget())
+                    map.getUnits(targetUnit.getCell())
+                            .filter(unit::isTarget)
+                            .forEach(target -> target.decreaseHealth(unit.getDamage()));
+                else
+                    targetUnit.decreaseHealth(unit.getDamage());
+            } else
+                unit.setHasAttacked(false);
         }
     }
 
@@ -183,13 +182,13 @@ public class Game {
     private void applyDamageUpgrades(List<ClientMessageInfo> clientMessageInfos) {
         for (ClientMessageInfo msg : clientMessageInfos) {
             try {
-                Unit unit = unitsWithId.get(((DamageUpgradeInfo)msg).getUnitId());
-                if(unit == null) throw new UnitNotInMapException();
-                if(unit.getPlayer().getId() != msg.getPlayerId()) throw new UpgradeOtherPlayerUnitException();
+                Unit unit = unitsWithId.get(((DamageUpgradeInfo) msg).getUnitId());
+                if (unit == null) throw new UnitNotInMapException();
+                if (unit.getPlayer().getId() != msg.getPlayerId()) throw new UpgradeOtherPlayerUnitException();
                 Player player = players[unit.getPlayer().getId()];
                 player.useUpgradeDamage();
                 unit.upgradeDamage();
-            }catch(Exception ex) {
+            } catch (Exception ex) {
 
             }
         }
@@ -199,16 +198,16 @@ public class Game {
     private void applyRangeUpgrades(List<ClientMessageInfo> clientMessageInfos) {
         for (ClientMessageInfo msg : clientMessageInfos) {
             try {
-                Unit unit = unitsWithId.get(((RangeUpgradeInfo)msg).getUnitId());
-                if(unit == null) throw new UnitNotInMapException();
-                if(unit.getPlayer().getId() != msg.getPlayerId()) throw new UpgradeOtherPlayerUnitException();
+                Unit unit = unitsWithId.get(((RangeUpgradeInfo) msg).getUnitId());
+                if (unit == null) throw new UnitNotInMapException();
+                if (unit.getPlayer().getId() != msg.getPlayerId()) throw new UpgradeOtherPlayerUnitException();
                 Player player = players[unit.getPlayer().getId()];
                 player.useUpgradeRange();
                 unit.upgradeRange();
-            }catch (Exception ex) { }
+            } catch (Exception ex) {
+            }
         }
     }
-
 
 
     private void applyPutUnits(List<ClientMessageInfo> putUnitMessages) {
@@ -238,7 +237,8 @@ public class Game {
         for (Spell spell : spells) {
             try {
                 spell.applyTo(this);
-            }catch(Exception ex) {}
+            } catch (Exception ex) {
+            }
         }
 
         //TODO exceptions for teleport.
@@ -270,9 +270,9 @@ public class Game {
     }
 
     public void teleportUnit(Unit unit, PathCell targetCell) {
-        if(unit instanceof KingUnit) throw new TeleportKingException();
+        if (unit instanceof KingUnit) throw new TeleportKingException();
         int index = targetCell.getNumberOfCell();
-        if(index >= (targetCell.getPath().getLength() + 1)/2) throw new TeleportTooFarException();
+        if (index >= (targetCell.getPath().getLength() + 1) / 2) throw new TeleportTooFarException();
         getMap().moveUnit(unit, targetCell);
     }
 

@@ -11,7 +11,6 @@ import java.util.Optional;
 public class GeneralUnit extends Unit {
     private int health;
     private int damage;
-    private Unit targetUnit;
     private boolean hasAttacked;
 
     public GeneralUnit(BaseUnit baseUnit, Player player,
@@ -24,19 +23,6 @@ public class GeneralUnit extends Unit {
     public GeneralUnit(BaseUnit baseUnit, Player player) {
         this(baseUnit, player,
                 baseUnit.getBaseHealth(), baseUnit.getBaseDamage());
-    }
-
-
-    public Unit getTarget(Map map) {
-        if (targetUnit == null || targetUnit.getHealth() <= 0 || MapUtils.calcManhattanDistance(getCell(), targetUnit.getCell()) > getRange())
-            resetTargetUnit(map);
-        return targetUnit;
-    }
-
-    private void resetTargetUnit(Map map) {
-        Optional<Unit> result = map.getNearestTargetUnit(this);
-
-        targetUnit = result.orElse(null);
     }
 
     void move() {

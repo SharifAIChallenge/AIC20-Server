@@ -21,16 +21,16 @@ public class King {
 
         healthComponent.setHealth(health);
 
-        for (int dr=-1; dr<=1; dr++)
-            for (int dc=-1; dc<=1; dc++) {
+        for (int dr = -1; dr <= 1; dr++)
+            for (int dc = -1; dc <= 1; dc++) {
                 int nr = center.getRow() + dr, nc = center.getCol() + dc;
 
                 BaseUnit baseUnit;
 
                 if (dr == 0 && dc == 0) {
-                    baseUnit = new BaseUnit(KING_TYPE_1, 0, damage, 0, range, 0, 0, 0, MoveType.AIR, TargetType.BOTH);
-                }else {
-                    baseUnit = new BaseUnit(KING_TYPE_2, 0, 0, 0, 0, 0 ,0 ,0 , MoveType.AIR, TargetType.AIR);
+                    baseUnit = new BaseUnit(KING_TYPE_1, 0, damage, 0, range, 0, 0, false, 0, MoveType.AIR, TargetType.BOTH);
+                } else {
+                    baseUnit = new BaseUnit(KING_TYPE_2, 0, 0, 0, 0, 0, 0, false, 0, MoveType.AIR, TargetType.AIR);
                 }
 
                 KingUnit kingUnit = new KingUnit(baseUnit, player, healthComponent);

@@ -120,7 +120,6 @@ public class Player {
         setSpellUsed(false);
         setUpgradeUsed(false);
 
-
         updateHand();
     }
 
@@ -155,7 +154,6 @@ public class Player {
         hand.add(chances.get(ptr));
 
         hand.remove(currentPutUnit);
-
     }
 
     public int getTeam() {

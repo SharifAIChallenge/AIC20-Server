@@ -108,12 +108,17 @@ public class Player {
         return spellCount.get(type);
     }
 
-    public void updateHand() {
-
+    public void reset() {
         setPutUsed(false);
         setSpellUsed(false);
         setUpgradeUsed(false);
 
+        updateHand();
+
+    }
+
+    private void updateHand() {
+        
         if(currentPutUnit == null) return ;
 
         ArrayList<BaseUnit> chances = new ArrayList<>();

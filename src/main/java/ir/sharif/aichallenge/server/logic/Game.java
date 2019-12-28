@@ -56,7 +56,7 @@ public class Game {
 
         evaluateUnits();
 
-        updateDecks();
+        resetPlayers();
 
         sendDataToClient();
 
@@ -86,10 +86,10 @@ public class Game {
         unit.upgradeDamage();
     }
 
-    private void updateDecks() {
+    private void resetPlayers() {
         if (players == null) return;
         for (Player player : players)
-            player.updateHand();
+            player.reset();
     }
 
     private void sendDataToClient() {

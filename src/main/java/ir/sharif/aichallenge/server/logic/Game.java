@@ -3,12 +3,11 @@ package ir.sharif.aichallenge.server.logic;
 import ir.sharif.aichallenge.server.common.network.data.*;
 import ir.sharif.aichallenge.server.logic.dto.init.InitialMessage;
 import ir.sharif.aichallenge.server.logic.entities.spells.SpellFactory;
-import ir.sharif.aichallenge.server.logic.entities.units.BaseUnit;
-import ir.sharif.aichallenge.server.logic.entities.units.ClonedUnit;
+import ir.sharif.aichallenge.server.logic.entities.units.*;
 import ir.sharif.aichallenge.server.logic.entities.Player;
 import ir.sharif.aichallenge.server.logic.entities.spells.Spell;
-import ir.sharif.aichallenge.server.logic.entities.units.GeneralUnit;
-import ir.sharif.aichallenge.server.logic.entities.units.Unit;
+import ir.sharif.aichallenge.server.logic.exceptions.TeleportKingException;
+import ir.sharif.aichallenge.server.logic.exceptions.TeleportTooFarException;
 import ir.sharif.aichallenge.server.logic.exceptions.UnitNotInMapException;
 import ir.sharif.aichallenge.server.logic.exceptions.UpgradeOtherPlayerUnitException;
 import ir.sharif.aichallenge.server.logic.map.Map;
@@ -195,7 +194,14 @@ public class Game {
             }
         });
 
-        spells.forEach(spell -> spell.applyTo(this));
+        for (Spell spell : spells) {
+            try {
+                spell.applyTo(this);
+            }catch(Exception ex) {}
+        }
+
+        //TODO exceptions for teleport.
+        //spells.forEach(spell -> spell.applyTo(this));
     }
 
     private void readRequestsFromClient() {
@@ -222,6 +228,9 @@ public class Game {
     }
 
     public void teleportUnit(Unit unit, PathCell targetCell) {
+        if(unit instanceof King) throw new TeleportKingException();
+        int index = targetCell.getNumberOfCell();
+        if(index >= (targetCell.getPath().getLength() + 1)/2) throw new TeleportTooFarException();
         getMap().moveUnit(unit, targetCell);
     }
 

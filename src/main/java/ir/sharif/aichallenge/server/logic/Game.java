@@ -4,6 +4,7 @@ import ir.sharif.aichallenge.server.common.network.data.CastSpellInfo;
 import ir.sharif.aichallenge.server.common.network.data.ClientMessageInfo;
 import ir.sharif.aichallenge.server.common.network.data.MessageTypes;
 import ir.sharif.aichallenge.server.common.network.data.PutUnitInfo;
+import ir.sharif.aichallenge.server.logic.dto.init.InitialMessage;
 import ir.sharif.aichallenge.server.logic.entities.spells.SpellFactory;
 import ir.sharif.aichallenge.server.logic.entities.units.BaseUnit;
 import ir.sharif.aichallenge.server.logic.entities.units.ClonedUnit;
@@ -35,7 +36,7 @@ public class Game {
     @Getter
     private AtomicInteger currentTurn = new AtomicInteger(0);
 
-    public void init() {
+    public void init(InitialMessage initialMessage) {
         //make initial map and paths and players.
     }
 

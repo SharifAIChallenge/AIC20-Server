@@ -4,6 +4,7 @@ import ir.sharif.aichallenge.server.logic.Game;
 import ir.sharif.aichallenge.server.logic.entities.Disposable;
 import ir.sharif.aichallenge.server.logic.entities.Entity;
 import ir.sharif.aichallenge.server.logic.entities.Player;
+import ir.sharif.aichallenge.server.logic.entities.units.King;
 import ir.sharif.aichallenge.server.logic.entities.units.Unit;
 import ir.sharif.aichallenge.server.logic.map.Cell;
 import ir.sharif.aichallenge.server.logic.map.Map;
@@ -32,6 +33,7 @@ public abstract class Spell extends Entity implements Disposable {
     protected abstract void applyEffectOn(Unit unit);
 
     public boolean isTarget(Unit unit) {
+        if (unit instanceof King) return false;
         switch (this.getTargetType()) {
             case SELF:
                 return this.isSelfEntity(unit);
@@ -45,6 +47,7 @@ public abstract class Spell extends Entity implements Disposable {
     }
 
     protected Stream<Unit> getTargetUnitsInRange(Map map) {
+
         return map.getUnitsInArea(getPosition().getRow(), getPosition().getCol(), getRange())
                 .filter(this::isTarget);
     }

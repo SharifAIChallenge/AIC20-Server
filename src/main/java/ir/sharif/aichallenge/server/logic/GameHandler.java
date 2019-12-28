@@ -18,6 +18,7 @@ public class GameHandler implements GameLogic {
     public static final FileParam PARAM_MAP = new FileParam("Map", null, ".*\\.map");
 
     private Game game;
+    private InitialMessage initialMessage;
 
     @Override
     public int getClientsNum() {
@@ -37,7 +38,7 @@ public class GameHandler implements GameLogic {
     @Override
     public void init() {
         String initStr = readMapFile(PARAM_MAP);
-        InitialMessage initialMessage = null;
+        initialMessage = null;
         try {
             initialMessage = Json.GSON.fromJson(initStr, InitialMessage.class);
         }
@@ -77,6 +78,7 @@ public class GameHandler implements GameLogic {
 
     @Override
     public Message[] getClientInitialMessages() {
+        //initialMessage
         return new Message[0];
     }
 
@@ -106,7 +108,13 @@ public class GameHandler implements GameLogic {
 
     @Override
     public Message[] getClientMessages() {
-        return new Message[0];
+        Message[] messages = new Message[4];
+        if (game.getCurrentTurn().get() == 0) {     //todo check init is 0
+            return getClientInitialMessages();
+        }
+
+        //todo turn
+        return messages;
     }
 
     @Override

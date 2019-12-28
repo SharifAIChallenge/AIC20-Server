@@ -1,7 +1,16 @@
 package ir.sharif.aichallenge.server.logic.dto.init;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.util.List;
 
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class ClientMap {
     private int rows;
     private int cols;

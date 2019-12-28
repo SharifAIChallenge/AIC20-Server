@@ -22,15 +22,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Game {
 
-    Map map;
-    SortedSet<Spell> spells = new TreeSet<Spell>(Comparator.comparing(Spell::getPriority));
-    List<Pair<Unit, Integer>> unitsToPut = new ArrayList<>();
-    List<Unit> clonedUnitToPut = new ArrayList<>();
-
-    Player[] players;
-    HashMap<Integer, Unit> unitsWithId = new HashMap<>();
-
-    private int numberOfUnits = 0;
+    private Map map;
+    private SortedSet<Spell> spells = new TreeSet<Spell>(Comparator.comparing(Spell::getPriority));
+    private List<Pair<Unit, Integer>> unitsToPut = new ArrayList<>();
+    private List<Unit> clonedUnitToPut = new ArrayList<>();
+    private Player[] players;
+    private HashMap<Integer, Unit> unitsWithId = new HashMap<>();
 
     @Getter
     private AtomicInteger currentTurn = new AtomicInteger(0);
@@ -177,8 +174,8 @@ public class Game {
                 Player player = players[info.getPathId()];
                 BaseUnit baseUnit = BaseUnit.getInstance(info.getTypeId());
                 player.putUnit(baseUnit);
-                int id = numberOfUnits++;
-                unitsWithId.put(id, new GeneralUnit(id, baseUnit, player));
+                GeneralUnit generalUnit = new GeneralUnit(baseUnit, player);
+                unitsWithId.put(generalUnit.getId(), generalUnit);
             } catch (Exception ex) {
 
             }
@@ -213,11 +210,10 @@ public class Game {
     }
 
     public GeneralUnit cloneUnit(Unit unit, int rateOfHealthOfCloneUnit, int rateOfDamageCloneUnit) {
-        GeneralUnit clonedUnit = new GeneralUnit(numberOfUnits, unit.getBaseUnit(), unit.getPlayer(),
+        GeneralUnit clonedUnit = new GeneralUnit(unit.getBaseUnit(), unit.getPlayer(),
                 unit.getHealth() / rateOfHealthOfCloneUnit, unit.getDamage() / rateOfDamageCloneUnit);
         unitsWithId.put(clonedUnit.getId(), clonedUnit);
         clonedUnitToPut.add(clonedUnit);
-        numberOfUnits++;
         return clonedUnit;
     }
 

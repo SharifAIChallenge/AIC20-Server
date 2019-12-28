@@ -1,6 +1,5 @@
 package ir.sharif.aichallenge.server.logic.entities;
 
-import ir.sharif.aichallenge.server.logic.entities.spells.Spell;
 import ir.sharif.aichallenge.server.logic.entities.units.BaseUnit;
 import ir.sharif.aichallenge.server.logic.exceptions.*;
 import lombok.Getter;
@@ -79,15 +78,15 @@ public class Player {
         currentPutUnit = null;
 
         if (!hand.contains(baseUnit)) throw new UnitNotInHandException();
-        if(AP < baseUnit.getAP()) throw new APNotEnoughException();
-        if(putUsed) throw new PutMoreThanOneUnitException();
+        if (AP < baseUnit.getCost()) throw new APNotEnoughException();
+        if (putUsed) throw new PutMoreThanOneUnitException();
 
         setPutUsed(true);
 
         numberOfUse[baseUnitId.get(baseUnit)] ++;
 
         currentPutUnit = baseUnit;
-        AP -= baseUnit.getAP();
+        AP -= baseUnit.getCost();
 
     }
 

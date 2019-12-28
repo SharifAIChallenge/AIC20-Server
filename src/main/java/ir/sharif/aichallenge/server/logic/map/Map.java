@@ -55,13 +55,12 @@ public class Map {
         unitsInCell.remove(unit);
     }
 
-    public Stream<Unit> getUnits(int row, int col) {
-        return unitsInCell.getUnits(row, col);
+    public Stream<Unit> getUnits(Cell cell) {
+        return getUnits(cell.getRow(), cell.getCol());
     }
 
-    public Stream<Unit> getUnitsInRange(int centerRow, int centerCol, int range) {
-        //Implement using getUnitsInArea or getUnitsInRangeManhattan
-        throw new UnsupportedOperationException();
+    public Stream<Unit> getUnits(int row, int col) {
+        return unitsInCell.getUnits(row, col);
     }
 
     public Stream<Unit> getUnitsInArea(int centerRow, int centerCol, int range) {
@@ -81,18 +80,17 @@ public class Map {
 
     public Stream<Unit> getUnitsInManhattanRange(int centerRow, int centerCol, int range) {
         return IntStream.rangeClosed(0, range).boxed()
-                .flatMap(i -> IntStream.rangeClosed(-i, i).boxed()
-                        .flatMap(j ->
-                                Stream.concat(getUnits(centerRow + j, centerCol + i - Math.abs(j)),
-                                        getUnits(centerRow + j, centerCol - i + Math.abs(j)))));
+                .flatMap(i -> getUnitsWithManhattanDistance(centerRow, centerCol, range));
     }
 
-    public Optional<Unit> getNearestTargetUnit(Unit unit) {
-        Stream<Unit> units = getUnitsInManhattanRange(unit.getCell().getRow(), unit.getCell().getCol(), unit.getRange());
-        final TargetType targetType = unit.getTargetType();
-        if (targetType != TargetType.BOTH)
-            units = units.filter(u -> u.getMoveType().value == targetType.value);
-        units = units.filter(unit::isEnemy);
-        return units.findFirst();
+    public Stream<Unit> getUnitsWithManhattanDistance(Cell cell, int distance) {
+        return getUnitsWithManhattanDistance(cell.getRow(), cell.getCol(), distance);
+    }
+
+    public Stream<Unit> getUnitsWithManhattanDistance(int centerRow, int centerCol, int distance) {
+        return IntStream.rangeClosed(-distance, distance).boxed()
+                .flatMap(j ->
+                        Stream.concat(getUnits(centerRow + j, centerCol + distance - Math.abs(j)),
+                                getUnits(centerRow + j, centerCol - distance + Math.abs(j))));
     }
 }

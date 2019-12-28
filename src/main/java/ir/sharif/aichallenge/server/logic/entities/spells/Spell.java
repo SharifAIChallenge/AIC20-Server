@@ -47,7 +47,6 @@ public abstract class Spell extends Entity implements Disposable {
     }
 
     protected Stream<Unit> getTargetUnitsInRange(Map map) {
-
         return map.getUnitsInArea(getPosition().getRow(), getPosition().getCol(), getRange())
                 .filter(this::isTarget);
     }

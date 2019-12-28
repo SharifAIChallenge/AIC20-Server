@@ -126,7 +126,7 @@ public class Game {
 
     }
 
-    private void evaluateSpells() {
+    private void evaluateSpells() {         // todo check turn
         List<Spell> removeSpells = new ArrayList<>();
 
         for (Spell spell : spells) {

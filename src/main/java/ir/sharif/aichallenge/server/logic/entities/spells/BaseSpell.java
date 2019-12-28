@@ -26,7 +26,7 @@ public class BaseSpell {
 
 
     private int type;
-    private int priority;
+    private int priority;   //todo set this
     private int duration;
     private int range;
     private SpellTargetType targetType;

@@ -1,56 +1,47 @@
 package ir.sharif.aichallenge.server.logic.entities.units;
 
 import ir.sharif.aichallenge.server.logic.entities.Player;
-import ir.sharif.aichallenge.server.logic.map.Map;
+import ir.sharif.aichallenge.server.logic.entities.TargetType;
+import ir.sharif.aichallenge.server.logic.map.Cell;
+import ir.sharif.aichallenge.server.logic.map.Path;
+import ir.sharif.aichallenge.server.logic.map.PathCell;
 
-public class King extends Unit {
+import java.util.ArrayList;
+import java.util.List;
 
-    private HealthComponent health;
+public class King {
 
-    public King(BaseUnit baseUnit, Player player, HealthComponent health) {
-        super(baseUnit, player);
-        this.health = health;
+    private static int KING_TYPE_1 = 10, KING_TYPE_2 = 11;
+
+    ArrayList<KingUnit> units = new ArrayList<>();
+
+    KingUnit.HealthComponent healthComponent = new KingUnit.HealthComponent();
+
+    public King(Player player, Cell center, int health, int damage, int range) {
+
+        healthComponent.setHealth(health);
+
+        for (int dr=-1; dr<=1; dr++)
+            for (int dc=-1; dc<=1; dc++) {
+                int nr = center.getRow() + dr, nc = center.getCol() + dc;
+
+                BaseUnit baseUnit;
+
+                if (dr == 0 && dc == 0) {
+                    baseUnit = new BaseUnit(KING_TYPE_1, 0, damage, 0, range, 0, 0, 0, MoveType.AIR, TargetType.BOTH);
+                }else {
+                    baseUnit = new BaseUnit(KING_TYPE_2, 0, 0, 0, 0, 0 ,0 ,0 , MoveType.AIR, TargetType.AIR);
+                }
+
+                KingUnit kingUnit = new KingUnit(baseUnit, player, healthComponent);
+                //TODO
+                kingUnit.setPosition(new PathCell(new Path(-1, new Cell(nr, nc)), false, 0));
+                units.add(kingUnit);
+            }
     }
 
-    @Override
-    public int getHealth() {
-        return health.getHealth();
+    public List<KingUnit> getUnits() {
+        return units;
     }
 
-    @Override
-    public void increaseHealth(int heal) {
-    }
-
-    @Override
-    public void decreaseHealth(int amount) {
-        health.decrease(amount);
-    }
-
-    @Override
-    public int getDamage() {
-        return 0;
-    }
-
-    @Override
-    public int getSpeed() {
-        return 0;
-    }
-
-    @Override
-    public Unit getTarget(Map map) {
-        return null;
-    }
-
-
-    private static class HealthComponent {
-        private int health;
-
-        public int getHealth() {
-            return this.health;
-        }
-
-        public void decrease(int amount) {
-            this.health -= amount;
-        }
-    }
 }

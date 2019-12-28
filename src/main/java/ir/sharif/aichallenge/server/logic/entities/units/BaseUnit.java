@@ -35,8 +35,8 @@ public class BaseUnit {
         BaseUnit instance = instances.get(new BaseInfo(type));
         if (instance == null) {
             //create one or read from file or ...
-            if(type == 0) instance = new BaseUnit(type, 10, 100,7, 1, 2,  1, 1, 1, MoveType.GROUND, TargetType.BOTH);
-            else if(type == 1) instance = new BaseUnit(type, 15, 100,9, 1, 2, 1, 1, 1, MoveType.GROUND, TargetType.BOTH);
+            if(type == 0) instance = new BaseUnit(type, 10, 7, 1, 2,  1, 1, 1, MoveType.GROUND, TargetType.BOTH);
+            else if(type == 1) instance = new BaseUnit(type, 15, 9, 1, 2, 1, 1, 1, MoveType.GROUND, TargetType.BOTH);
         }
 
         return instance;
@@ -45,7 +45,6 @@ public class BaseUnit {
     private final int type;
 
     private final int baseHealth;
-    private final int baseMaxHealth;
     private final int baseDamage;
     private final int baseDamageRange;
     private final int baseSpeed;
@@ -56,10 +55,9 @@ public class BaseUnit {
     private final MoveType moveType;
     private final TargetType targetType;
 
-    public BaseUnit(int type, int baseHealth, int baseMaxHealth, int baseDamage, int deltaDamage, int baseDamageRange, int deltaDamageRange, int baseSpeed, int AP, MoveType moveType, TargetType targetType) {
+    public BaseUnit(int type, int baseHealth,int baseDamage, int deltaDamage, int baseDamageRange, int deltaDamageRange, int baseSpeed, int AP, MoveType moveType, TargetType targetType) {
         this.type = type;
         this.baseHealth = baseHealth;
-        this.baseMaxHealth = baseMaxHealth;
         this.baseDamage = baseDamage;
         this.baseDamageRange = baseDamageRange;
         this.baseSpeed = baseSpeed;

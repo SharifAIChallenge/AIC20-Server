@@ -1,6 +1,8 @@
 package ir.sharif.aichallenge.server.logic.entities.units;
 
+import ir.sharif.aichallenge.server.logic.dto.init.ClientBaseUnit;
 import ir.sharif.aichallenge.server.logic.entities.TargetType;
+import ir.sharif.aichallenge.server.logic.exceptions.LogicException;
 import lombok.Getter;
 
 import java.util.HashMap;
@@ -8,37 +10,12 @@ import java.util.HashMap;
 @Getter
 public class BaseUnit {
 
-    private static class BaseInfo {
-        public final int type;
 
-        public BaseInfo(int type) {
-            this.type = type;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof BaseInfo)) return false;
-            BaseInfo baseInfo = (BaseInfo) o;
-            return type == baseInfo.type;
-        }
-
-        @Override
-        public int hashCode() {
-            return type << (Integer.SIZE / 2);
-        }
-    }
-
-    private static HashMap<BaseInfo, BaseUnit> instances = new HashMap<>();
+    private static HashMap<Integer, BaseUnit> instances = new HashMap<>();
 
     public static BaseUnit getInstance(int type) {
-        BaseUnit instance = instances.get(new BaseInfo(type));
-        if (instance == null) {
-            //create one or read from file or ...
-            if(type == 0) instance = new BaseUnit(type, 10, 7, 1, 2,  1, 1, 1, MoveType.GROUND, TargetType.BOTH);
-            else if(type == 1) instance = new BaseUnit(type, 15, 9, 1, 2, 1, 1, 1, MoveType.GROUND, TargetType.BOTH);
-        }
-
+        BaseUnit instance = instances.get(type);
+        if (instance == null) throw new LogicException();
         return instance;
     }
 
@@ -66,6 +43,26 @@ public class BaseUnit {
         this.deltaDamage = deltaDamage;
         this.deltaDamageRange = deltaDamageRange;
         this.AP = AP;
+    }
+
+    public static BaseUnit initBaseUnits(ClientBaseUnit cBU, int deltaDamage, int deltaDamageRange) {
+
+        MoveType moveType;
+        if(cBU.isFlying()) moveType = MoveType.AIR;
+        else moveType = MoveType.GROUND;
+
+        TargetType targetType;
+        if(cBU.getTarget().equals("GROUND")) targetType = TargetType.GROUND;
+        else if(cBU.getTarget().equals("AIR")) targetType = TargetType.AIR;
+        else targetType = TargetType.BOTH;
+
+        BaseUnit baseUnit = new BaseUnit(cBU.getTypeId(), cBU.getMaxHP(),
+                cBU.getBaseAttack(), deltaDamage, cBU.getBaseRange(), deltaDamageRange, 1, 10,  moveType, targetType);
+        //TODO AP, Multiple
+
+        instances.put(cBU.getTypeId(), baseUnit);
+
+        return baseUnit;
     }
 
 }

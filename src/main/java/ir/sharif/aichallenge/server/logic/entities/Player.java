@@ -14,7 +14,7 @@ public class Player {
 
     private static final int HAND_SIZE = 6, DECK_SIZE = 9;
 
-    private int id, AP;
+    private int id, AP, maxAP;
 
     private HashMap<Integer, Integer> spellCount = new HashMap<>();
 
@@ -32,9 +32,15 @@ public class Player {
 
     BaseUnit currentPutUnit;
 
-    public Player(int id, int AP, ArrayList<BaseUnit> deck) {
+    public Player(int id, int AP) {
         this.id = id;
         this.AP = AP;
+        this.maxAP = AP;
+
+        upgradeUsed = putUsed = spellUsed = false;
+    }
+
+    public void initDeck(ArrayList<BaseUnit> deck) {
         this.deck = deck;
         for (int i=0; i<HAND_SIZE; i++)
             hand.add(deck.get(i));
@@ -44,7 +50,6 @@ public class Player {
         for (int i=0; i<DECK_SIZE; i++)
             baseUnitId.put(deck.get(i), i);
 
-        upgradeUsed = putUsed = spellUsed = false;
     }
 
     public void addUpgradeRangeToken(){
@@ -110,11 +115,16 @@ public class Player {
         return spellCount.get(type);
     }
 
-    public void updateHand() {
-
+    public void reset() {
         setPutUsed(false);
         setSpellUsed(false);
         setUpgradeUsed(false);
+
+
+        updateHand();
+    }
+
+    private void updateHand() {
 
         if(currentPutUnit == null) return ;
 

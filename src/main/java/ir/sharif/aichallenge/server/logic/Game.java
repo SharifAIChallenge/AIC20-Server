@@ -43,7 +43,7 @@ public class Game {
 
         //init players
         for (int i=0; i<4; i++)
-            players[i] = new Player(i, gameConstants.getMaxAP(), null);
+            players[i] = new Player(i, gameConstants.getMaxAP());
 
         initMap(initialMessage.getMap());
 

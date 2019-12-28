@@ -218,8 +218,10 @@ public class Game {
     public GeneralUnit cloneUnit(Unit unit, int rateOfHealthOfCloneUnit, int rateOfDamageCloneUnit) {
         GeneralUnit clonedUnit = new GeneralUnit(unit.getBaseUnit(), unit.getPlayer(),
                 unit.getHealth() / rateOfHealthOfCloneUnit, unit.getDamage() / rateOfDamageCloneUnit);
+
         unitsWithId.put(clonedUnit.getId(), clonedUnit);
-        clonedUnitToPut.add(clonedUnit);
+        getMap().putUnit(clonedUnit);
+
         return clonedUnit;
     }
 

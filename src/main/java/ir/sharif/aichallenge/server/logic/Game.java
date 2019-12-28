@@ -1,6 +1,5 @@
 package ir.sharif.aichallenge.server.logic;
 
-import com.sun.security.ntlm.Client;
 import ir.sharif.aichallenge.server.common.network.data.*;
 import ir.sharif.aichallenge.server.logic.dto.ClientCell;
 import ir.sharif.aichallenge.server.logic.dto.init.*;
@@ -21,7 +20,6 @@ import lombok.Getter;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 public class Game {
 
@@ -100,7 +98,7 @@ public class Game {
 
         evaluateUnits();
 
-        updateDecks();
+        resetPlayers();
 
         sendDataToClient();
 
@@ -130,10 +128,10 @@ public class Game {
         unit.upgradeDamage();
     }
 
-    private void updateDecks() {
+    private void resetPlayers() {
         if (players == null) return;
         for (Player player : players)
-            player.updateHand();
+            player.reset();
     }
 
     private void sendDataToClient() {

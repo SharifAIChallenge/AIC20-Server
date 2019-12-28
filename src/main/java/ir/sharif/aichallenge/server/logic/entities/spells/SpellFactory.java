@@ -19,9 +19,9 @@ public class SpellFactory {
             case HealSpell.TYPE:
                 return new HealSpell(id, player, cell);
             case TeleportSpell.TYPE:
-                if(player.getTeam() == 0)
+                if (player.getTeam() == 0)
                     return new TeleportSpell(id, player, cell, unitId,
-                        new PathCell(path, player.getTeam() == 0, path.getLength() - path.getCells().indexOf(cell)-1));
+                            new PathCell(path, player.getTeam() == 0, path.getLength() - path.getCells().indexOf(cell) - 1));
                 else
                     return new TeleportSpell(id, player, cell, unitId,
                             new PathCell(path, player.getTeam() == 0, path.getCells().indexOf(cell)));

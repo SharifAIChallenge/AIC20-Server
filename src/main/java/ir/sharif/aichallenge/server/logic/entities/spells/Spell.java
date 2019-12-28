@@ -33,6 +33,7 @@ public abstract class Spell extends Entity implements Disposable {
     protected abstract void applyEffectOn(Unit unit);
 
     public boolean isTarget(Unit unit) {
+        if (unit instanceof King) return false;
         switch (this.getTargetType()) {
             case SELF:
                 return this.isSelfEntity(unit);
@@ -48,7 +49,7 @@ public abstract class Spell extends Entity implements Disposable {
     protected Stream<Unit> getTargetUnitsInRange(Map map) {
 
         return map.getUnitsInArea(getPosition().getRow(), getPosition().getCol(), getRange())
-                .filter(this::isTarget).filter(target->(!(target instanceof King)));
+                .filter(this::isTarget);
     }
 
     @Override

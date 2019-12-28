@@ -11,7 +11,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ClientInitMessage {
+public class InitialMessage {
     private GameConstants gameConstants;
     private ClientMap map;
     private List<ClientBaseUnit> baseUnits;

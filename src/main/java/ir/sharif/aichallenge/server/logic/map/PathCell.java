@@ -24,7 +24,7 @@ public class PathCell {
     }
 
     public Cell getCell() {
-        return path.getCellAt(reversed ? path.getLength() - numberOfCell : numberOfCell);
+        return path.getCellAt(reversed ? path.getLength() - numberOfCell - 1: numberOfCell);
     }
 
     public PathCell nextCell() {

@@ -15,10 +15,10 @@ public abstract class Unit extends Entity {
     @Delegate()
     @Setter
     private PathCell position;
-
     private int speedIncrease;
-
-    private int damageLevel = 0, rangeLevel = 0;
+    private int damageLevel = 0;
+    private int rangeLevel = 0;
+    private static int unitId = 1;
 
     public void upgradeDamage(){
         damageLevel++;
@@ -30,8 +30,9 @@ public abstract class Unit extends Entity {
 
     private boolean hasAttacked;
 
-    public Unit(int id, BaseUnit baseUnit, Player player) {
-        super(id, player);
+    public Unit(BaseUnit baseUnit, Player player) {
+        super(unitId, player);
+        unitId++;
         this.baseUnit = baseUnit;
     }
 

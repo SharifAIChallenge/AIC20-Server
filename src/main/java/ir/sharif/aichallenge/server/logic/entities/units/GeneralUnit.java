@@ -14,15 +14,15 @@ public class GeneralUnit extends Unit {
     private Unit targetUnit;
     private boolean hasAttacked;
 
-    public GeneralUnit(int unitId, BaseUnit baseUnit, Player player,
+    public GeneralUnit(BaseUnit baseUnit, Player player,
                        int health, int damage) {
-        super(unitId, baseUnit, player);
+        super(baseUnit, player);
         this.health = health;
         this.damage = damage;
     }
 
-    public GeneralUnit(int unitId, BaseUnit baseUnit, Player player) {
-        this(unitId, baseUnit, player,
+    public GeneralUnit(BaseUnit baseUnit, Player player) {
+        this(baseUnit, player,
                 baseUnit.getBaseHealth(), baseUnit.getBaseDamage());
     }
 

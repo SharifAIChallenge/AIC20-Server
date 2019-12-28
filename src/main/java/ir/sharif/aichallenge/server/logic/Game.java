@@ -10,6 +10,7 @@ import ir.sharif.aichallenge.server.logic.exceptions.TeleportKingException;
 import ir.sharif.aichallenge.server.logic.exceptions.TeleportTooFarException;
 import ir.sharif.aichallenge.server.logic.exceptions.UnitNotInMapException;
 import ir.sharif.aichallenge.server.logic.exceptions.UpgradeOtherPlayerUnitException;
+import ir.sharif.aichallenge.server.logic.map.Cell;
 import ir.sharif.aichallenge.server.logic.map.Map;
 import ir.sharif.aichallenge.server.logic.map.Path;
 import ir.sharif.aichallenge.server.logic.map.PathCell;
@@ -27,6 +28,7 @@ public class Game {
     private List<Unit> clonedUnitToPut = new ArrayList<>();
     private Player[] players;
     private HashMap<Integer, Unit> unitsWithId = new HashMap<>();
+    private ArrayList<King> kings = new ArrayList<>();
 
     @Getter
     private AtomicInteger currentTurn = new AtomicInteger(0);
@@ -226,7 +228,7 @@ public class Game {
     }
 
     public void teleportUnit(Unit unit, PathCell targetCell) {
-        if(unit instanceof King) throw new TeleportKingException();
+        if(unit instanceof KingUnit) throw new TeleportKingException();
         int index = targetCell.getNumberOfCell();
         if(index >= (targetCell.getPath().getLength() + 1)/2) throw new TeleportTooFarException();
         getMap().moveUnit(unit, targetCell);
@@ -252,4 +254,13 @@ public class Game {
     public void addPath(Path path) {
         map.addPath(path);
     }
+
+    public void addKing(Player player, Cell centerCell, int health, int damage, int range) {
+        King king = new King(player, centerCell, health, damage, range);
+        for (KingUnit kingUnit : king.getUnits()) {
+            unitsWithId.put(kingUnit.getId(), kingUnit);
+            map.putUnit(kingUnit);
+        }
+    }
+
 }

@@ -50,7 +50,7 @@ public class GeneralUnit extends Unit {
     @Override
     public void increaseHealth(int heal) {
         this.health += heal;
-        this.health = Math.min(getBaseMaxHealth(), this.health);
+        this.health = Math.min(getBaseHealth(), this.health);
     }
 
     @Override

@@ -3,12 +3,16 @@ package ir.sharif.aichallenge.server.logic;
 import ir.sharif.aichallenge.server.common.network.Json;
 import ir.sharif.aichallenge.server.common.network.data.ClientMessageInfo;
 import ir.sharif.aichallenge.server.common.network.data.Message;
+import ir.sharif.aichallenge.server.common.network.data.MessageTypes;
 import ir.sharif.aichallenge.server.engine.config.FileParam;
 import ir.sharif.aichallenge.server.engine.core.GameLogic;
+import ir.sharif.aichallenge.server.logic.dto.init.ClientBaseKing;
+import ir.sharif.aichallenge.server.logic.dto.init.ClientMap;
 import ir.sharif.aichallenge.server.logic.dto.init.InitialMessage;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -78,8 +82,28 @@ public class GameHandler implements GameLogic {
 
     @Override
     public Message[] getClientInitialMessages() {
-        //initialMessage
-        return new Message[0];
+        Message[] initMessages = new Message[4];
+
+        ClientMap map = initialMessage.getMap();
+        List<ClientBaseKing> kings = map.getKings();
+        ClientBaseKing[] sortedKings = new ClientBaseKing[4];
+        for (ClientBaseKing king: kings) {
+            sortedKings[king.getPlayerId()] = king;
+        }
+
+        map.setKings(Arrays.asList(sortedKings[0], sortedKings[2], sortedKings[1], sortedKings[3]));
+        initMessages[0] = new Message(MessageTypes.INIT, Json.GSON.toJsonTree(initialMessage).getAsJsonObject());
+
+        map.setKings(Arrays.asList(sortedKings[2], sortedKings[0], sortedKings[1], sortedKings[3]));
+        initMessages[2] = new Message(MessageTypes.INIT, Json.GSON.toJsonTree(initialMessage).getAsJsonObject());
+
+        map.setKings(Arrays.asList(sortedKings[1], sortedKings[3], sortedKings[0], sortedKings[2]));
+        initMessages[1] = new Message(MessageTypes.INIT, Json.GSON.toJsonTree(initialMessage).getAsJsonObject());
+
+        map.setKings(Arrays.asList(sortedKings[3], sortedKings[1], sortedKings[0], sortedKings[2]));
+        initMessages[3] = new Message(MessageTypes.INIT, Json.GSON.toJsonTree(initialMessage).getAsJsonObject());
+
+        return initMessages;
     }
 
     @Override

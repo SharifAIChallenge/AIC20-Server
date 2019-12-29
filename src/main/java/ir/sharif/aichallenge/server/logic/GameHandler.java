@@ -9,6 +9,7 @@ import ir.sharif.aichallenge.server.engine.core.GameLogic;
 import ir.sharif.aichallenge.server.logic.dto.init.ClientBaseKing;
 import ir.sharif.aichallenge.server.logic.dto.init.ClientMap;
 import ir.sharif.aichallenge.server.logic.dto.init.InitialMessage;
+import ir.sharif.aichallenge.server.logic.dto.turn.ClientTurnMessage;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -137,7 +138,12 @@ public class GameHandler implements GameLogic {
             return getClientInitialMessages();
         }
 
-        //todo turn
+        // turn
+        ClientTurnMessage[] clientTurnMessages = game.getClientTurnMessages();
+        for (int i = 0; i < 4; i++) {
+            messages[i] = new Message(MessageTypes.TURN,
+                    Json.GSON.toJsonTree(clientTurnMessages[i], ClientTurnMessage.class).getAsJsonObject());
+        }
         return messages;
     }
 

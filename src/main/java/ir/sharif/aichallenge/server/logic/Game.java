@@ -3,6 +3,7 @@ package ir.sharif.aichallenge.server.logic;
 import ir.sharif.aichallenge.server.common.network.data.*;
 import ir.sharif.aichallenge.server.logic.dto.ClientCell;
 import ir.sharif.aichallenge.server.logic.dto.init.*;
+import ir.sharif.aichallenge.server.logic.dto.turn.ClientTurnMessage;
 import ir.sharif.aichallenge.server.logic.entities.spells.SpellFactory;
 import ir.sharif.aichallenge.server.logic.entities.units.*;
 import ir.sharif.aichallenge.server.logic.entities.Player;
@@ -31,6 +32,8 @@ public class Game {
     private HashMap<Integer, Unit> unitsWithId = new HashMap<>();
     private ArrayList<King> kings = new ArrayList<>();
     private GameConstants gameConstants;
+    @Getter
+    private ClientTurnMessage[] clientTurnMessages = new ClientTurnMessage[4];  //todo set each turn
 
 
     @Getter
@@ -83,6 +86,7 @@ public class Game {
     }
 
     public void turn(java.util.Map<String, List<ClientMessageInfo>> messages) {
+        initializeTurn();
 
         applyRangeUpgrades(messages.get(MessageTypes.UPGRADE_RANGE));
         applyDamageUpgrades(messages.get(MessageTypes.UPGRADE_DAMAGE));
@@ -101,6 +105,12 @@ public class Game {
         sendDataToClient();
 
         currentTurn.incrementAndGet();
+    }
+
+    private void initializeTurn() {
+        for(int i = 0;i < 4; i++) {
+            clientTurnMessages[i] = new ClientTurnMessage();
+        }
     }
 
     private void evaluateUnits() {

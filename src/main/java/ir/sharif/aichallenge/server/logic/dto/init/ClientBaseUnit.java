@@ -17,4 +17,5 @@ public class ClientBaseUnit {
     private String target;      //can be enum, values: GROUND, AIR, BOTH
     private boolean isFlying;
     private boolean isMultiple;
+    private int ap;
 }

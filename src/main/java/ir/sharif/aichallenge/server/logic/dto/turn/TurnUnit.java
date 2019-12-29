@@ -28,4 +28,5 @@ public class TurnUnit {
     private int range;
     private int attack;
     private boolean wasPlayedThisTurn;
+    private int target;
 }

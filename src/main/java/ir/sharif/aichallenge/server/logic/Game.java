@@ -231,7 +231,7 @@ public class Game {
 
 
     private void applyPutUnits(List<ClientMessageInfo> putUnitMessages) {
-        putUnitMessages.stream().map(message -> (PutUnitInfo) message).forEach(info -> {
+        putUnitMessages.stream().map(message -> (UnitPutInfo) message).forEach(info -> {
             try {
                 Player player = players[info.getPathId()];
                 BaseUnit baseUnit = BaseUnit.getInstance(info.getTypeId());
@@ -245,7 +245,7 @@ public class Game {
     }
 
     private void applySpells(List<ClientMessageInfo> castSpellMessages) {
-        castSpellMessages.stream().map(info -> (CastSpellInfo) info).forEach(info -> {
+        castSpellMessages.stream().map(info -> (SpellCastInfo) info).forEach(info -> {
             try {
                 final Player player = players[info.getPlayerId()];
                 player.castSpell(info.getTypeId());

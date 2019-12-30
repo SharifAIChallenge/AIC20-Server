@@ -3,11 +3,11 @@ package ir.sharif.aichallenge.server.common.network.data;
 import lombok.Getter;
 
 @Getter
-public class PutUnitInfo extends ClientMessageInfo {
+public class UnitPutInfo extends ClientMessageInfo {
     private final int typeId;
     private final int pathId;
 
-    public PutUnitInfo(int typeId, int pathId) {
+    public UnitPutInfo(int typeId, int pathId) {
         this.typeId = typeId;
         this.pathId = pathId;
     }

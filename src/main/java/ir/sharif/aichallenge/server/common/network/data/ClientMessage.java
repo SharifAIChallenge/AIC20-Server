@@ -1,9 +1,10 @@
 package ir.sharif.aichallenge.server.common.network.data;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import ir.sharif.aichallenge.server.common.network.Json;
 import lombok.Getter;
+
+import java.lang.reflect.Type;
 
 @Getter
 public class ClientMessage extends Message {
@@ -16,6 +17,23 @@ public class ClientMessage extends Message {
     }
 
     public ClientMessageInfo getParsedInfo() {
-        return Json.GSON.fromJson(this.getInfo(), ClientMessageInfo.class);
+        Class clazz;
+        switch (this.getType()) {
+            case MessageTypes.PUT_UNIT:
+                clazz = UnitPutInfo.class;
+                break;
+            case MessageTypes.CAST_SPELL:
+                clazz = SpellCastInfo.class;
+                break;
+            case MessageTypes.UPGRADE_DAMAGE:
+                clazz = DamageUpgradeInfo.class;
+                break;
+            case MessageTypes.UPGRADE_RANGE:
+                clazz = RangeUpgradeInfo.class;
+                break;
+            default:
+                return null;
+        }
+        return (ClientMessageInfo) Json.GSON.fromJson(this.getInfo(), clazz);
     }
 }

@@ -4,6 +4,7 @@ import ir.sharif.aichallenge.server.common.network.data.*;
 import ir.sharif.aichallenge.server.logic.dto.ClientCell;
 import ir.sharif.aichallenge.server.logic.dto.init.*;
 import ir.sharif.aichallenge.server.logic.dto.turn.ClientTurnMessage;
+import ir.sharif.aichallenge.server.logic.dto.turn.TurnKing;
 import ir.sharif.aichallenge.server.logic.entities.Player;
 import ir.sharif.aichallenge.server.logic.entities.spells.BaseSpell;
 import ir.sharif.aichallenge.server.logic.entities.spells.Spell;
@@ -38,7 +39,7 @@ public class Game {
     private Set<Integer> rangeUpgradedUnits;
     private Set<Integer> hastedUnits;
     private Set<Integer> cloneUnits;
-    private java.util.Map<Integer, List<Spell>> activeSpellsOnUnits;
+    private java.util.Map<Unit, List<Spell>> activeSpellsOnUnits;
     private java.util.Map<Integer, List<Unit>> affectedUnits;
 
 
@@ -94,7 +95,6 @@ public class Game {
     }
 
     public void pick(List<PickInfo> messages) {
-        //TODO: to be implemented
 
         for (PickInfo pickInfo : messages) {
             int playerId = pickInfo.getPlayerId();
@@ -124,10 +124,42 @@ public class Game {
 
         resetPlayers();
 
-        currentTurn.incrementAndGet();
-
         checkToGiveUpgradeTokens();
         checkToGiveSpells();
+
+        fillClientMessage();
+
+        currentTurn.incrementAndGet();
+    }
+
+    private void fillClientMessage() {
+
+        List<TurnKing> turnKings = new ArrayList<>();
+        for (int pId=0; pId<4; pId++) {
+            int health = kings.get(pId).getHealthComponent().getHealth();
+            turnKings.add(new TurnKing(pId, health > 0, health));
+        }
+
+        for (int pId=0; pId<4; pId++) {
+            int friendId = pId ^ 2;
+
+            clientTurnMessages[pId].setKings(turnKings);
+
+            clientTurnMessages[pId].setAvailableRangeUpgrades(players[pId].getNumberOfRangeUpgrades());
+            clientTurnMessages[pId].setAvailableDamageUpgrades(players[pId].getNumberOfDamageUpgrades());
+
+            clientTurnMessages[pId].setRemainingAP(players[pId].getAp());
+
+            clientTurnMessages[pId].setMySpells(players[pId].getAvailableSpellIds());
+            clientTurnMessages[pId].setFriendSpells(players[friendId].getAvailableSpellIds());
+
+
+            clientTurnMessages[pId].setCurrTurn(currentTurn.get());
+
+            clientTurnMessages[pId].setDeck(players[pId].getDeckIds());
+            clientTurnMessages[pId].setHand(players[pId].getHandIds());
+
+        }
     }
 
     private int getRandom(int L, int R) { //[L, R)
@@ -137,7 +169,18 @@ public class Game {
 
     private void checkToGiveSpells() {
         if(currentTurn.get() % gameConstants.getTurnsToSpell() != 0) return ;
+
+        for (int pId=0; pId<4; pId ++) {
+            clientTurnMessages[pId].setReceivedSpell(-1);
+            clientTurnMessages[pId].setFriendReceivedSpell(-1);
+        }
         giveSpells();
+    }
+
+    private void giveSpellToPlayer(int playerId, int type) {
+        players[playerId].addSpell(type);
+        clientTurnMessages[playerId].setReceivedSpell(type);
+        clientTurnMessages[playerId ^ 2].setFriendReceivedSpell(type);
     }
 
     private void giveSpells() {
@@ -147,48 +190,62 @@ public class Game {
         int rnd = getRandom(0, 2);
 
         if(rnd == 0) {
-            players[0].addSpell(type1);
-            players[2].addSpell(type2);
+            giveSpellToPlayer(0, type1);
+            giveSpellToPlayer(2, type2);
         }else {
-            players[0].addSpell(type2);
-            players[2].addSpell(type1);
+            giveSpellToPlayer(0, type2);
+            giveSpellToPlayer(2, type1);
         }
 
         rnd = getRandom(0, 2);
         if(rnd == 0) {
-            players[1].addSpell(type1);
-            players[3].addSpell(type2);
+            giveSpellToPlayer(1, type1);
+            giveSpellToPlayer(3, type2);
         }else {
-            players[1].addSpell(type2);
-            players[3].addSpell(type1);
+            giveSpellToPlayer(1, type2);
+            giveSpellToPlayer(3, type1);
         }
 
     }
 
     private void checkToGiveUpgradeTokens() {
         if (currentTurn.get() % gameConstants.getTurnsToUpgrade() != 0) return;
+        for (int pId=0; pId<4; pId++) {
+            clientTurnMessages[pId].setGotDamageUpgrade(false);
+            clientTurnMessages[pId].setGotRangeUpgrade(false);
+        }
         giveUpgradeTokens();
 
+    }
+
+    private void giveUpgradeDamageToPlayer(int playerId) {
+        players[playerId].addUpgradeDamageToken();
+        clientTurnMessages[playerId].setGotDamageUpgrade(true);
+    }
+
+    private void giveUpgradeRangeToPlayer(int playerId) {
+        players[playerId].addUpgradeRangeToken();
+        clientTurnMessages[playerId].setGotRangeUpgrade(true);
     }
 
     private void giveUpgradeTokens() {
         int rnd = getRandom(0, 2);
 
         if (rnd == 0) {
-            players[0].addUpgradeDamageToken();
-            players[2].addUpgradeRangeToken();
+            giveUpgradeDamageToPlayer(0);
+            giveUpgradeRangeToPlayer(2);
         } else {
-            players[0].addUpgradeRangeToken();
-            players[2].addUpgradeDamageToken();
+            giveUpgradeDamageToPlayer(2);
+            giveUpgradeRangeToPlayer(0);
         }
 
         rnd = getRandom(0, 2);
         if (rnd == 0) {
-            players[1].addUpgradeDamageToken();
-            players[3].addUpgradeRangeToken();
+            giveUpgradeDamageToPlayer(1);
+            giveUpgradeRangeToPlayer(3);
         } else {
-            players[1].addUpgradeRangeToken();
-            players[3].addUpgradeDamageToken();
+            giveUpgradeDamageToPlayer(3);
+            giveUpgradeRangeToPlayer(1);
         }
     }
 
@@ -372,6 +429,7 @@ public class Game {
 
         GeneralUnit clonedUnit = new GeneralUnit(unit.getBaseUnit(), unit.getPlayer(),
                 unit.getHealth() / rateOfHealthOfCloneUnit, unit.getDamage() / rateOfDamageCloneUnit);
+        clonedUnit.setCloned();
 
         unitsWithId.put(clonedUnit.getId(), clonedUnit);
         getMap().putUnit(clonedUnit);

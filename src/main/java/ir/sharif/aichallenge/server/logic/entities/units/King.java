@@ -5,17 +5,20 @@ import ir.sharif.aichallenge.server.logic.entities.TargetType;
 import ir.sharif.aichallenge.server.logic.map.Cell;
 import ir.sharif.aichallenge.server.logic.map.Path;
 import ir.sharif.aichallenge.server.logic.map.PathCell;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
 
+
+@Getter
 public class King {
 
-    private static int KING_TYPE_1 = 10, KING_TYPE_2 = 11;
+    private static int KING_TYPE_1 = 100, KING_TYPE_2 = 101;
 
-    ArrayList<KingUnit> units = new ArrayList<>();
+    private ArrayList<KingUnit> units = new ArrayList<>();
 
-    KingUnit.HealthComponent healthComponent = new KingUnit.HealthComponent();
+    private KingUnit.HealthComponent healthComponent = new KingUnit.HealthComponent();
 
     public King(Player player, Cell center, int health, int damage, int range) {
 

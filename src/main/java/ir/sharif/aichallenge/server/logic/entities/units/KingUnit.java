@@ -18,8 +18,7 @@ public class KingUnit extends Unit {
     }
 
     @Override
-    public void increaseHealth(int heal) {
-    }
+    public void increaseHealth(int heal) { }
 
     @Override
     public void decreaseHealth(int amount) {

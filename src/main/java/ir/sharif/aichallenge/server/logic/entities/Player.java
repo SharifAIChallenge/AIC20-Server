@@ -105,7 +105,7 @@ public class Player {
     }
 
     public void castSpell(int type) {
-        int currentCount = getSpellCount(type);
+        int currentCount = getSpellCountOfType(type);
         if (currentCount == 0)
             throw new SpellNotHaveException();
 
@@ -117,12 +117,12 @@ public class Player {
     }
 
     public void addSpell(int type) {
-        int currentCount = getSpellCount(type);
+        int currentCount = getSpellCountOfType(type);
         currentCount++;
         spellCount.put(type, currentCount);
     }
 
-    private int getSpellCount(int type) {
+    private int getSpellCountOfType(int type) {
         if (spellCount.get(type) == null)
             return 0;
         return spellCount.get(type);
@@ -189,4 +189,27 @@ public class Player {
         int rnd = (int) (Math.random() * (R - L)) + L;
         return rnd;
     }
+
+    public List<Integer> getDeckIds() {
+        ArrayList<Integer> ids = new ArrayList<>();
+        for (BaseUnit baseUnit : this.deck)
+            ids.add(baseUnit.getType());
+        return ids;
+    }
+
+    public List<Integer> getHandIds() {
+        ArrayList<Integer> ids = new ArrayList<>();
+        for (BaseUnit baseUnit : this.hand)
+            ids.add(baseUnit.getType());
+        return ids;
+    }
+
+    public List<Integer> getAvailableSpellIds() {
+        ArrayList<Integer> availableSpells = new ArrayList<>();
+        for (java.util.Map.Entry<Integer, Integer> spell : spellCount.entrySet()) {
+            if(spell.getValue() > 0) availableSpells.add(spell.getKey());
+        }
+        return availableSpells;
+    }
+
 }

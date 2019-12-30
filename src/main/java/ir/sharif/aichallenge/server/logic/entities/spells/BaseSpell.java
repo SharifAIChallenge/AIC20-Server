@@ -1,9 +1,6 @@
 package ir.sharif.aichallenge.server.logic.entities.spells;
 
 import ir.sharif.aichallenge.server.logic.dto.init.ClientSpell;
-import ir.sharif.aichallenge.server.logic.entities.TargetType;
-import ir.sharif.aichallenge.server.logic.entities.units.BaseUnit;
-import ir.sharif.aichallenge.server.logic.entities.units.MoveType;
 import ir.sharif.aichallenge.server.logic.exceptions.LogicException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,6 +12,12 @@ import java.util.HashMap;
 public class BaseSpell {
 
     private static HashMap<Integer, BaseSpell> instances = new HashMap<>();
+    private int type;
+    private int duration;
+    private int range;
+    private SpellTargetType targetType;
+    private int power;
+    private SpellType spellType;
 
     public static BaseSpell getInstance(int type) {
         BaseSpell instance = instances.get(type);
@@ -27,14 +30,9 @@ public class BaseSpell {
         if(clientSpell.isDamaging()) spellTargetType = SpellTargetType.ENEMY;
         else spellTargetType = SpellTargetType.ALLIED;
 
+        SpellType spellType = SpellType.getSpellTypeByTypeId(clientSpell.getTypeId());
         BaseSpell baseSpell = new BaseSpell(clientSpell.getTypeId(), clientSpell.getTurnEffect(),
-                clientSpell.getRange(), spellTargetType, clientSpell.getPower());
+                clientSpell.getRange(), spellTargetType, clientSpell.getPower(), spellType);
         instances.put(clientSpell.getTypeId(), baseSpell);
     }
-
-    private int type;
-    private int duration;
-    private int range;
-    private SpellTargetType targetType;
-    private int power;
 }

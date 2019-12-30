@@ -5,9 +5,11 @@ import ir.sharif.aichallenge.server.logic.entities.Player;
 import ir.sharif.aichallenge.server.logic.entities.units.Unit;
 import ir.sharif.aichallenge.server.logic.map.Cell;
 import ir.sharif.aichallenge.server.logic.map.PathCell;
+import lombok.Getter;
 
 import java.util.function.BiConsumer;
 
+@Getter
 public class TeleportSpell extends Spell {
     public static final int TYPE = 3;
 

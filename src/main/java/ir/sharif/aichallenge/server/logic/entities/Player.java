@@ -104,15 +104,25 @@ public class Player {
 
     }
 
-    public void castSpell(int type) {
+    public boolean castSpell(int type) {
         int currentCount = getSpellCountOfType(type);
         if (currentCount == 0)
-            throw new SpellNotHaveException();
+            return false;
+            //throw new SpellNotHaveException();
 
-        if (spellUsed) throw new UseMoreThanOneSpellException();
+        if (spellUsed)
+            return false;
+            //throw new UseMoreThanOneSpellException();
         setSpellUsed(true);
 
         currentCount--;
+        spellCount.put(type, currentCount);
+        return true;
+    }
+
+    public void unCastSpell(int type) {
+        int currentCount = getSpellCountOfType(type);
+        currentCount++;
         spellCount.put(type, currentCount);
     }
 

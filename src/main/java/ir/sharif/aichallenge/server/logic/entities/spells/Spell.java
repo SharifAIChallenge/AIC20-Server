@@ -51,6 +51,8 @@ public abstract class Spell extends Entity implements Disposable {
                 .filter(this::isTarget);
     }
 
+    public abstract int getPriority();
+
     @Override
     public int getRemainingTurns() {
         return remainingTurns;

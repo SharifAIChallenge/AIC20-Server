@@ -50,6 +50,8 @@ public abstract class Unit extends Entity {
 
     public abstract int getHealth();
 
+    public abstract void setCloned();
+
     public abstract void increaseHealth(int heal);
 
     public abstract void decreaseHealth(int damage);

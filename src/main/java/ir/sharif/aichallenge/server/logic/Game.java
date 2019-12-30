@@ -9,10 +9,7 @@ import ir.sharif.aichallenge.server.logic.entities.spells.SpellFactory;
 import ir.sharif.aichallenge.server.logic.entities.units.*;
 import ir.sharif.aichallenge.server.logic.entities.Player;
 import ir.sharif.aichallenge.server.logic.entities.spells.Spell;
-import ir.sharif.aichallenge.server.logic.exceptions.TeleportKingException;
-import ir.sharif.aichallenge.server.logic.exceptions.TeleportTooFarException;
-import ir.sharif.aichallenge.server.logic.exceptions.UnitNotInMapException;
-import ir.sharif.aichallenge.server.logic.exceptions.UpgradeOtherPlayerUnitException;
+import ir.sharif.aichallenge.server.logic.exceptions.*;
 import ir.sharif.aichallenge.server.logic.map.Cell;
 import ir.sharif.aichallenge.server.logic.map.Map;
 import ir.sharif.aichallenge.server.logic.map.Path;
@@ -346,6 +343,7 @@ public class Game {
     }
 
     public GeneralUnit cloneUnit(Unit unit, int rateOfHealthOfCloneUnit, int rateOfDamageCloneUnit) {
+
         GeneralUnit clonedUnit = new GeneralUnit(unit.getBaseUnit(), unit.getPlayer(),
                 unit.getHealth() / rateOfHealthOfCloneUnit, unit.getDamage() / rateOfDamageCloneUnit);
 
@@ -356,6 +354,13 @@ public class Game {
     }
 
     public void teleportUnit(Unit unit, PathCell targetCell) {
+        //TODO clean code
+        if(unit == null)
+            throw new NullPointerException();
+
+        if(!unit.isAlive())
+            throw new NotAliveUnitException();
+
         if (unit instanceof KingUnit) throw new TeleportKingException();
         int index = targetCell.getNumberOfCell();
         if (index >= (targetCell.getPath().getLength() + 1) / 2) throw new TeleportTooFarException();

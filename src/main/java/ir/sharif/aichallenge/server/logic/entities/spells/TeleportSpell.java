@@ -11,6 +11,7 @@ import java.util.function.BiConsumer;
 public class TeleportSpell extends Spell {
     public static final int TYPE = 3;
 
+
     private int targetUnitId;
     private PathCell targetCell;
 
@@ -29,5 +30,10 @@ public class TeleportSpell extends Spell {
 
     @Override
     protected void applyEffectOn(Unit unit) {
+    }
+
+    @Override
+    public int getPriority() {
+        return 1;
     }
 }

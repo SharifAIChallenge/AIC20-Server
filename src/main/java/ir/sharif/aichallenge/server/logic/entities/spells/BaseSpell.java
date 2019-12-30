@@ -1,8 +1,10 @@
 package ir.sharif.aichallenge.server.logic.entities.spells;
 
+import ir.sharif.aichallenge.server.logic.dto.init.ClientSpell;
 import ir.sharif.aichallenge.server.logic.entities.TargetType;
 import ir.sharif.aichallenge.server.logic.entities.units.BaseUnit;
 import ir.sharif.aichallenge.server.logic.entities.units.MoveType;
+import ir.sharif.aichallenge.server.logic.exceptions.LogicException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -16,17 +18,21 @@ public class BaseSpell {
 
     public static BaseSpell getInstance(int type) {
         BaseSpell instance = instances.get(type);
-        if (instance == null) {
-            //create one or read from file or ...
-            instance = new BaseSpell(type, 0, 10, 100, SpellTargetType.ALLIED, 100);
-            instances.put(type, instance);
-        }
+        if (instance == null) throw new LogicException();
         return instance;
     }
 
+    public static void initSpell(ClientSpell clientSpell) {
+        SpellTargetType spellTargetType;
+        if(clientSpell.isDamaging()) spellTargetType = SpellTargetType.ENEMY;
+        else spellTargetType = SpellTargetType.ALLIED;
+
+        BaseSpell baseSpell = new BaseSpell(clientSpell.getTypeId(), clientSpell.getTurnEffect(),
+                clientSpell.getRange(), spellTargetType, clientSpell.getPower());
+        instances.put(clientSpell.getTypeId(), baseSpell);
+    }
 
     private int type;
-    private int priority;
     private int duration;
     private int range;
     private SpellTargetType targetType;

@@ -7,6 +7,7 @@ import ir.sharif.aichallenge.server.logic.map.Cell;
 public class HealSpell extends AreaSpell {
     public static final int TYPE = 2;
 
+
     public HealSpell(int id, Player player, Cell position) {
         super(id, BaseSpell.getInstance(TYPE), player, position);
     }
@@ -14,5 +15,10 @@ public class HealSpell extends AreaSpell {
     @Override
     protected void applyEffectOn(Unit unit) {
         unit.increaseHealth(getPower());
+    }
+
+    @Override
+    public int getPriority() {
+        return 1;
     }
 }

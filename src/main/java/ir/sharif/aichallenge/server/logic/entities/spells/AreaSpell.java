@@ -8,11 +8,11 @@ import ir.sharif.aichallenge.server.logic.map.Cell;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public abstract class StickySpell extends Spell {
+public abstract class AreaSpell extends Spell {
 
-    protected Set<Unit> cachedUnits;
+    protected Set<Unit> caughtUnits;
 
-    public StickySpell(int id, BaseSpell baseSpell, Player player, Cell position) {
+    public AreaSpell(int id, BaseSpell baseSpell, Player player, Cell position) {
         super(id, baseSpell, player, position);
     }
 
@@ -22,9 +22,9 @@ public abstract class StickySpell extends Spell {
             return;
 
         if (isFirstTurn())
-            cachedUnits = getTargetUnitsInRange(game.getMap()).collect(Collectors.toSet());
+            caughtUnits = getTargetUnitsInRange(game.getMap()).collect(Collectors.toSet());
 
-        cachedUnits.forEach(this::applyEffectOn);
+        caughtUnits.forEach(this::applyEffectOn);
     }
 
 }

@@ -110,8 +110,6 @@ public class Game {
 
         resetPlayers();
 
-        sendDataToClient();
-
         currentTurn.incrementAndGet();
     }
 
@@ -148,10 +146,6 @@ public class Game {
         if (players == null) return;
         for (Player player : players)
             player.reset();
-    }
-
-    private void sendDataToClient() {
-        //network ....
     }
 
     private void attack() {

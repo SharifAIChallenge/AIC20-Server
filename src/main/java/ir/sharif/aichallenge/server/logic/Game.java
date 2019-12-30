@@ -15,6 +15,7 @@ import ir.sharif.aichallenge.server.logic.map.Cell;
 import ir.sharif.aichallenge.server.logic.map.Map;
 import ir.sharif.aichallenge.server.logic.map.Path;
 import ir.sharif.aichallenge.server.logic.map.PathCell;
+import javafx.util.Builder;
 import javafx.util.Pair;
 import lombok.Getter;
 
@@ -40,7 +41,8 @@ public class Game {
     private Set<Integer> rangeUpgradedUnits;
     private Set<Integer> hastedUnits;
     private Set<Integer> cloneUnits;
-    private java.util.Map<Unit, List<Spell>> activeSpellsOnUnits;
+    private Set<Integer> playedUnits = new HashSet<>();
+    private java.util.Map<Integer, List<Spell>> activeSpellsOnUnits;
     private java.util.Map<Integer, List<Unit>> affectedUnits;
 
 
@@ -133,6 +135,23 @@ public class Game {
         currentTurn.incrementAndGet();
     }
 
+    private TurnUnit buildTargetUnit(Unit unit) {
+        int pathId = -1, pId = unit.getPlayer().getId();
+        if(unit.getPlayer().getId() == pId || unit.getPlayer().getId() == (pId ^ 2)) pathId = unit.getPath().getId();
+
+        int targetId = -1;
+        if(unit.getTargetUnit() != null) targetId = unit.getTargetUnit().getId();
+
+
+        TurnUnit build = TurnUnit.builder().unitId(unit.getId()).playerId(pId).typeId(unit.getBaseUnit().getType()).
+                pathId(pathId).cell(new ClientCell(unit.getCell().getRow(), unit.getCell().getCol())).
+                hp(unit.getHealth()).damageLevel(unit.getDamageLevel()).rangeLevel(unit.getRangeLevel()).
+                range(unit.getRange()).attack(unit.getDamage()).wasDamageUpgraded(damageUpgradedUnits.contains(unit.getId())).
+                wasRangeUpgraded(rangeUpgradedUnits.contains(unit.getId())).isClone(unit.getIsCloned()).isHasted(unit.getSpeed() > 1).
+                activePoisons(unit.getActivePoisons()).target(targetId).wasPlayedThisTurn(playedUnits.contains(unit.getId())).build();
+        return build;
+    }
+
     private void fillClientMessage() {
 
         List<TurnKing> turnKings = new ArrayList<>();
@@ -145,8 +164,10 @@ public class Game {
             ArrayList<TurnUnit> turnUnits = new ArrayList<>();
             ArrayList<Unit> units = getAllUnits();
             for (Unit unit : units) {
-
+                TurnUnit turnUnit = buildTargetUnit(unit);
+                turnUnits.add(turnUnit);
             }
+            clientTurnMessages[pId].setUnits(turnUnits);
         }
 
         for (int pId=0; pId<4; pId++) {
@@ -268,6 +289,7 @@ public class Game {
     }
 
     private void initializeTurn() {
+        playedUnits.clear();
         for (int i = 0; i < 4; i++) {
             clientTurnMessages[i] = new ClientTurnMessage();
         }
@@ -386,6 +408,10 @@ public class Game {
                 player.putUnit(baseUnit);
                 GeneralUnit generalUnit = new GeneralUnit(baseUnit, player);
                 unitsWithId.put(generalUnit.getId(), generalUnit);
+
+                //
+                playedUnits.add(generalUnit.getId());
+
             } catch (Exception ex) {
 
             }

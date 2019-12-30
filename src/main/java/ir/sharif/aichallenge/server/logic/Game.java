@@ -34,6 +34,12 @@ public class Game {
     private GameConstants gameConstants;
     @Getter
     private ClientTurnMessage[] clientTurnMessages = new ClientTurnMessage[4];  //todo set each turn
+    private Set<Integer> damageUpgradedUnits;
+    private Set<Integer> rangeUpgradedUnits;
+    private Set<Integer> hastedUnits;
+    private Set<Integer> cloneUnits;
+    private java.util.Map<Integer, List<Spell>> activeSpellsOnUnits;
+    private java.util.Map<Integer, List<Unit>> affectedUnits;
 
 
     @Getter
@@ -90,14 +96,16 @@ public class Game {
 
         applyRangeUpgrades(messages.get(MessageTypes.UPGRADE_RANGE));
         applyDamageUpgrades(messages.get(MessageTypes.UPGRADE_DAMAGE));
+
         applySpells(messages.get(MessageTypes.CAST_SPELL));
-        applyPutUnits(messages.get(MessageTypes.PUT_UNIT));
+        evaluateUnits();
+
+        applyPutUnits(messages.get(MessageTypes.PUT_UNIT)); //todo isn't put before spells?
 
         evaluateSpells();
 
         attack();
         move();
-
         evaluateUnits();
 
         resetPlayers();
@@ -198,6 +206,7 @@ public class Game {
                 Player player = players[unit.getPlayer().getId()];
                 player.useUpgradeDamage();
                 unit.upgradeDamage();
+                damageUpgradedUnits.add(unit.getId());
             } catch (Exception ex) {
 
             }
@@ -214,7 +223,8 @@ public class Game {
                 Player player = players[unit.getPlayer().getId()];
                 player.useUpgradeRange();
                 unit.upgradeRange();
-            } catch (Exception ex) {
+                rangeUpgradedUnits.add(unit.getId());
+            } catch (Exception ex) {    //todo catch all possible exceptions or remove the exception classes
             }
         }
     }

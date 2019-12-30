@@ -3,7 +3,7 @@ package ir.sharif.aichallenge.server.logic.entities;
 import lombok.Getter;
 
 @Getter
-public class Entity {
+public abstract class Entity {
     private int id;
 
     private Player player;

@@ -5,8 +5,8 @@ public class ClonedUnit extends GeneralUnit {
 
     private int remainingTurns;
 
-    public ClonedUnit(int unitId, GeneralUnit source, int remainingTurns) {
-        super(unitId, source.getBaseUnit(), source.getPlayer(), source.getHealth(), source.getDamage());
+    public ClonedUnit(GeneralUnit source, int remainingTurns) {
+        super(source.getBaseUnit(), source.getPlayer(), source.getHealth(), source.getDamage());
         this.remainingTurns = remainingTurns;
     }
 

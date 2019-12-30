@@ -110,7 +110,7 @@ public class GameHandler implements GameLogic {
     }
 
     @Override
-    public void simulateEvents(Map<String, List<ClientMessageInfo>> messages) {
+    public void simulateEvents(Map<String, List<ClientMessageInfo>> messages) { //todo filter messages to be this turn
         if (game.getCurrentTurn().get() == 0) {
             List<ClientMessageInfo> clientMessageInfos = messages.get(MessageTypes.PICK);
             List<PickInfo> pickInfos = clientMessageInfos.stream().map(

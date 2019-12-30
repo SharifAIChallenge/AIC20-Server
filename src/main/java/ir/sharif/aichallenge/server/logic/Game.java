@@ -4,11 +4,11 @@ import ir.sharif.aichallenge.server.common.network.data.*;
 import ir.sharif.aichallenge.server.logic.dto.ClientCell;
 import ir.sharif.aichallenge.server.logic.dto.init.*;
 import ir.sharif.aichallenge.server.logic.dto.turn.ClientTurnMessage;
+import ir.sharif.aichallenge.server.logic.dto.turn.TurnCastSpell;
 import ir.sharif.aichallenge.server.logic.dto.turn.TurnKing;
 import ir.sharif.aichallenge.server.logic.dto.turn.TurnUnit;
 import ir.sharif.aichallenge.server.logic.entities.Player;
-import ir.sharif.aichallenge.server.logic.entities.spells.BaseSpell;
-import ir.sharif.aichallenge.server.logic.entities.spells.Spell;
+import ir.sharif.aichallenge.server.logic.entities.spells.*;
 import ir.sharif.aichallenge.server.logic.entities.units.*;
 import ir.sharif.aichallenge.server.logic.exceptions.*;
 import ir.sharif.aichallenge.server.logic.map.Cell;
@@ -21,6 +21,8 @@ import lombok.Getter;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Game {
 
@@ -29,6 +31,8 @@ public class Game {
 
     private Map map;
     private SortedSet<Spell> spells = new TreeSet<Spell>(Comparator.comparing(Spell::getPriority));
+    private List<Spell> hpSpells = new ArrayList<>();
+    private List<Spell> nonHpSpells = new ArrayList<>();
     private List<Pair<Unit, Integer>> unitsToPut = new ArrayList<>();
     private List<Unit> clonedUnitToPut = new ArrayList<>();
     private Player[] players = new Player[4];
@@ -44,6 +48,7 @@ public class Game {
     private Set<Integer> playedUnits = new HashSet<>();
     private java.util.Map<Integer, List<Spell>> activeSpellsOnUnits;
     private java.util.Map<Integer, List<Unit>> affectedUnits;
+    private List<TurnCastSpell> turnCastSpells = new ArrayList<>();
 
 
     @Getter
@@ -290,6 +295,7 @@ public class Game {
 
     private void initializeTurn() {
         playedUnits.clear();
+        turnCastSpells.clear();
         for (int i = 0; i < 4; i++) {
             clientTurnMessages[i] = new ClientTurnMessage();
         }
@@ -419,9 +425,22 @@ public class Game {
     }
 
     private void applySpells(List<ClientMessageInfo> castSpellMessages) {
-//        applyHPSpells(messages.get(MessageTypes.CAST_SPELL).stream().filter());
+        Stream<SpellCastInfo> castInfoStream =
+                castSpellMessages.stream().map(castSpellMessage -> (SpellCastInfo) castSpellMessage);
+
+        //hp spells
+        castSpells(castInfoStream.filter(spellCastInfo -> {
+            SpellType spellType = SpellType.getSpellTypeByTypeId(spellCastInfo.getTypeId());
+            return spellType == SpellType.HEAL || spellType == SpellType.DAMAGE || spellType == SpellType.POISON;
+        }).collect(Collectors.toList()), hpSpells);
+
         evaluateUnits();
-//        applyNonHPSpells(messages.get(MessageTypes.CAST_SPELL));
+
+        //non hp spells
+        castSpells(castInfoStream.filter(spellCastInfo -> {
+            SpellType spellType = SpellType.getSpellTypeByTypeId(spellCastInfo.getTypeId());
+            return spellType != SpellType.HEAL && spellType != SpellType.DAMAGE && spellType != SpellType.POISON;
+        }).collect(Collectors.toList()), nonHpSpells);
 
         /*castSpellMessages.stream().map(info -> (SpellCastInfo) info).forEach(info -> {
             try {
@@ -444,6 +463,45 @@ public class Game {
 
         //TODO exceptions for teleport.
         //spells.forEach(spell -> spell.applyTo(this));
+    }
+
+    private void castSpells(List<SpellCastInfo> spellCastInfos, List<Spell> activeSpells) {
+        for (SpellCastInfo spellCastInfo: spellCastInfos) {
+            int typeId = spellCastInfo.getTypeId();
+            try {
+                final Player player = players[spellCastInfo.getPlayerId()]; //todo invalid index exception
+                Spell spell = SpellFactory.createSpell(typeId, player,
+                        spellCastInfo.getCell(), spellCastInfo.getUnitId(), map.getPath(spellCastInfo.getPathId()));
+                if (player.castSpell(typeId)) {
+                    try {
+                        spell.applyTo(this);    //todo null pointer
+                        TurnCastSpell turnCastSpell = TurnCastSpell.builder()
+                                .casterId(player.getId()).cell(new ClientCell(spell.getPosition()))
+                                .typeId(spell.getType()).build();
+                        if (spell.getSpellType() == SpellType.TELE) {
+                            TeleportSpell teleportSpell = (TeleportSpell) spell;
+                            turnCastSpell.setUnitId(teleportSpell.getTargetUnitId());
+                            turnCastSpell.setPathId(teleportSpell.getTargetCell().getPath().getId());
+                            turnCastSpell.setAffectedUnits(Collections.singletonList(teleportSpell.getTargetUnitId()));
+                        }
+                        else {
+                            Set<Unit> caughtUnits = ((AreaSpell) spell).getCaughtUnits();
+                            turnCastSpell.setAffectedUnits(
+                                    caughtUnits.stream().map(unit -> unit.getId()).collect(Collectors.toList()));
+                            //todo set isClone, activePoisons, ... in applyTo
+                        }
+                        turnCastSpells.add(turnCastSpell);
+                    } catch (LogicException e) {
+                        player.unCastSpell(typeId);
+                    }
+                }
+
+            }
+            catch (LogicException e) {
+                //todo
+            }
+            //todo active spells
+        }
     }
 
     private void readRequestsFromClient() {

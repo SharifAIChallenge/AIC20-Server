@@ -86,7 +86,7 @@ public class Game {
 
     }
 
-    public void pick(java.util.Map<String, List<ClientMessageInfo>> messages) {
+    public void pick(List<PickInfo> messages) {
         //TODO: to be implemented
         currentTurn.incrementAndGet();
     }
@@ -97,8 +97,7 @@ public class Game {
         applyRangeUpgrades(messages.get(MessageTypes.UPGRADE_RANGE));
         applyDamageUpgrades(messages.get(MessageTypes.UPGRADE_DAMAGE));
 
-        applySpells(messages.get(MessageTypes.CAST_SPELL));
-        evaluateUnits();
+        applySpells(messages.get(MessageTypes.CAST_SPELL)); //todo
 
         applyPutUnits(messages.get(MessageTypes.PUT_UNIT)); //todo isn't put before spells?
 
@@ -111,6 +110,14 @@ public class Game {
         resetPlayers();
 
         currentTurn.incrementAndGet();
+    }
+
+    private void applyNonHPSpells(List<ClientMessageInfo> clientMessageInfos) {
+
+    }
+
+    private void applyHPSpells(List<ClientMessageInfo> clientMessageInfos) {
+
     }
 
     private void initializeTurn() {
@@ -239,11 +246,18 @@ public class Game {
     }
 
     private void applySpells(List<ClientMessageInfo> castSpellMessages) {
-        castSpellMessages.stream().map(info -> (SpellCastInfo) info).forEach(info -> {
+//        applyHPSpells(messages.get(MessageTypes.CAST_SPELL).stream().filter());
+        evaluateUnits();
+//        applyNonHPSpells(messages.get(MessageTypes.CAST_SPELL));
+
+        /*castSpellMessages.stream().map(info -> (SpellCastInfo) info).forEach(info -> {
             try {
                 final Player player = players[info.getPlayerId()];
                 player.castSpell(info.getTypeId());
-                spells.add(SpellFactory.createSpell(info.getTypeId(), player, info.getCell(), info.getUnitId(), map.getPath(info.getPathId())));
+                Spell spell = SpellFactory.createSpell(
+                        info.getTypeId(), player, info.getCell(), info.getUnitId(), map.getPath(info.getPathId()));
+                spells.add(spell);
+
             } catch (Exception ex) {
             }
         });
@@ -253,7 +267,7 @@ public class Game {
                 spell.applyTo(this);
             } catch (Exception ex) {
             }
-        }
+        }*/
 
         //TODO exceptions for teleport.
         //spells.forEach(spell -> spell.applyTo(this));

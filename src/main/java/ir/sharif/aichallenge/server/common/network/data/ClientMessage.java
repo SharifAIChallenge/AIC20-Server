@@ -31,6 +31,9 @@ public class ClientMessage extends Message {
             case MessageTypes.UPGRADE_RANGE:
                 clazz = RangeUpgradeInfo.class;
                 break;
+            case MessageTypes.PICK:
+                clazz = PickInfo.class;
+                break;
             default:
                 return null;
         }

@@ -4,6 +4,7 @@ import ir.sharif.aichallenge.server.common.network.Json;
 import ir.sharif.aichallenge.server.common.network.data.ClientMessageInfo;
 import ir.sharif.aichallenge.server.common.network.data.Message;
 import ir.sharif.aichallenge.server.common.network.data.MessageTypes;
+import ir.sharif.aichallenge.server.common.network.data.PickInfo;
 import ir.sharif.aichallenge.server.engine.config.FileParam;
 import ir.sharif.aichallenge.server.engine.core.GameLogic;
 import ir.sharif.aichallenge.server.logic.dto.init.ClientBaseKing;
@@ -17,6 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class GameHandler implements GameLogic {
     private static final int RESPONSE_TIMEOUT = 300;
@@ -108,12 +110,15 @@ public class GameHandler implements GameLogic {
     }
 
     @Override
-    public void simulateEvents(Map<String, List<ClientMessageInfo>> events) {
+    public void simulateEvents(Map<String, List<ClientMessageInfo>> messages) {
         if (game.getCurrentTurn().get() == 0) {
-            game.pick(events);
+            List<ClientMessageInfo> clientMessageInfos = messages.get(MessageTypes.PICK);
+            List<PickInfo> pickInfos = clientMessageInfos.stream().map(
+                    clientMessageInfo -> (PickInfo) clientMessageInfo).collect(Collectors.toList());
+            game.pick(pickInfos);
             return;
         }
-        game.turn(events);
+        game.turn(messages);
     }
 
     @Override

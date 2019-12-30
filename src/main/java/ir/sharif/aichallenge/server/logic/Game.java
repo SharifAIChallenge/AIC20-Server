@@ -8,10 +8,7 @@ import ir.sharif.aichallenge.server.logic.entities.Player;
 import ir.sharif.aichallenge.server.logic.entities.spells.BaseSpell;
 import ir.sharif.aichallenge.server.logic.entities.spells.Spell;
 import ir.sharif.aichallenge.server.logic.entities.units.*;
-import ir.sharif.aichallenge.server.logic.exceptions.TeleportKingException;
-import ir.sharif.aichallenge.server.logic.exceptions.TeleportTooFarException;
-import ir.sharif.aichallenge.server.logic.exceptions.UnitNotInMapException;
-import ir.sharif.aichallenge.server.logic.exceptions.UpgradeOtherPlayerUnitException;
+import ir.sharif.aichallenge.server.logic.exceptions.*;
 import ir.sharif.aichallenge.server.logic.map.Cell;
 import ir.sharif.aichallenge.server.logic.map.Map;
 import ir.sharif.aichallenge.server.logic.map.Path;
@@ -23,6 +20,9 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Game {
+
+    private int numberOfSpells;
+    private int numberOfBaseUnits;
 
     private Map map;
     private SortedSet<Spell> spells = new TreeSet<Spell>(Comparator.comparing(Spell::getPriority));
@@ -61,11 +61,13 @@ public class Game {
     }
 
     private void initSpells(List<ClientSpell> spells) {
+        numberOfSpells = spells.size();
         for (ClientSpell clientSpell : spells)
             BaseSpell.initSpell(clientSpell);
     }
 
     private void initBaseUnits(List<ClientBaseUnit> baseUnits) {
+        numberOfBaseUnits = baseUnits.size();
         for (ClientBaseUnit cBU : baseUnits) {
             BaseUnit.initBaseUnits(cBU, gameConstants.getDamageUpgradeAddition(), gameConstants.getRangeUpgradeAddition());
         }
@@ -93,7 +95,15 @@ public class Game {
 
     public void pick(List<PickInfo> messages) {
         //TODO: to be implemented
+
+        for (PickInfo pickInfo : messages) {
+            int playerId = pickInfo.getPlayerId();
+            players[playerId].initDeck(pickInfo.getUnits(), numberOfBaseUnits);
+        }
+
         currentTurn.incrementAndGet();
+
+
     }
 
     public void turn(java.util.Map<String, List<ClientMessageInfo>> messages) {
@@ -131,8 +141,8 @@ public class Game {
     }
 
     private void giveSpells() {
-        int type1 = getRandom(0, 5);
-        int type2 = getRandom(0, 5);
+        int type1 = getRandom(0, numberOfSpells);
+        int type2 = getRandom(0, numberOfSpells);
 
         int rnd = getRandom(0, 2);
 

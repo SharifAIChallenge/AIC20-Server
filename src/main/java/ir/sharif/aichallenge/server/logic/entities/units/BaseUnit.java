@@ -31,7 +31,7 @@ public class BaseUnit {
         else targetType = TargetType.BOTH;
 
         BaseUnit baseUnit = new BaseUnit(cBU.getTypeId(), cBU.getMaxHP(),
-                1, cBU.getBaseAttack(), cBU.getBaseRange(), deltaDamage, deltaDamageRange, cBU.isMultiple(), 10, moveType, targetType);
+                1, cBU.getBaseAttack(), cBU.getBaseRange(), deltaDamage, deltaDamageRange, cBU.isMultiple(), cBU.getAp(), moveType, targetType);
         //TODO AP, Multiple
 
         instances.put(cBU.getTypeId(), baseUnit);

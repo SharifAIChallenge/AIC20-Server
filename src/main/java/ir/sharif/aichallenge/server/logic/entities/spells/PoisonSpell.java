@@ -15,4 +15,9 @@ public class PoisonSpell extends AreaSpell {
     protected void applyEffectOn(Unit unit) {
         unit.decreaseHealth(getPower());
     }
+
+    @Override
+    public int getPriority() {
+        return 0;
+    }
 }

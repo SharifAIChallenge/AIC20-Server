@@ -29,4 +29,9 @@ public class DuplicateSpell extends AreaSpell {
     @Override
     protected void applyEffectOn(Unit unit) {
     }
+
+    @Override
+    public int getPriority() {
+        return 3;
+    }
 }

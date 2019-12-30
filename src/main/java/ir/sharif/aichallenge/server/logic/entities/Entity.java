@@ -25,4 +25,14 @@ public abstract class Entity {
         return this.getPlayer().getId() == other.getPlayer().getId();
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if(!(obj instanceof Entity)) return false;
+        return ((Entity) obj).getId() == getId();
+    }
+
+    @Override
+    public int hashCode() {
+        return getId();
+    }
 }

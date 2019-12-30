@@ -54,6 +54,14 @@ public abstract class Unit extends Entity {
 
     public abstract void decreaseHealth(int damage);
 
+    public abstract void increaseActivePoisons();
+
+    public abstract void decreaseActivePoisons();
+
+    public abstract int getActivePoisons();
+
+    public abstract boolean getIsCloned();
+
     public boolean isAlive() {
         return getHealth() > 0;
     }

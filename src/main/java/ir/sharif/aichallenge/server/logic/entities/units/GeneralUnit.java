@@ -11,6 +11,9 @@ import java.util.Optional;
 public class GeneralUnit extends Unit {
     private int health;
     private int damage;
+    private boolean isCloned = false;
+    private int activePoisons = 0;
+
     private boolean hasAttacked;
 
     public GeneralUnit(BaseUnit baseUnit, Player player,
@@ -18,6 +21,10 @@ public class GeneralUnit extends Unit {
         super(baseUnit, player);
         this.health = health;
         this.damage = damage;
+    }
+
+    public void setCloned() {
+        isCloned = true;
     }
 
     public GeneralUnit(BaseUnit baseUnit, Player player) {
@@ -43,6 +50,26 @@ public class GeneralUnit extends Unit {
     public void decreaseHealth(int damage) {
         health -= damage;
         health = Math.max(0, health);
+    }
+
+    @Override
+    public void increaseActivePoisons() {
+        activePoisons ++;
+    }
+
+    @Override
+    public void decreaseActivePoisons() {
+        activePoisons --;
+    }
+
+    @Override
+    public int getActivePoisons() {
+        return activePoisons;
+    }
+
+    @Override
+    public boolean getIsCloned() {
+        return isCloned;
     }
 
 }

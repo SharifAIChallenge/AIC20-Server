@@ -59,7 +59,6 @@ public class Game {
 
         initSpells(initialMessage.getSpells());
 
-        //make initial map and paths and players.
     }
 
     private void initSpells(List<ClientSpell> spells) {
@@ -118,10 +117,76 @@ public class Game {
         resetPlayers();
 
         currentTurn.incrementAndGet();
+
+        checkToGiveUpgradeTokens();
+        checkToGiveSpells();
     }
 
+    private int getRandom(int L, int R) { //[L, R)
+        int rnd = (int)(Math.random() * (R - L)) + L;
+        return rnd;
+    }
+
+    private void checkToGiveSpells() {
+        if(currentTurn.get() % gameConstants.getTurnsToSpell() != 0) return ;
+        giveSpells();
+    }
+
+    private void giveSpells() {
+        int type1 = getRandom(0, 5);
+        int type2 = getRandom(0, 5);
+
+        int rnd = getRandom(0, 2);
+
+        if(rnd == 0) {
+            players[0].addSpell(type1);
+            players[2].addSpell(type2);
+        }else {
+            players[0].addSpell(type2);
+            players[2].addSpell(type1);
+        }
+
+        rnd = getRandom(0, 2);
+        if(rnd == 0) {
+            players[1].addSpell(type1);
+            players[3].addSpell(type2);
+        }else {
+            players[1].addSpell(type2);
+            players[3].addSpell(type1);
+        }
+
+    }
+
+    private void checkToGiveUpgradeTokens() {
+        if (currentTurn.get() % gameConstants.getTurnsToUpgrade() != 0) return;
+        giveUpgradeTokens();
+
+    }
+
+    private void giveUpgradeTokens() {
+        int rnd = getRandom(0, 2);
+
+        if (rnd == 0) {
+            players[0].addUpgradeDamageToken();
+            players[2].addUpgradeRangeToken();
+        } else {
+            players[0].addUpgradeRangeToken();
+            players[2].addUpgradeDamageToken();
+        }
+
+        rnd = getRandom(0, 2);
+        if (rnd == 0) {
+            players[1].addUpgradeDamageToken();
+            players[3].addUpgradeRangeToken();
+        } else {
+            players[1].addUpgradeRangeToken();
+            players[3].addUpgradeDamageToken();
+        }
+    }
+
+
     private void initializeTurn() {
-        for(int i = 0;i < 4; i++) {
+        for (int i = 0; i < 4; i++) {
             clientTurnMessages[i] = new ClientTurnMessage();
         }
     }

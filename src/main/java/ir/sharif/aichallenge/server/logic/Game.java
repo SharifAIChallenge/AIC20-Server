@@ -4,6 +4,7 @@ import ir.sharif.aichallenge.server.common.network.data.*;
 import ir.sharif.aichallenge.server.logic.dto.ClientCell;
 import ir.sharif.aichallenge.server.logic.dto.init.*;
 import ir.sharif.aichallenge.server.logic.dto.turn.ClientTurnMessage;
+import ir.sharif.aichallenge.server.logic.entities.spells.BaseSpell;
 import ir.sharif.aichallenge.server.logic.entities.spells.SpellFactory;
 import ir.sharif.aichallenge.server.logic.entities.units.*;
 import ir.sharif.aichallenge.server.logic.entities.Player;
@@ -56,8 +57,14 @@ public class Game {
 
         initBaseUnits(initialMessage.getBaseUnits());
 
+        initSpells(initialMessage.getSpells());
 
         //make initial map and paths and players.
+    }
+
+    private void initSpells(List<ClientSpell> spells) {
+        for (ClientSpell clientSpell : spells)
+            BaseSpell.initSpell(clientSpell);
     }
 
     private void initBaseUnits(List<ClientBaseUnit> baseUnits) {

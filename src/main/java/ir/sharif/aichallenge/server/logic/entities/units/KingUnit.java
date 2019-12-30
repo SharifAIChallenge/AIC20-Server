@@ -18,11 +18,30 @@ public class KingUnit extends Unit {
     }
 
     @Override
+    public void setCloned() { }
+
+    @Override
     public void increaseHealth(int heal) { }
 
     @Override
     public void decreaseHealth(int amount) {
         health.decrease(amount);
+    }
+
+    @Override
+    public void increaseActivePoisons() { }
+
+    @Override
+    public void decreaseActivePoisons() {
+
+    }
+
+    @Override
+    public int getActivePoisons() { return 0; }
+
+    @Override
+    public boolean getIsCloned() {
+        return false;
     }
 
     @Override

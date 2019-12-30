@@ -5,6 +5,7 @@ import ir.sharif.aichallenge.server.logic.dto.ClientCell;
 import ir.sharif.aichallenge.server.logic.dto.init.*;
 import ir.sharif.aichallenge.server.logic.dto.turn.ClientTurnMessage;
 import ir.sharif.aichallenge.server.logic.dto.turn.TurnKing;
+import ir.sharif.aichallenge.server.logic.dto.turn.TurnUnit;
 import ir.sharif.aichallenge.server.logic.entities.Player;
 import ir.sharif.aichallenge.server.logic.entities.spells.BaseSpell;
 import ir.sharif.aichallenge.server.logic.entities.spells.Spell;
@@ -138,6 +139,14 @@ public class Game {
         for (int pId=0; pId<4; pId++) {
             int health = kings.get(pId).getHealthComponent().getHealth();
             turnKings.add(new TurnKing(pId, health > 0, health));
+        }
+
+        for (int pId=0; pId<4; pId ++) {
+            ArrayList<TurnUnit> turnUnits = new ArrayList<>();
+            ArrayList<Unit> units = getAllUnits();
+            for (Unit unit : units) {
+
+            }
         }
 
         for (int pId=0; pId<4; pId++) {

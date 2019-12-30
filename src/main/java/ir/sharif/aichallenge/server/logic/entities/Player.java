@@ -13,7 +13,9 @@ public class Player {
 
     private static final int HAND_SIZE = 6, DECK_SIZE = 9;
 
-    private int id, AP, maxAP;
+    private int id;
+    private int ap;
+    private int maxAP;
 
     private HashMap<Integer, Integer> spellCount = new HashMap<>();
 
@@ -31,10 +33,10 @@ public class Player {
 
     BaseUnit currentPutUnit;
 
-    public Player(int id, int AP) {
+    public Player(int id, int ap) {
         this.id = id;
-        this.AP = AP;
-        this.maxAP = AP;
+        this.ap = ap;
+        this.maxAP = ap;
 
         upgradeUsed = putUsed = spellUsed = false;
     }
@@ -78,7 +80,7 @@ public class Player {
         currentPutUnit = null;
 
         if (!hand.contains(baseUnit)) throw new UnitNotInHandException();
-        if (AP < baseUnit.getCost()) throw new APNotEnoughException();
+        if (ap < baseUnit.getCost()) throw new APNotEnoughException();
         if (putUsed) throw new PutMoreThanOneUnitException();
 
         setPutUsed(true);
@@ -86,7 +88,7 @@ public class Player {
         numberOfUse[baseUnitId.get(baseUnit)] ++;
 
         currentPutUnit = baseUnit;
-        AP -= baseUnit.getCost();
+        ap -= baseUnit.getCost();
 
     }
 

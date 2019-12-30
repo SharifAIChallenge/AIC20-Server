@@ -7,7 +7,7 @@ import ir.sharif.aichallenge.server.logic.map.Cell;
 
 import java.util.stream.Collectors;
 
-public class DuplicateSpell extends StickySpell {
+public class DuplicateSpell extends AreaSpell {
     public static final int TYPE = 4;
 
     public DuplicateSpell(int id, Player player, Cell position) {
@@ -17,13 +17,13 @@ public class DuplicateSpell extends StickySpell {
     @Override
     public void applyTo(Game game) {
         if (isFirstTurn())
-            cachedUnits = getTargetUnitsInRange(game.getMap())      //todo what happens to cached units??
+            caughtUnits = getTargetUnitsInRange(game.getMap())      //todo what happens to cached units??
                     .map(unit -> game.cloneUnit(unit, getPower(), getPower()))
                     .collect(Collectors.toSet());
 
         //Killing all cloned units after spell is disposed
         if (isDisposed())   //todo we check to kill cloned units twice
-            cachedUnits.forEach(unit -> unit.decreaseHealth(unit.getHealth()));
+            caughtUnits.forEach(unit -> unit.decreaseHealth(unit.getHealth()));
     }
 
     @Override

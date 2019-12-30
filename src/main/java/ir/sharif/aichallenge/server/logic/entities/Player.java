@@ -5,8 +5,7 @@ import ir.sharif.aichallenge.server.logic.exceptions.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 
 @Getter
 public class Player {
@@ -19,7 +18,7 @@ public class Player {
 
     private HashMap<Integer, Integer> spellCount = new HashMap<>();
 
-    private ArrayList<BaseUnit> deck;
+    private ArrayList<BaseUnit> deck = new ArrayList<>();
     private ArrayList<BaseUnit> hand = new ArrayList<>();
     private int[] numberOfUse = new int[DECK_SIZE];
 
@@ -41,37 +40,50 @@ public class Player {
         upgradeUsed = putUsed = spellUsed = false;
     }
 
-    public void initDeck(ArrayList<BaseUnit> deck) {
-        this.deck = deck;
-        for (int i=0; i<HAND_SIZE; i++)
+    public void initDeck(List<Integer> baseUnitIds, int numberOfBaseUnits) {
+
+        Set<Integer> ids = new HashSet<>();
+        ids.addAll(baseUnitIds);
+
+        while (ids.size() < DECK_SIZE) {
+            int random_id = getRandom(0, numberOfBaseUnits);
+            ids.add(random_id);
+        }
+
+        for (Integer id : ids) {
+            if (this.deck.size() == DECK_SIZE) break;
+            this.deck.add(BaseUnit.getInstance(id));
+        }
+
+        for (int i = 0; i < HAND_SIZE; i++)
             hand.add(deck.get(i));
 
-        for (int i=0; i<DECK_SIZE; i++) numberOfUse[i] = 0;
+        for (int i = 0; i < DECK_SIZE; i++) numberOfUse[i] = 0;
 
-        for (int i=0; i<DECK_SIZE; i++)
+        for (int i = 0; i < DECK_SIZE; i++)
             baseUnitId.put(deck.get(i), i);
 
     }
 
-    public void addUpgradeRangeToken(){
-        numberOfRangeUpgrades ++;
+    public void addUpgradeRangeToken() {
+        numberOfRangeUpgrades++;
     }
 
-    public void addUpgradeDamageToken(){
-        numberOfDamageUpgrades ++;
+    public void addUpgradeDamageToken() {
+        numberOfDamageUpgrades++;
     }
 
     public void useUpgradeDamage() {
-        if(upgradeUsed) throw new UseMoreThanOneUpgradeException();
-        if(numberOfDamageUpgrades == 0) throw new UpgradeNotHaveException();
-        numberOfDamageUpgrades --;
+        if (upgradeUsed) throw new UseMoreThanOneUpgradeException();
+        if (numberOfDamageUpgrades == 0) throw new UpgradeNotHaveException();
+        numberOfDamageUpgrades--;
         setUpgradeUsed(true);
     }
 
     public void useUpgradeRange() {
-        if(upgradeUsed) throw new UseMoreThanOneUpgradeException();
-        if(numberOfRangeUpgrades == 0) throw new UpgradeNotHaveException();
-        numberOfRangeUpgrades --;
+        if (upgradeUsed) throw new UseMoreThanOneUpgradeException();
+        if (numberOfRangeUpgrades == 0) throw new UpgradeNotHaveException();
+        numberOfRangeUpgrades--;
         setUpgradeUsed(true);
     }
 
@@ -85,7 +97,7 @@ public class Player {
 
         setPutUsed(true);
 
-        numberOfUse[baseUnitId.get(baseUnit)] ++;
+        numberOfUse[baseUnitId.get(baseUnit)]++;
 
         currentPutUnit = baseUnit;
         ap -= baseUnit.getCost();
@@ -94,24 +106,24 @@ public class Player {
 
     public void castSpell(int type) {
         int currentCount = getSpellCount(type);
-        if(currentCount == 0)
+        if (currentCount == 0)
             throw new SpellNotHaveException();
 
-        if(spellUsed) throw new UseMoreThanOneSpellException();
+        if (spellUsed) throw new UseMoreThanOneSpellException();
         setSpellUsed(true);
 
-        currentCount --;
+        currentCount--;
         spellCount.put(type, currentCount);
     }
 
     public void addSpell(int type) {
         int currentCount = getSpellCount(type);
-        currentCount ++;
+        currentCount++;
         spellCount.put(type, currentCount);
     }
 
     private int getSpellCount(int type) {
-        if(spellCount.get(type) == null)
+        if (spellCount.get(type) == null)
             return 0;
         return spellCount.get(type);
     }
@@ -126,7 +138,7 @@ public class Player {
 
     private void updateHand() {
 
-        if(currentPutUnit == null) return ;
+        if (currentPutUnit == null) return;
 
         ArrayList<BaseUnit> chances = new ArrayList<>();
         ArrayList<Double> probs = new ArrayList<>();
@@ -135,7 +147,7 @@ public class Player {
         for (BaseUnit baseUnit : deck) {
             if (hand.contains(baseUnit)) continue;
             chances.add(baseUnit);
-            double prob = (double)1 / (1 + numberOfUse[baseUnitId.get(baseUnit)]);
+            double prob = (double) 1 / (1 + numberOfUse[baseUnitId.get(baseUnit)]);
             probs.add(prob);
             normalize += prob;
         }
@@ -144,10 +156,10 @@ public class Player {
 
         int ptr = 2;
 
-        for (int i=0; i<3; i++){
-            if(random <= probs.get(i)) {
+        for (int i = 0; i < 3; i++) {
+            if (random <= probs.get(i)) {
                 ptr = i;
-                break ;
+                break;
             }
             random -= probs.get(i);
         }
@@ -171,5 +183,10 @@ public class Player {
 
     public boolean isAllyExclusive(Player other) {
         return this.getId() != other.getId() && this.getTeam() == other.getTeam();
+    }
+
+    private int getRandom(int L, int R) { //[L, R)
+        int rnd = (int) (Math.random() * (R - L)) + L;
+        return rnd;
     }
 }

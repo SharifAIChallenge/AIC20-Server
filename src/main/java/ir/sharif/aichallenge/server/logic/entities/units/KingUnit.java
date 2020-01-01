@@ -29,18 +29,7 @@ public class KingUnit extends Unit {
     }
 
     @Override
-    public void increaseActivePoisons() { }
-
-    @Override
-    public void decreaseActivePoisons() {
-
-    }
-
-    @Override
-    public int getActivePoisons() { return 0; }
-
-    @Override
-    public boolean getIsCloned() {
+    public boolean isCloned() {
         return false;
     }
 

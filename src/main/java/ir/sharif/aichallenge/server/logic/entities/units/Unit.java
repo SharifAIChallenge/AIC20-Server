@@ -3,6 +3,7 @@ package ir.sharif.aichallenge.server.logic.entities.units;
 import ir.sharif.aichallenge.server.logic.entities.Entity;
 import ir.sharif.aichallenge.server.logic.entities.Player;
 import ir.sharif.aichallenge.server.logic.entities.TargetType;
+import ir.sharif.aichallenge.server.logic.entities.spells.Spell;
 import ir.sharif.aichallenge.server.logic.map.Map;
 import ir.sharif.aichallenge.server.logic.map.MapUtils;
 import ir.sharif.aichallenge.server.logic.map.PathCell;
@@ -11,13 +12,15 @@ import lombok.Setter;
 import lombok.experimental.Delegate;
 
 import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Stream;
 
 @Getter
 public abstract class Unit extends Entity {
     @Delegate
     private BaseUnit baseUnit;
-    @Delegate()
+    @Delegate
     @Setter
     private PathCell position;
     private int speedIncrease;
@@ -26,6 +29,9 @@ public abstract class Unit extends Entity {
     private static int unitId = 1;
 
     private Unit targetUnit;
+    private boolean hasAttacked;
+
+    private Set<Integer> activeSpells;
 
     public void upgradeDamage() {
         damageLevel++;
@@ -34,8 +40,6 @@ public abstract class Unit extends Entity {
     public void upgradeRange() {
         rangeLevel++;
     }
-
-    private boolean hasAttacked;
 
     public Unit(BaseUnit baseUnit, Player player) {
         super(unitId, player);
@@ -56,13 +60,7 @@ public abstract class Unit extends Entity {
 
     public abstract void decreaseHealth(int damage);
 
-    public abstract void increaseActivePoisons();
-
-    public abstract void decreaseActivePoisons();
-
-    public abstract int getActivePoisons();
-
-    public abstract boolean getIsCloned();
+    public abstract boolean isCloned();
 
     public boolean isAlive() {
         return getHealth() > 0;
@@ -123,5 +121,17 @@ public abstract class Unit extends Entity {
 
     public void setHasAttacked(boolean hasAttacked) {
         this.hasAttacked = hasAttacked;
+    }
+
+    public void addActiveSpell(int spellId) {
+        if (activeSpells == null)
+            activeSpells = new HashSet<>();
+        activeSpells.add(spellId);
+    }
+
+    public void removeActiveSpell(int spellId) {
+        if (activeSpells == null)
+            return;
+        activeSpells.remove(spellId);
     }
 }

@@ -11,9 +11,11 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TurnCastSpell {
+    private int id;
     private int typeId;
     private int casterId;
     private ClientCell cell;
+    private boolean wasCastedThisTurn;
     private int unitId;         // for unit spell
     private int pathId;         // for unit spell and caster == player,friend
     private List<Integer> affectedUnits;

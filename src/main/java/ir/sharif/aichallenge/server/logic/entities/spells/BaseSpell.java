@@ -12,27 +12,42 @@ import java.util.HashMap;
 public class BaseSpell {
 
     private static HashMap<Integer, BaseSpell> instances = new HashMap<>();
-    private int type;
-    private int duration;
-    private int range;
-    private SpellTargetType targetType;
-    private int power;
-    private SpellType spellType;
 
-    public static BaseSpell getInstance(int type) {
-        BaseSpell instance = instances.get(type);
+    private static HashMap<Integer, SpellType> typeIdsToTypes = new HashMap<>();
+    private static HashMap<SpellType, Integer> typesToTypeIds = new HashMap<>();
+
+    public static BaseSpell getInstance(SpellType type) {
+        return getInstance(typesToTypeIds.get(type));
+    }
+
+    public static BaseSpell getInstance(int typeId) {
+        BaseSpell instance = instances.get(typeId);
         if (instance == null) throw new LogicException();
         return instance;
     }
 
     public static void initSpell(ClientSpell clientSpell) {
-        SpellTargetType spellTargetType;
-        if(clientSpell.isDamaging()) spellTargetType = SpellTargetType.ENEMY;
-        else spellTargetType = SpellTargetType.ALLIED;
+        typeIdsToTypes.put(clientSpell.getTypeId(), clientSpell.getType());
+        typesToTypeIds.put(clientSpell.getType(), clientSpell.getTypeId());
 
-        SpellType spellType = SpellType.getSpellTypeByTypeId(clientSpell.getTypeId());
-        BaseSpell baseSpell = new BaseSpell(clientSpell.getTypeId(), clientSpell.getTurnEffect(),
-                clientSpell.getRange(), spellTargetType, clientSpell.getPower(), spellType);
-        instances.put(clientSpell.getTypeId(), baseSpell);
+        instances.put(clientSpell.getTypeId(), new BaseSpell(clientSpell.getType(),
+                clientSpell.getTypeId(),
+                clientSpell.getPriority(),
+                clientSpell.getDuration(),
+                clientSpell.getRange(),
+                clientSpell.getTargetType(),
+                clientSpell.getPower()));
     }
+
+    public static SpellType getTypeByTypeId(int typeId) {
+        return typeIdsToTypes.get(typeId);
+    }
+
+    private SpellType type;
+    private int typeId;
+    private int priority;
+    private int duration;
+    private int range;
+    private SpellTargetType targetType;
+    private int power;
 }

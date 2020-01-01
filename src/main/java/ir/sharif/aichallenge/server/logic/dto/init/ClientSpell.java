@@ -1,5 +1,7 @@
 package ir.sharif.aichallenge.server.logic.dto.init;
 
+import ir.sharif.aichallenge.server.logic.entities.spells.SpellTargetType;
+import ir.sharif.aichallenge.server.logic.entities.spells.SpellType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,10 +12,11 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ClientSpell {
+    private SpellType type;
     private int typeId;
-    private int turnEffect;
-    private boolean isAreaSpell;
-    private int range;          //invalid for unit spell
-    private int power;          //invalid for unit spell
-    private boolean isDamaging; //invalid for unit spell
+    private int priority;
+    private int duration;
+    private int range;
+    private SpellTargetType targetType;
+    private int power;
 }

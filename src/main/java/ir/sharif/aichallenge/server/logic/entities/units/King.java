@@ -20,8 +20,10 @@ public class King {
 
     private KingUnit.HealthComponent healthComponent = new KingUnit.HealthComponent();
 
-    public King(Player player, Cell center, int health, int damage, int range) {
+    private KingUnit mainUnit;
 
+    public King(Player player, Cell center, int health, int damage, int range) {
+        //TODO: cleanup
         healthComponent.setHealth(health);
 
         for (int dr = -1; dr <= 1; dr++)
@@ -37,9 +39,10 @@ public class King {
                 }
 
                 KingUnit kingUnit = new KingUnit(baseUnit, player, healthComponent);
-                //TODO
                 kingUnit.setPosition(new PathCell(new Path(-1, new Cell(nr, nc)), false, 0));
                 units.add(kingUnit);
+                if (dr == 0 && dc == 0)
+                    mainUnit = kingUnit;
             }
     }
 

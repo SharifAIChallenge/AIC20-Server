@@ -82,6 +82,7 @@ public abstract class Spell extends Entity implements Disposable {
                 .cell(new ClientCell(getPosition()))
                 .wasCastThisTurn(isFirstTurn())
                 .typeId(getTypeId())
+                .remainingTurns(getRemainingTurns())
                 .build();
     }
 }

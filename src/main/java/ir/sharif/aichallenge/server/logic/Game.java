@@ -27,18 +27,19 @@ import java.util.stream.Stream;
 
 public class Game {
 
+    private GameConstants gameConstants;
     private int numberOfSpells;
     private int numberOfBaseUnits;
 
+    private Random randomMaker = new Random();
+
+    @Getter
     private Map map;
     private SortedSet<Spell> spells = new TreeSet<Spell>(Comparator.comparing(Spell::getPriority));
 
-    private List<Pair<Unit, Integer>> unitsToPut = new ArrayList<>();
-    private List<Unit> clonedUnitToPut = new ArrayList<>();
     private Player[] players = new Player[4];
     private HashMap<Integer, Unit> unitsWithId = new HashMap<>();
     private ArrayList<King> kings = new ArrayList<>();
-    private GameConstants gameConstants;
     @Getter
     private ClientTurnMessage[] clientTurnMessages = new ClientTurnMessage[4];  //todo set each turn
     private Set<Integer> damageUpgradedUnits;
@@ -73,6 +74,10 @@ public class Game {
 
     }
 
+    public void initializeMap(int size) {
+        map = new Map(size, size);
+    }
+
     private void initSpells(List<ClientSpell> spells) {
         numberOfSpells = spells.size();
         for (ClientSpell clientSpell : spells)
@@ -95,7 +100,7 @@ public class Game {
             for (ClientCell clientCell : clientPath.getCells())
                 cells.add(new Cell(clientCell.getRow(), clientCell.getCol()));
 
-            addPath(new Path(clientPath.getId(), cells));
+            map.addPath(new Path(clientPath.getId(), cells));
         }
 
         for (ClientBaseKing clientBaseKing : clientMap.getKings()) {
@@ -104,6 +109,15 @@ public class Game {
                     clientBaseKing.getHp(), clientBaseKing.getAttack(), clientBaseKing.getRange());
         }
 
+    }
+
+    public void addKing(Player player, Cell centerCell, int health, int damage, int range) {
+        King king = new King(player, centerCell, health, damage, range);
+        for (KingUnit kingUnit : king.getUnits()) {
+            unitsWithId.put(kingUnit.getId(), kingUnit);
+            map.putUnit(kingUnit);
+        }
+        kings.add(king);
     }
 
     //endregion
@@ -144,76 +158,6 @@ public class Game {
         currentTurn.incrementAndGet();
     }
 
-    private TurnUnit buildTurnUnit(Unit unit) {
-        int pathId = -1;
-
-        int targetId = -1;
-        if (unit.getTargetUnit() != null) targetId = unit.getTargetUnit().getId();
-
-
-        return TurnUnit.builder().unitId(unit.getId()).playerId(unit.getPlayer().getId()).typeId(unit.getBaseUnit().getType()).
-                pathId(pathId).cell(new ClientCell(unit.getCell().getRow(), unit.getCell().getCol()))
-                .hp(unit.getHealth())
-                .attack(unit.getDamage()).damageLevel(unit.getDamageLevel())
-                .wasDamageUpgraded(damageUpgradedUnits.contains(unit.getId()))
-                .range(unit.getRange()).rangeLevel(unit.getRangeLevel())
-                .wasRangeUpgraded(rangeUpgradedUnits.contains(unit.getId()))
-                .isDuplicate(unit.isDuplicate())
-                .isHasted(unit.getSpeedIncrease() > 0)
-                .affectedSpells(unit.getAffectedSpells())
-                .target(targetId)
-                .wasPlayedThisTurn(playedUnits.contains(unit.getId())).build();
-    }
-
-    private void bindPathId(TurnUnit tunit, int sendToId, Unit unit) {
-        tunit.setPathId(unit.getPlayer().isAlly(sendToId) ? unit.getPath().getId() : -1);
-    }
-
-    private void fillClientMessage() {
-
-        List<TurnKing> turnKings = IntStream.range(0, 4).boxed()
-                .map(pId -> {
-                    int health = kings.get(pId).getHealthComponent().getHealth();
-                    return new TurnKing(pId, health > 0, health);
-                })
-                .collect(Collectors.toList());
-
-        final ArrayList<Unit> units = new ArrayList<>(unitsWithId.values());
-        final List<TurnUnit> turnUnits = units.stream()
-                .map(this::buildTurnUnit)
-                .collect(Collectors.toCollection(() -> new ArrayList<>(units.size())));
-
-        for (int pId = 0; pId < 4; pId++) {
-            int friendId = pId ^ 2;
-
-            final ClientTurnMessage message = clientTurnMessages[pId];
-            final Player player = players[pId];
-
-            for (int i = 0; i < units.size(); i++)
-                bindPathId(turnUnits.get(i), pId, units.get(i));
-            message.setUnits(turnUnits);
-            message.setCurrTurn(currentTurn.get());
-
-            message.setKings(turnKings);
-
-            message.setAvailableRangeUpgrades(player.getNumberOfRangeUpgrades());
-            message.setAvailableDamageUpgrades(player.getNumberOfDamageUpgrades());
-
-            message.setRemainingAP(player.getAp());
-
-            message.setMySpells(player.getAvailableSpellIds());
-            message.setFriendSpells(players[friendId].getAvailableSpellIds());
-
-            message.setDeck(player.getDeckIds());
-            message.setHand(player.getHandIds());
-        }
-    }
-
-    private int getRandom(int l, int r) { //[L, R)
-        int rnd = (int) (Math.random() * (r - l)) + l;
-        return rnd;
-    }
-
     private void initializeTurn() {
         playedUnits.clear();
         turnCastSpells.clear();
@@ -237,6 +181,23 @@ public class Game {
                         player.useUpgradeRange();
                         unit.upgradeRange();
                         rangeUpgradedUnits.add(unit.getId());
+                    }
+                });
+    }
+
+    private void applyPutUnits(List<ClientMessageInfo> putUnitMessages) {
+        putUnitMessages.stream()
+                .map(message -> (UnitPutInfo) message)
+                .forEach(info -> {
+                    try {
+                        Player player = players[info.getPathId()];
+                        BaseUnit baseUnit = BaseUnit.getInstance(info.getTypeId());
+                        player.putUnit(baseUnit);
+                        GeneralUnit generalUnit = new GeneralUnit(baseUnit, player);
+                        unitsWithId.put(generalUnit.getId(), generalUnit);
+
+                        playedUnits.add(generalUnit.getId());
+                    } catch (Exception ex) {
                     }
                 });
     }
@@ -296,24 +257,24 @@ public class Game {
     }
 
     private void resetPlayers() {
-        if (players == null) return;
         Arrays.stream(players).forEach(Player::reset);
     }
 
     private void attack() {
         for (Unit unit : unitsWithId.values()) {
             Unit targetUnit = unit.getTarget(map);
-            if (targetUnit != null) {
-                unit.setHasAttacked(true);
-
-                if (unit.isMultiTarget())
-                    map.getUnits(targetUnit.getCell())
-                            .filter(unit::isTarget)
-                            .forEach(target -> target.decreaseHealth(unit.getDamage()));
-                else
-                    targetUnit.decreaseHealth(unit.getDamage());
-            } else
+            if (targetUnit == null) {
                 unit.setHasAttacked(false);
+                continue;
+            }
+
+            unit.setHasAttacked(true);
+            if (unit.isMultiTarget())
+                map.getUnits(targetUnit.getCell())
+                        .filter(unit::isTarget)
+                        .forEach(target -> target.decreaseHealth(unit.getDamage()));
+            else
+                targetUnit.decreaseHealth(unit.getDamage());
         }
     }
 
@@ -321,38 +282,6 @@ public class Game {
         for (Unit unit : unitsWithId.values())
             if (unit.isAlive() && !unit.hasAttacked())
                 map.moveUnit(unit, unit.getNextMoveCell());
-    }
-
-
-    private void applyPutUnits(List<ClientMessageInfo> putUnitMessages) {
-        putUnitMessages.stream()
-                .map(message -> (UnitPutInfo) message)
-                .forEach(info -> {
-                    try {
-                        Player player = players[info.getPathId()];
-                        BaseUnit baseUnit = BaseUnit.getInstance(info.getTypeId());
-                        player.putUnit(baseUnit);
-                        GeneralUnit generalUnit = new GeneralUnit(baseUnit, player);
-                        unitsWithId.put(generalUnit.getId(), generalUnit);
-
-                        playedUnits.add(generalUnit.getId());
-                    } catch (Exception ex) {
-                    }
-                });
-    }
-
-    private void readRequestsFromClient() {
-        //network ....
-    }
-
-    private ArrayList<Unit> getAllUnits() {
-        Collection<Unit> units = unitsWithId.values();
-        return new ArrayList<>(units);
-    }
-
-    public void addUnit(Integer pathId, Unit unit) {
-        unitsWithId.put(unit.getId(), unit);
-        unitsToPut.add(new Pair<>(unit, pathId));
     }
 
     public GeneralUnit cloneUnit(Unit unit, int rateOfHealthOfCloneUnit, int rateOfDamageCloneUnit) {
@@ -368,11 +297,9 @@ public class Game {
     }
 
     public void teleportUnit(Unit unit, PathCell targetCell) {
-        //TODO clean code
-        if (unit == null)
-            throw new NullPointerException();
+        Objects.requireNonNull(unit);
 
-        if (!unit.isAlive())
+        if (!unit.isAlive())    //Impossible
             throw new NotAliveUnitException();
 
         if (unit instanceof KingUnit) throw new TeleportKingException();
@@ -381,36 +308,9 @@ public class Game {
         getMap().moveUnit(unit, targetCell);
     }
 
-    public Map getMap() {
-        return map;
-    }
-
-    public void initializeMap(int size) {
-        map = new Map(size, size);
-    }
-
-    public HashMap<Integer, Unit> getUnitsWithId() {
-        return unitsWithId;
-    }
-
     public Unit getUnitById(int id) {
         return this.unitsWithId.get(id);
     }
-
-
-    public void addPath(Path path) {
-        map.addPath(path);
-    }
-
-    public void addKing(Player player, Cell centerCell, int health, int damage, int range) {
-        King king = new King(player, centerCell, health, damage, range);
-        for (KingUnit kingUnit : king.getUnits()) {
-            unitsWithId.put(kingUnit.getId(), kingUnit);
-            map.putUnit(kingUnit);
-        }
-        kings.add(king);
-    }
-
 
     //region Token Givings
 
@@ -431,12 +331,10 @@ public class Game {
     }
 
     private void giveSpells() {
-        int type1 = getRandom(0, numberOfSpells);
-        int type2 = getRandom(0, numberOfSpells);
+        int type1 = randomMaker.nextInt(numberOfSpells);
+        int type2 = randomMaker.nextInt(numberOfSpells);
 
-        int rnd = getRandom(0, 2);
-
-        if (rnd == 0) {
+        if (randomMaker.nextBoolean()) {
             giveSpellToPlayer(0, type1);
             giveSpellToPlayer(2, type2);
         } else {
@@ -444,8 +342,7 @@ public class Game {
             giveSpellToPlayer(2, type1);
         }
 
-        rnd = getRandom(0, 2);
-        if (rnd == 0) {
+        if (randomMaker.nextBoolean()) {
             giveSpellToPlayer(1, type1);
             giveSpellToPlayer(3, type2);
         } else {
@@ -456,19 +353,18 @@ public class Game {
     }
 
     private void checkToGiveUpgradeTokens() {
-        if (currentTurn.get() % gameConstants.getTurnsToUpgrade() != 0) return;
+        if (currentTurn.get() % gameConstants.getTurnsToUpgrade() != 0)
+            return;
+
         for (int pId = 0; pId < 4; pId++) {
             clientTurnMessages[pId].setGotDamageUpgrade(false);
             clientTurnMessages[pId].setGotRangeUpgrade(false);
         }
         giveUpgradeTokens();
-
     }
 
     private void giveUpgradeTokens() {
-        int rnd = getRandom(0, 2);
-
-        if (rnd == 0) {
+        if (randomMaker.nextBoolean()) {
             giveUpgradeDamageToPlayer(0);
             giveUpgradeRangeToPlayer(2);
         } else {
@@ -476,8 +372,7 @@ public class Game {
             giveUpgradeRangeToPlayer(0);
         }
 
-        rnd = getRandom(0, 2);
-        if (rnd == 0) {
+        if (randomMaker.nextBoolean()) {
             giveUpgradeDamageToPlayer(1);
             giveUpgradeRangeToPlayer(3);
         } else {
@@ -494,6 +389,84 @@ public class Game {
     private void giveUpgradeRangeToPlayer(int playerId) {
         players[playerId].addUpgradeRangeToken();
         clientTurnMessages[playerId].setGotRangeUpgrade(true);
+    }
+
+    //endregion
+
+    //region Client Message
+
+    private TurnUnit buildTurnUnit(Unit unit) {
+        int pathId = -1;
+
+        int targetId = -1;
+        Cell targetCell = null;
+        if (unit.getTargetUnit() != null) {
+            if (unit.getTargetUnit() instanceof KingUnit)
+                targetId = unit.getPlayer().getId();
+            else
+                targetId = unit.getTargetUnit().getId();
+            targetCell = unit.getTargetUnit().getCell();
+        }
+
+
+        return TurnUnit.builder().unitId(unit.getId()).playerId(unit.getPlayer().getId()).typeId(unit.getBaseUnit().getType()).
+                pathId(pathId).cell(new ClientCell(unit.getCell()))
+                .hp(unit.getHealth())
+                .attack(unit.getDamage()).damageLevel(unit.getDamageLevel())
+                .wasDamageUpgraded(damageUpgradedUnits.contains(unit.getId()))
+                .range(unit.getRange()).rangeLevel(unit.getRangeLevel())
+                .wasRangeUpgraded(rangeUpgradedUnits.contains(unit.getId()))
+                .isDuplicate(unit.isDuplicate())
+                .isHasted(unit.getSpeedIncrease() > 0)
+                .affectedSpells(unit.getAffectedSpells())
+                .target(targetId).targetCell(new ClientCell(targetCell))
+                .wasPlayedThisTurn(playedUnits.contains(unit.getId())).build();
+    }
+
+    private void bindPathId(TurnUnit tunit, int sendToId, Unit unit) {
+        tunit.setPathId(unit.getPlayer().isAlly(sendToId) ? unit.getPath().getId() : -1);
+    }
+
+    private void fillClientMessage() {
+
+        List<TurnKing> turnKings = IntStream.range(0, 4).boxed()
+                .map(pId -> {
+                    final King king = kings.get(pId);
+                    int health = king.getHealthComponent().getHealth();
+                    final Unit targetUnit = king.getMainUnit().getTargetUnit();
+                    return new TurnKing(pId, health > 0, health, targetUnit == null ? -1 : targetUnit.getId());
+                })
+                .collect(Collectors.toList());
+
+        final ArrayList<Unit> units = new ArrayList<>(unitsWithId.values());
+        final List<TurnUnit> turnUnits = units.stream()
+                .map(this::buildTurnUnit)
+                .collect(Collectors.toCollection(() -> new ArrayList<>(units.size())));
+
+        for (int pId = 0; pId < 4; pId++) {
+            int friendId = pId ^ 2;
+
+            final ClientTurnMessage message = clientTurnMessages[pId];
+            final Player player = players[pId];
+
+            for (int i = 0; i < units.size(); i++)
+                bindPathId(turnUnits.get(i), pId, units.get(i));
+            message.setUnits(turnUnits);
+            message.setCurrTurn(currentTurn.get());
+
+            message.setKings(turnKings);
+
+            message.setAvailableRangeUpgrades(player.getNumberOfRangeUpgrades());
+            message.setAvailableDamageUpgrades(player.getNumberOfDamageUpgrades());
+
+            message.setRemainingAP(player.getAp());
+
+            message.setMySpells(player.getAvailableSpellIds());
+            message.setFriendSpells(players[friendId].getAvailableSpellIds());
+
+            message.setDeck(player.getDeckIds());
+            message.setHand(player.getHandIds());
+        }
     }
 
     //endregion

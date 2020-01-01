@@ -26,6 +26,6 @@ public class DuplicateSpell extends AreaSpell {
 
     @Override
     public boolean isTarget(Unit unit) {
-        return super.isTarget(unit) && !unit.isCloned();
+        return super.isTarget(unit) && !unit.isDuplicate();
     }
 }

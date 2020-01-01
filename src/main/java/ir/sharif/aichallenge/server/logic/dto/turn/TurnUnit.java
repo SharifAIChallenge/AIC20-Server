@@ -4,6 +4,8 @@ package ir.sharif.aichallenge.server.logic.dto.turn;
 import ir.sharif.aichallenge.server.logic.dto.ClientCell;
 import lombok.*;
 
+import java.util.Set;
+
 @Builder
 @Getter
 @Setter
@@ -20,9 +22,9 @@ public class TurnUnit {
     private int rangeLevel;
     private boolean wasDamageUpgraded;
     private boolean wasRangeUpgraded;
+    private boolean isDuplicate;
     private boolean isHasted;
-    private boolean isClone;
-    private int activePoisons;
+    private Set<Integer> affectedSpells;
     private int range;
     private int attack;
     private boolean wasPlayedThisTurn;

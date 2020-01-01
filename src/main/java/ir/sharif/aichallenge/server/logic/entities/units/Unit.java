@@ -54,13 +54,11 @@ public abstract class Unit extends Entity {
 
     public abstract int getHealth();
 
-    public abstract void setCloned();
-
     public abstract void increaseHealth(int heal);
 
     public abstract void decreaseHealth(int damage);
 
-    public abstract boolean isCloned();
+    public abstract boolean isDuplicate();
 
     public boolean isAlive() {
         return getHealth() > 0;

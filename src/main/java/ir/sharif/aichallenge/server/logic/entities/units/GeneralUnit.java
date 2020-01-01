@@ -1,17 +1,13 @@
 package ir.sharif.aichallenge.server.logic.entities.units;
 
 import ir.sharif.aichallenge.server.logic.entities.Player;
-import ir.sharif.aichallenge.server.logic.map.Map;
-import ir.sharif.aichallenge.server.logic.map.MapUtils;
 import lombok.Getter;
-
-import java.util.Optional;
 
 @Getter
 public class GeneralUnit extends Unit {
     private int health;
     private int damage;
-    private boolean isCloned = false;
+    private boolean isDuplicate = false;
     private int activePoisons = 0;
 
     private boolean hasAttacked;
@@ -23,8 +19,8 @@ public class GeneralUnit extends Unit {
         this.damage = damage;
     }
 
-    public void setCloned() {
-        isCloned = true;
+    public void setDuplicate() {
+        isDuplicate = true;
     }
 
     public GeneralUnit(BaseUnit baseUnit, Player player) {
@@ -53,8 +49,8 @@ public class GeneralUnit extends Unit {
     }
 
     @Override
-    public boolean isCloned() {
-        return isCloned;
+    public boolean isDuplicate() {
+        return isDuplicate;
     }
 
 }

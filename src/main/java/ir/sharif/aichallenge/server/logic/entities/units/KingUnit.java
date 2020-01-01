@@ -18,9 +18,6 @@ public class KingUnit extends Unit {
     }
 
     @Override
-    public void setCloned() { }
-
-    @Override
     public void increaseHealth(int heal) { }
 
     @Override
@@ -29,7 +26,7 @@ public class KingUnit extends Unit {
     }
 
     @Override
-    public boolean isCloned() {
+    public boolean isDuplicate() {
         return false;
     }
 

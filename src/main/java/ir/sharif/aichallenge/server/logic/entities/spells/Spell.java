@@ -14,7 +14,6 @@ import lombok.Getter;
 import lombok.experimental.Delegate;
 
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Getter
@@ -81,7 +80,7 @@ public abstract class Spell extends Entity implements Disposable {
                 .id(getId())
                 .casterId(getPlayer().getId())
                 .cell(new ClientCell(getPosition()))
-                .wasCastedThisTurn(isFirstTurn())
+                .wasCastThisTurn(isFirstTurn())
                 .typeId(getTypeId())
                 .build();
     }

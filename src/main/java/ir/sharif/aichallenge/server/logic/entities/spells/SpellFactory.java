@@ -9,26 +9,22 @@ public class SpellFactory {
 
     private static int id = 0;
 
-    public static Spell createSpell(int typeId, Player player, Cell cell, int unitId, Path path) {
+    public static Spell createSpell(int typeId, Player player, Cell position, int unitId, Path path) {
         id++;
-        switch (typeId) {
-            case HasteSpell.TYPE:
-                return new HasteSpell(id, player, cell);
-            case DamageSpell.TYPE:
-                return new DamageSpell(id, player, cell);
-            case HealSpell.TYPE:
-                return new HealSpell(id, player, cell);
-            case TeleportSpell.TYPE:
+        switch (BaseSpell.getTypeByTypeId(typeId)) {
+            case HP:
+                return new HPSpell(id, BaseSpell.getInstance(typeId), player, position);
+            case HASTE:
+                return new HasteSpell(id, player, position);
+            case TELE:
                 if (player.getTeam() == 0)
-                    return new TeleportSpell(id, player, cell, unitId,
-                            new PathCell(path, player.getTeam() == 0, path.getLength() - path.getCells().indexOf(cell) - 1));
+                    return new TeleportSpell(id, player, position, unitId,
+                            new PathCell(path, player.getTeam() == 0, path.getLength() - path.getCells().indexOf(position) - 1));
                 else
-                    return new TeleportSpell(id, player, cell, unitId,
-                            new PathCell(path, player.getTeam() == 0, path.getCells().indexOf(cell)));
-            case DuplicateSpell.TYPE:
-                return new DuplicateSpell(id, player, cell);
-            case PoisonSpell.TYPE:
-                return new PoisonSpell(id, player, cell);
+                    return new TeleportSpell(id, player, position, unitId,
+                            new PathCell(path, player.getTeam() == 0, path.getCells().indexOf(position)));
+            case DUPLICATE:
+                return new DuplicateSpell(id, player, position);
             default:
                 return null;
         }

@@ -53,22 +53,7 @@ public class GeneralUnit extends Unit {
     }
 
     @Override
-    public void increaseActivePoisons() {
-        activePoisons ++;
-    }
-
-    @Override
-    public void decreaseActivePoisons() {
-        activePoisons --;
-    }
-
-    @Override
-    public int getActivePoisons() {
-        return activePoisons;
-    }
-
-    @Override
-    public boolean getIsCloned() {
+    public boolean isCloned() {
         return isCloned;
     }
 

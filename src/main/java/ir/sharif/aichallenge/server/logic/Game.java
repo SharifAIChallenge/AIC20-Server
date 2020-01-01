@@ -15,14 +15,11 @@ import ir.sharif.aichallenge.server.logic.map.Cell;
 import ir.sharif.aichallenge.server.logic.map.Map;
 import ir.sharif.aichallenge.server.logic.map.Path;
 import ir.sharif.aichallenge.server.logic.map.PathCell;
-import javafx.util.Builder;
 import javafx.util.Pair;
 import lombok.Getter;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Game {
 
@@ -33,6 +30,7 @@ public class Game {
     private SortedSet<Spell> spells = new TreeSet<Spell>(Comparator.comparing(Spell::getPriority));
     private List<Spell> hpSpells = new ArrayList<>();
     private List<Spell> nonHpSpells = new ArrayList<>();
+
     private List<Pair<Unit, Integer>> unitsToPut = new ArrayList<>();
     private List<Unit> clonedUnitToPut = new ArrayList<>();
     private Player[] players = new Player[4];
@@ -142,30 +140,30 @@ public class Game {
 
     private TurnUnit buildTargetUnit(Unit unit) {
         int pathId = -1, pId = unit.getPlayer().getId();
-        if(unit.getPlayer().getId() == pId || unit.getPlayer().getId() == (pId ^ 2)) pathId = unit.getPath().getId();
+        if (unit.getPlayer().getId() == pId || unit.getPlayer().getId() == (pId ^ 2)) pathId = unit.getPath().getId();
 
         int targetId = -1;
-        if(unit.getTargetUnit() != null) targetId = unit.getTargetUnit().getId();
+        if (unit.getTargetUnit() != null) targetId = unit.getTargetUnit().getId();
 
 
         TurnUnit build = TurnUnit.builder().unitId(unit.getId()).playerId(pId).typeId(unit.getBaseUnit().getType()).
                 pathId(pathId).cell(new ClientCell(unit.getCell().getRow(), unit.getCell().getCol())).
                 hp(unit.getHealth()).damageLevel(unit.getDamageLevel()).rangeLevel(unit.getRangeLevel()).
                 range(unit.getRange()).attack(unit.getDamage()).wasDamageUpgraded(damageUpgradedUnits.contains(unit.getId())).
-                wasRangeUpgraded(rangeUpgradedUnits.contains(unit.getId())).isClone(unit.getIsCloned()).isHasted(unit.getSpeed() > 1).
-                activePoisons(unit.getActivePoisons()).target(targetId).wasPlayedThisTurn(playedUnits.contains(unit.getId())).build();
+                wasRangeUpgraded(rangeUpgradedUnits.contains(unit.getId())).isClone(unit.isCloned()).isHasted(unit.getSpeed() > 1)
+                .target(targetId).wasPlayedThisTurn(playedUnits.contains(unit.getId())).build();
         return build;
     }
 
     private void fillClientMessage() {
 
         List<TurnKing> turnKings = new ArrayList<>();
-        for (int pId=0; pId<4; pId++) {
+        for (int pId = 0; pId < 4; pId++) {
             int health = kings.get(pId).getHealthComponent().getHealth();
             turnKings.add(new TurnKing(pId, health > 0, health));
         }
 
-        for (int pId=0; pId<4; pId ++) {
+        for (int pId = 0; pId < 4; pId++) {
             ArrayList<TurnUnit> turnUnits = new ArrayList<>();
             ArrayList<Unit> units = getAllUnits();
             for (Unit unit : units) {
@@ -175,7 +173,7 @@ public class Game {
             clientTurnMessages[pId].setUnits(turnUnits);
         }
 
-        for (int pId=0; pId<4; pId++) {
+        for (int pId = 0; pId < 4; pId++) {
             int friendId = pId ^ 2;
 
             clientTurnMessages[pId].setKings(turnKings);
@@ -198,14 +196,14 @@ public class Game {
     }
 
     private int getRandom(int L, int R) { //[L, R)
-        int rnd = (int)(Math.random() * (R - L)) + L;
+        int rnd = (int) (Math.random() * (R - L)) + L;
         return rnd;
     }
 
     private void checkToGiveSpells() {
-        if(currentTurn.get() % gameConstants.getTurnsToSpell() != 0) return ;
+        if (currentTurn.get() % gameConstants.getTurnsToSpell() != 0) return;
 
-        for (int pId=0; pId<4; pId ++) {
+        for (int pId = 0; pId < 4; pId++) {
             clientTurnMessages[pId].setReceivedSpell(-1);
             clientTurnMessages[pId].setFriendReceivedSpell(-1);
         }
@@ -224,19 +222,19 @@ public class Game {
 
         int rnd = getRandom(0, 2);
 
-        if(rnd == 0) {
+        if (rnd == 0) {
             giveSpellToPlayer(0, type1);
             giveSpellToPlayer(2, type2);
-        }else {
+        } else {
             giveSpellToPlayer(0, type2);
             giveSpellToPlayer(2, type1);
         }
 
         rnd = getRandom(0, 2);
-        if(rnd == 0) {
+        if (rnd == 0) {
             giveSpellToPlayer(1, type1);
             giveSpellToPlayer(3, type2);
-        }else {
+        } else {
             giveSpellToPlayer(1, type2);
             giveSpellToPlayer(3, type1);
         }
@@ -245,7 +243,7 @@ public class Game {
 
     private void checkToGiveUpgradeTokens() {
         if (currentTurn.get() % gameConstants.getTurnsToUpgrade() != 0) return;
-        for (int pId=0; pId<4; pId++) {
+        for (int pId = 0; pId < 4; pId++) {
             clientTurnMessages[pId].setGotDamageUpgrade(false);
             clientTurnMessages[pId].setGotRangeUpgrade(false);
         }
@@ -305,10 +303,6 @@ public class Game {
         ArrayList<Unit> allUnits = getAllUnits();
 
         for (Unit unit : allUnits) {
-
-            if (unit instanceof ClonedUnit)
-                ((ClonedUnit) unit).decreaseRemainingTurns();
-
             if (!unit.isAlive()) {
                 map.removeUnit(unit);
                 unitsWithId.remove(unit.getId());
@@ -366,7 +360,10 @@ public class Game {
 
         for (Spell spell : spells) {
             spell.decreaseRemainingTurns();
-            if (spell.shouldRemove()) removeSpells.add(spell);
+            if (spell.shouldRemove()) {
+                spell.getCaughtUnits().forEach(unit -> unit.removeActiveSpell(spell.getId()));
+                removeSpells.add(spell);
+            }
         }
 
         for (Spell spell : removeSpells)
@@ -425,82 +422,31 @@ public class Game {
     }
 
     private void applySpells(List<ClientMessageInfo> castSpellMessages) {
-        Stream<SpellCastInfo> castInfoStream =
-                castSpellMessages.stream().map(castSpellMessage -> (SpellCastInfo) castSpellMessage);
-
-        //hp spells
-        castSpells(castInfoStream.filter(spellCastInfo -> {
-            SpellType spellType = SpellType.getSpellTypeByTypeId(spellCastInfo.getTypeId());
-            return spellType == SpellType.HEAL || spellType == SpellType.DAMAGE || spellType == SpellType.POISON;
-        }).collect(Collectors.toList()), hpSpells);
-
-        evaluateUnits();
-
-        //non hp spells
-        castSpells(castInfoStream.filter(spellCastInfo -> {
-            SpellType spellType = SpellType.getSpellTypeByTypeId(spellCastInfo.getTypeId());
-            return spellType != SpellType.HEAL && spellType != SpellType.DAMAGE && spellType != SpellType.POISON;
-        }).collect(Collectors.toList()), nonHpSpells);
-
-        /*castSpellMessages.stream().map(info -> (SpellCastInfo) info).forEach(info -> {
+        castSpellMessages.stream().map(info -> (SpellCastInfo) info).forEach(info -> {
             try {
                 final Player player = players[info.getPlayerId()];
-                player.castSpell(info.getTypeId());
-                Spell spell = SpellFactory.createSpell(
-                        info.getTypeId(), player, info.getCell(), info.getUnitId(), map.getPath(info.getPathId()));
-                spells.add(spell);
-
+                if (player.castSpell(info.getTypeId())) {
+                    Spell spell = SpellFactory.createSpell(
+                            info.getTypeId(), player, info.getCell(), info.getUnitId(), map.getPath(info.getPathId()));
+                    spells.add(spell);
+                }
             } catch (Exception ex) {
             }
         });
 
+        if (spells.isEmpty())
+            return;
+
+        Spell lastSpell = spells.first();
         for (Spell spell : spells) {
+            if (spell.getType() != SpellType.HP && lastSpell.getType() == SpellType.HP)
+                evaluateUnits();
             try {
                 spell.applyTo(this);
+                spell.getCaughtUnits().forEach(unit -> unit.addActiveSpell(spell.getId()));
+                turnCastSpells.add(spell.getTurnCastSpell());
             } catch (Exception ex) {
             }
-        }*/
-
-        //TODO exceptions for teleport.
-        //spells.forEach(spell -> spell.applyTo(this));
-    }
-
-    private void castSpells(List<SpellCastInfo> spellCastInfos, List<Spell> activeSpells) {
-        for (SpellCastInfo spellCastInfo: spellCastInfos) {
-            int typeId = spellCastInfo.getTypeId();
-            try {
-                final Player player = players[spellCastInfo.getPlayerId()]; //todo invalid index exception
-                Spell spell = SpellFactory.createSpell(typeId, player,
-                        spellCastInfo.getCell(), spellCastInfo.getUnitId(), map.getPath(spellCastInfo.getPathId()));
-                if (player.castSpell(typeId)) {
-                    try {
-                        spell.applyTo(this);    //todo null pointer
-                        TurnCastSpell turnCastSpell = TurnCastSpell.builder()
-                                .casterId(player.getId()).cell(new ClientCell(spell.getPosition()))
-                                .typeId(spell.getType()).build();
-                        if (spell.getSpellType() == SpellType.TELE) {
-                            TeleportSpell teleportSpell = (TeleportSpell) spell;
-                            turnCastSpell.setUnitId(teleportSpell.getTargetUnitId());
-                            turnCastSpell.setPathId(teleportSpell.getTargetCell().getPath().getId());
-                            turnCastSpell.setAffectedUnits(Collections.singletonList(teleportSpell.getTargetUnitId()));
-                        }
-                        else {
-                            Set<Unit> caughtUnits = ((AreaSpell) spell).getCaughtUnits();
-                            turnCastSpell.setAffectedUnits(
-                                    caughtUnits.stream().map(unit -> unit.getId()).collect(Collectors.toList()));
-                            //todo set isClone, activePoisons, ... in applyTo
-                        }
-                        turnCastSpells.add(turnCastSpell);
-                    } catch (LogicException e) {
-                        player.unCastSpell(typeId);
-                    }
-                }
-
-            }
-            catch (LogicException e) {
-                //todo
-            }
-            //todo active spells
         }
     }
 
@@ -532,10 +478,10 @@ public class Game {
 
     public void teleportUnit(Unit unit, PathCell targetCell) {
         //TODO clean code
-        if(unit == null)
+        if (unit == null)
             throw new NullPointerException();
 
-        if(!unit.isAlive())
+        if (!unit.isAlive())
             throw new NotAliveUnitException();
 
         if (unit instanceof KingUnit) throw new TeleportKingException();

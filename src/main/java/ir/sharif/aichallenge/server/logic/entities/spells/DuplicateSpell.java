@@ -8,10 +8,8 @@ import ir.sharif.aichallenge.server.logic.map.Cell;
 import java.util.stream.Collectors;
 
 public class DuplicateSpell extends AreaSpell {
-    public static final int TYPE = 4;
-
     public DuplicateSpell(int id, Player player, Cell position) {
-        super(id, BaseSpell.getInstance(TYPE), player, position);
+        super(id, BaseSpell.getInstance(SpellType.DUPLICATE), player, position);
     }
 
     @Override
@@ -23,15 +21,11 @@ public class DuplicateSpell extends AreaSpell {
 
         //Killing all cloned units after spell is disposed
         if (isDisposed())   //todo we check to kill cloned units twice
-            caughtUnits.forEach(unit -> unit.decreaseHealth(unit.getHealth()));
+            caughtUnits.forEach(unit -> unit.decreaseHealth(Integer.MAX_VALUE));
     }
 
     @Override
-    protected void applyEffectOn(Unit unit) {
-    }
-
-    @Override
-    public int getPriority() {
-        return 3;
+    public boolean isTarget(Unit unit) {
+        return super.isTarget(unit) && !unit.isCloned();
     }
 }

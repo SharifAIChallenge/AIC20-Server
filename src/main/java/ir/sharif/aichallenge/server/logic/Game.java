@@ -118,11 +118,12 @@ public class Game {
         applyRangeUpgrades(messages.get(MessageTypes.UPGRADE_RANGE));
         applyDamageUpgrades(messages.get(MessageTypes.UPGRADE_DAMAGE));
 
+        evaluateSpells();
+
         applySpells(messages.get(MessageTypes.CAST_SPELL)); //todo
 
         applyPutUnits(messages.get(MessageTypes.PUT_UNIT)); //todo isn't put before spells?
 
-        evaluateSpells();
 
         attack();
         move();
@@ -146,13 +147,17 @@ public class Game {
         if (unit.getTargetUnit() != null) targetId = unit.getTargetUnit().getId();
 
 
-        TurnUnit build = TurnUnit.builder().unitId(unit.getId()).playerId(pId).typeId(unit.getBaseUnit().getType()).
-                pathId(pathId).cell(new ClientCell(unit.getCell().getRow(), unit.getCell().getCol())).
-                hp(unit.getHealth()).damageLevel(unit.getDamageLevel()).rangeLevel(unit.getRangeLevel()).
-                range(unit.getRange()).attack(unit.getDamage()).wasDamageUpgraded(damageUpgradedUnits.contains(unit.getId())).
-                wasRangeUpgraded(rangeUpgradedUnits.contains(unit.getId())).isClone(unit.isCloned()).isHasted(unit.getSpeed() > 1)
+        return TurnUnit.builder().unitId(unit.getId()).playerId(pId).typeId(unit.getBaseUnit().getType()).
+                pathId(pathId).cell(new ClientCell(unit.getCell().getRow(), unit.getCell().getCol()))
+                .hp(unit.getHealth())
+                .attack(unit.getDamage()).damageLevel(unit.getDamageLevel())
+                .wasDamageUpgraded(damageUpgradedUnits.contains(unit.getId()))
+                .range(unit.getRange()).rangeLevel(unit.getRangeLevel())
+                .wasRangeUpgraded(rangeUpgradedUnits.contains(unit.getId()))
+                .isDuplicate(unit.isDuplicate())
+                .isHasted(unit.getSpeedIncrease() > 0)
+                .affectedSpells(unit.getAffectedSpells())
                 .target(targetId).wasPlayedThisTurn(playedUnits.contains(unit.getId())).build();
-        return build;
     }
 
     private void fillClientMessage() {
@@ -468,7 +473,7 @@ public class Game {
 
         GeneralUnit clonedUnit = new GeneralUnit(unit.getBaseUnit(), unit.getPlayer(),
                 unit.getHealth() / rateOfHealthOfCloneUnit, unit.getDamage() / rateOfDamageCloneUnit);
-        clonedUnit.setCloned();
+        clonedUnit.setDuplicate();
 
         unitsWithId.put(clonedUnit.getId(), clonedUnit);
         getMap().putUnit(clonedUnit);

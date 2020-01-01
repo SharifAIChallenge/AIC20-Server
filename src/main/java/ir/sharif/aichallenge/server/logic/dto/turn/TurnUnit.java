@@ -29,4 +29,5 @@ public class TurnUnit {
     private int attack;
     private boolean wasPlayedThisTurn;
     private int target;
+    private ClientCell targetCell;
 }

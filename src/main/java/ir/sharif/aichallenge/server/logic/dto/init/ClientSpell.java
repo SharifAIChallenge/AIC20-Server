@@ -17,6 +17,6 @@ public class ClientSpell {
     private int priority;
     private int duration;
     private int range;
-    private SpellTargetType targetType;
+    private SpellTargetType target;
     private int power;
 }

@@ -13,4 +13,5 @@ public class TurnKing {
     private int playerId;
     private boolean isAlive;
     private int hp;
+    private int target;
 }

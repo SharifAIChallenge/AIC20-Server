@@ -35,7 +35,7 @@ public class BaseSpell {
                 clientSpell.getPriority(),
                 clientSpell.getDuration(),
                 clientSpell.getRange(),
-                clientSpell.getTargetType(),
+                clientSpell.getTarget(),
                 clientSpell.getPower()));
     }
 

@@ -88,7 +88,6 @@ public class Player {
     }
 
     public void putUnit(BaseUnit baseUnit) {
-
         currentPutUnit = null;
 
         if (!hand.contains(baseUnit)) throw new UnitNotInHandException();
@@ -108,11 +107,11 @@ public class Player {
         int currentCount = getSpellCountOfType(type);
         if (currentCount == 0)
             return false;
-            //throw new SpellNotHaveException();
+        //throw new SpellNotHaveException();
 
         if (spellUsed)
             return false;
-            //throw new UseMoreThanOneSpellException();
+        //throw new UseMoreThanOneSpellException();
         setSpellUsed(true);
 
         currentCount--;
@@ -191,6 +190,10 @@ public class Player {
         return this.getTeam() == other.getTeam();
     }
 
+    public boolean isAlly(int otherId) {
+        return this.id == otherId || this.id == (otherId ^ 2);
+    }
+
     public boolean isAllyExclusive(Player other) {
         return this.getId() != other.getId() && this.getTeam() == other.getTeam();
     }
@@ -217,7 +220,7 @@ public class Player {
     public List<Integer> getAvailableSpellIds() {
         ArrayList<Integer> availableSpells = new ArrayList<>();
         for (java.util.Map.Entry<Integer, Integer> spell : spellCount.entrySet()) {
-            if(spell.getValue() > 0) availableSpells.add(spell.getKey());
+            if (spell.getValue() > 0) availableSpells.add(spell.getKey());
         }
         return availableSpells;
     }

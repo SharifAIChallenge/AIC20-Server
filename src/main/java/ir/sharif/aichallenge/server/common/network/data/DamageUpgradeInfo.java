@@ -3,11 +3,9 @@ package ir.sharif.aichallenge.server.common.network.data;
 import lombok.Getter;
 
 @Getter
-public class DamageUpgradeInfo extends ClientMessageInfo {
-    private final int unitId;
-
+public class DamageUpgradeInfo extends UpgradeInfo {
     public DamageUpgradeInfo(int unitId) {
-        this.unitId = unitId;
+        super(unitId);
     }
 
     @Override

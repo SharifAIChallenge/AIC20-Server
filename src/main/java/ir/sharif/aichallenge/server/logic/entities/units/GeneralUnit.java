@@ -28,9 +28,6 @@ public class GeneralUnit extends Unit {
                 baseUnit.getBaseHealth(), baseUnit.getBaseDamage());
     }
 
-    void move() {
-    }
-
     @Override
     public int getSpeed() {
         return getBaseSpeed() + getSpeedIncrease();

@@ -1,6 +1,7 @@
 package ir.sharif.aichallenge.server.logic;
 
 import ir.sharif.aichallenge.server.common.network.data.*;
+import ir.sharif.aichallenge.server.engine.core.GameServer;
 import ir.sharif.aichallenge.server.logic.dto.ClientCell;
 import ir.sharif.aichallenge.server.logic.dto.init.*;
 import ir.sharif.aichallenge.server.logic.dto.turn.ClientTurnMessage;
@@ -45,9 +46,15 @@ public class Game {
     private Set<Integer> playedUnits = new HashSet<>();
     private List<TurnCastSpell> turnCastSpells = new ArrayList<>();
 
-
     @Getter
     private AtomicInteger currentTurn = new AtomicInteger(0);
+
+
+    public static void main(String[] args) throws InterruptedException {
+        GameServer gameServer = new GameServer(new GameHandler(), args);
+        gameServer.start();
+        gameServer.waitForFinish();
+    }
 
     //region Initializations
 

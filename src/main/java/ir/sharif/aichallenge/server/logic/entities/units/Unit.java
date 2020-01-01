@@ -109,8 +109,7 @@ public abstract class Unit extends Entity {
     }
 
     public boolean isTarget(Unit unit) {
-        return isEnemy(unit) &&
-                getTargetType() == TargetType.BOTH || unit.getMoveType().value == getTargetType().value;
+        return isEnemy(unit) && (unit.getMoveType().value & getTargetType().value) != 0;
     }
 
     public boolean hasAttacked() {

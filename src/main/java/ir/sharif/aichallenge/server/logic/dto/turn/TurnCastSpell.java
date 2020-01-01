@@ -15,7 +15,7 @@ public class TurnCastSpell {
     private int typeId;
     private int casterId;
     private ClientCell cell;
-    private boolean wasCastedThisTurn;
+    private boolean wasCastThisTurn;
     private int unitId;         // for unit spell
     private int pathId;         // for unit spell and caster == player,friend
     private List<Integer> affectedUnits;

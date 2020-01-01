@@ -3,7 +3,6 @@ package ir.sharif.aichallenge.server.logic.entities.units;
 import ir.sharif.aichallenge.server.logic.entities.Entity;
 import ir.sharif.aichallenge.server.logic.entities.Player;
 import ir.sharif.aichallenge.server.logic.entities.TargetType;
-import ir.sharif.aichallenge.server.logic.entities.spells.Spell;
 import ir.sharif.aichallenge.server.logic.map.Map;
 import ir.sharif.aichallenge.server.logic.map.MapUtils;
 import ir.sharif.aichallenge.server.logic.map.PathCell;
@@ -11,6 +10,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Delegate;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
@@ -31,7 +31,7 @@ public abstract class Unit extends Entity {
     private Unit targetUnit;
     private boolean hasAttacked;
 
-    private Set<Integer> activeSpells;
+    private Set<Integer> affectedSpells;
 
     public void upgradeDamage() {
         damageLevel++;
@@ -124,14 +124,18 @@ public abstract class Unit extends Entity {
     }
 
     public void addActiveSpell(int spellId) {
-        if (activeSpells == null)
-            activeSpells = new HashSet<>();
-        activeSpells.add(spellId);
+        if (affectedSpells == null)
+            affectedSpells = new HashSet<>();
+        affectedSpells.add(spellId);
     }
 
     public void removeActiveSpell(int spellId) {
-        if (activeSpells == null)
+        if (affectedSpells == null)
             return;
-        activeSpells.remove(spellId);
+        affectedSpells.remove(spellId);
+    }
+
+    public Set<Integer> getAffectedSpells() {
+        return Collections.unmodifiableSet(this.affectedSpells);
     }
 }

@@ -21,10 +21,9 @@ import java.util.Scanner;
 import java.util.stream.Collectors;
 
 public class GameHandler implements GameLogic {
-    private static final int RESPONSE_TIMEOUT = 300;
     public static final FileParam PARAM_MAP = new FileParam("Map", null, ".*\\.map");
 
-    private Game game;
+    private Game game = new Game();
     private InitialMessage initialMessage;
 
     @Override
@@ -34,7 +33,10 @@ public class GameHandler implements GameLogic {
 
     @Override
     public long getClientResponseTimeout() {
-        return RESPONSE_TIMEOUT;
+        if(game.getCurrentTurn().get() == 0) {
+            return initialMessage.getGameConstants().getPickTimeout();
+        }
+        return initialMessage.getGameConstants().getTurnTimeout();
     }
 
     @Override

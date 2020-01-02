@@ -1,15 +1,13 @@
 package ir.sharif.aichallenge.server.logic.entities.spells;
 
 import ir.sharif.aichallenge.server.logic.Game;
-import ir.sharif.aichallenge.server.logic.dto.ClientCell;
-import ir.sharif.aichallenge.server.logic.dto.turn.TurnCastSpell;
+import ir.sharif.aichallenge.server.logic.dto.client.turn.TurnCastSpell;
 import ir.sharif.aichallenge.server.logic.entities.Entity;
 import ir.sharif.aichallenge.server.logic.entities.Player;
 import ir.sharif.aichallenge.server.logic.entities.units.Unit;
 import ir.sharif.aichallenge.server.logic.map.Cell;
 import lombok.Getter;
 
-import java.util.ArrayList;
 import java.util.Set;
 import java.util.stream.Collectors;
 

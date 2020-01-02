@@ -1,4 +1,4 @@
-package ir.sharif.aichallenge.server.logic.dto.turn;
+package ir.sharif.aichallenge.server.logic.dto.client.turn;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

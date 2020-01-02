@@ -1,4 +1,4 @@
-package ir.sharif.aichallenge.server.logic.dto;
+package ir.sharif.aichallenge.server.logic.dto.client;
 
 import ir.sharif.aichallenge.server.logic.map.Cell;
 import lombok.AllArgsConstructor;

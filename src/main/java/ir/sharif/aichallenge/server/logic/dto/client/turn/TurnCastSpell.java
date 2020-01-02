@@ -1,6 +1,6 @@
-package ir.sharif.aichallenge.server.logic.dto.turn;
+package ir.sharif.aichallenge.server.logic.dto.client.turn;
 
-import ir.sharif.aichallenge.server.logic.dto.ClientCell;
+import ir.sharif.aichallenge.server.logic.dto.client.ClientCell;
 import lombok.*;
 
 import java.util.List;

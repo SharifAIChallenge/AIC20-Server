@@ -1,6 +1,6 @@
 package ir.sharif.aichallenge.server.logic.entities.units;
 
-import ir.sharif.aichallenge.server.logic.dto.init.ClientBaseUnit;
+import ir.sharif.aichallenge.server.logic.dto.client.init.ClientBaseUnit;
 import ir.sharif.aichallenge.server.logic.entities.TargetType;
 import ir.sharif.aichallenge.server.logic.exceptions.LogicException;
 import lombok.Getter;

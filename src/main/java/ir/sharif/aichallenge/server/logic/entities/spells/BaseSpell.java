@@ -1,6 +1,6 @@
 package ir.sharif.aichallenge.server.logic.entities.spells;
 
-import ir.sharif.aichallenge.server.logic.dto.init.ClientSpell;
+import ir.sharif.aichallenge.server.logic.dto.client.init.ClientSpell;
 import ir.sharif.aichallenge.server.logic.exceptions.LogicException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,6 +1,6 @@
-package ir.sharif.aichallenge.server.logic.dto.init;
+package ir.sharif.aichallenge.server.logic.dto.client.init;
 
-import ir.sharif.aichallenge.server.logic.dto.ClientCell;
+import ir.sharif.aichallenge.server.logic.dto.client.ClientCell;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

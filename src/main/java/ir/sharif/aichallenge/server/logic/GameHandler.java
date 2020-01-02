@@ -7,10 +7,10 @@ import ir.sharif.aichallenge.server.common.network.data.MessageTypes;
 import ir.sharif.aichallenge.server.common.network.data.PickInfo;
 import ir.sharif.aichallenge.server.engine.config.FileParam;
 import ir.sharif.aichallenge.server.engine.core.GameLogic;
-import ir.sharif.aichallenge.server.logic.dto.init.ClientBaseKing;
-import ir.sharif.aichallenge.server.logic.dto.init.ClientMap;
-import ir.sharif.aichallenge.server.logic.dto.init.InitialMessage;
-import ir.sharif.aichallenge.server.logic.dto.turn.ClientTurnMessage;
+import ir.sharif.aichallenge.server.logic.dto.client.init.ClientBaseKing;
+import ir.sharif.aichallenge.server.logic.dto.client.init.ClientMap;
+import ir.sharif.aichallenge.server.logic.dto.client.init.InitialMessage;
+import ir.sharif.aichallenge.server.logic.dto.client.turn.ClientTurnMessage;
 
 import java.io.File;
 import java.io.FileNotFoundException;

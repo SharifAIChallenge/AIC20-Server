@@ -13,8 +13,8 @@ public class Map {
     UnitsInCellsCollection unitsInCell;
     ArrayList<Unit> kings;
 
-    public Map(int width, int height) {
-        unitsInCell = new UnitsInCellsCollection(width, height);
+    public Map(int height, int width) {
+        unitsInCell = new UnitsInCellsCollection(height, width);
         paths = new HashMap<>();
     }
 

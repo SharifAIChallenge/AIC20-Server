@@ -11,7 +11,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class InitialMessage {
+public class InitialMessage {       //todo set primitives to classes if necessary (because null values be null)
     private GameConstants gameConstants;
     private ClientMap map;
     private List<ClientBaseUnit> baseUnits;

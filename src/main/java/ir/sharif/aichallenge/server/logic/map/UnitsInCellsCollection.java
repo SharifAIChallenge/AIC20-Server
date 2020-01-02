@@ -8,12 +8,12 @@ import java.util.stream.Stream;
 
 public class UnitsInCellsCollection {
     @Getter
-    private int width;
+    private int width;  //todo change to rows, cols
     @Getter
     private int height;
     private LinkedList<Unit>[][] unitsInCell;
 
-    public UnitsInCellsCollection(int width, int height) {
+    public UnitsInCellsCollection(int height, int width) {
         this.width = width;
         this.height = height;
         unitsInCell = new LinkedList[height][width];

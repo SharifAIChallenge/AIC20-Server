@@ -188,19 +188,23 @@ public class Game {
     private void applyUpgrades(Stream<ClientMessageInfo> upgradeMessages) {
         upgradeMessages.map(info -> (UpgradeInfo) info)
                 .forEach(message -> {
-                    Unit unit = unitsWithId.get(message.getUnitId());
-                    if (unit == null) throw new UnitNotInMapException();
-                    if (unit.getPlayer().getId() != message.getPlayerId()) throw new UpgradeOtherPlayerUnitException();
-                    Player player = players[unit.getPlayer().getId()];
-                    if (message.getType().equals(MessageTypes.UPGRADE_DAMAGE)) {
-                        player.useUpgradeDamage();
-                        unit.upgradeDamage();
-                        damageUpgradedUnits.add(unit.getId());
-                    } else {
-                        player.useUpgradeRange();
-                        unit.upgradeRange();
-                        rangeUpgradedUnits.add(unit.getId());
-                    }
+                    try {
+                        Unit unit = unitsWithId.get(message.getUnitId());
+
+                        if (unit == null) throw new UnitNotInMapException();
+                        if (unit.getPlayer().getId() != message.getPlayerId())
+                            throw new UpgradeOtherPlayerUnitException();
+                        Player player = players[unit.getPlayer().getId()];
+                        if (message.getType().equals(MessageTypes.UPGRADE_DAMAGE)) {
+                            player.useUpgradeDamage();
+                            unit.upgradeDamage();
+                            damageUpgradedUnits.add(unit.getId());
+                        } else {
+                            player.useUpgradeRange();
+                            unit.upgradeRange();
+                            rangeUpgradedUnits.add(unit.getId());
+                        }
+                    } catch(Exception ex) {}
                 });
     }
 
@@ -210,7 +214,7 @@ public class Game {
                 .forEach(info -> {
                     try {
                         Player player = players[info.getPlayerId()];
-                        BaseUnit baseUnit = BaseUnit.getInstance(info.getTypeId());
+                        BaseUnit baseUnit = BaseUnit.getInstance(info.getTypeId()); //TODO
                         player.putUnit(baseUnit);
                         GeneralUnit generalUnit = new GeneralUnit(baseUnit, player);
                         unitsWithId.put(generalUnit.getId(), generalUnit);

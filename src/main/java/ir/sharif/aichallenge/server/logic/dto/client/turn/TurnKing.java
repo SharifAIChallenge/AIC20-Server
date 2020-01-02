@@ -1,5 +1,9 @@
 package ir.sharif.aichallenge.server.logic.dto.client.turn;
 
+import ir.sharif.aichallenge.server.logic.dto.graphic.turn.TurnAttack;
+import ir.sharif.aichallenge.server.logic.entities.units.King;
+import ir.sharif.aichallenge.server.logic.entities.units.KingUnit;
+import ir.sharif.aichallenge.server.logic.entities.units.Unit;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,4 +18,18 @@ public class TurnKing {
     private boolean isAlive;
     private int hp;
     private int target;
+
+    public static TurnAttack getTurnKing(Unit unit, Unit targetUnit) {
+        int idSource = getIdForAttack(unit);
+        int idTarget = getIdForAttack(targetUnit);
+        return new TurnAttack(idSource, idTarget);
+
+    }
+
+    private static int getIdForAttack(Unit unit) {
+        int id = unit.getId();
+        if(unit instanceof KingUnit)
+            id = unit.getPlayer().getId();
+        return id;
+    }
 }

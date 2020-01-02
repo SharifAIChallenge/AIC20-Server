@@ -8,6 +8,9 @@ import ir.sharif.aichallenge.server.logic.dto.client.turn.ClientTurnMessage;
 import ir.sharif.aichallenge.server.logic.dto.client.turn.TurnCastSpell;
 import ir.sharif.aichallenge.server.logic.dto.client.turn.TurnKing;
 import ir.sharif.aichallenge.server.logic.dto.client.turn.TurnUnit;
+import ir.sharif.aichallenge.server.logic.dto.graphic.GraphicCell;
+import ir.sharif.aichallenge.server.logic.dto.graphic.GraphicMessage;
+import ir.sharif.aichallenge.server.logic.dto.graphic.turn.*;
 import ir.sharif.aichallenge.server.logic.entities.Player;
 import ir.sharif.aichallenge.server.logic.entities.spells.BaseSpell;
 import ir.sharif.aichallenge.server.logic.entities.spells.Spell;
@@ -37,9 +40,12 @@ public class Game {
 
     @Getter
     private Map map;
+    @Getter
     private SortedSet<Spell> spells = new TreeSet<>(Comparator.comparing(Spell::getPriority));
 
+    @Getter
     private Player[] players = new Player[4];
+    @Getter
     private HashMap<Integer, Unit> unitsWithId = new HashMap<>();
     private ArrayList<King> kings = new ArrayList<>();
     @Getter
@@ -48,6 +54,10 @@ public class Game {
     private Set<Integer> rangeUpgradedUnits;
     private Set<Integer> playedUnits = new HashSet<>();
     private List<TurnCastSpell> turnCastSpells = new ArrayList<>();
+
+
+    private GraphicMessage graphicMessage = new GraphicMessage();
+    private GraphicHandler graphicHandler = new GraphicHandler();
 
     @Getter
     private AtomicInteger currentTurn = new AtomicInteger(0);
@@ -156,6 +166,7 @@ public class Game {
         checkToGiveSpells();
 
         fillClientMessage();
+        addTurnToGraphicMessage();
 
         currentTurn.incrementAndGet();
     }
@@ -433,7 +444,7 @@ public class Game {
 
         List<TurnKing> turnKings = IntStream.range(0, 4).boxed()
                 .map(pId -> {
-                    final King king = kings.get(pId);
+                    final King king = kings.get(pId); //TODO
                     int health = king.getHealthComponent().getHealth();
                     final Unit targetUnit = king.getMainUnit().getTargetUnit();
                     return new TurnKing(pId, health > 0, health, targetUnit == null ? -1 : targetUnit.getId());
@@ -469,6 +480,20 @@ public class Game {
             message.setDeck(player.getDeckIds());
             message.setHand(player.getHandIds());
         }
+    }
+
+    private void addTurnToGraphicMessage() {
+        GraphicTurn graphicTurn = graphicHandler.getGraphicTurn(this);
+        graphicMessage.getTurns().add(graphicTurn);
+    }
+
+
+
+    public King getKingWithId(int id) {
+        for (King king : kings)
+            if(king.getMainUnit().getPlayer().getId() == id)
+                return king;
+        return null;
     }
 
     //endregion

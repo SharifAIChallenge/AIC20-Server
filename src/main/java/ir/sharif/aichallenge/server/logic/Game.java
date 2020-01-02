@@ -9,6 +9,7 @@ import ir.sharif.aichallenge.server.logic.dto.client.turn.TurnCastSpell;
 import ir.sharif.aichallenge.server.logic.dto.client.turn.TurnKing;
 import ir.sharif.aichallenge.server.logic.dto.client.turn.TurnUnit;
 import ir.sharif.aichallenge.server.logic.dto.graphic.GraphicMessage;
+import ir.sharif.aichallenge.server.logic.dto.graphic.init.GraphicInit;
 import ir.sharif.aichallenge.server.logic.dto.graphic.turn.*;
 import ir.sharif.aichallenge.server.logic.entities.Player;
 import ir.sharif.aichallenge.server.logic.entities.spells.BaseSpell;
@@ -87,6 +88,7 @@ public class Game {
 
         initSpells(initialMessage.getSpells());
 
+        graphicMessage.setInit(GraphicInit.makeGraphicInit(initialMessage));
     }
 
     public void initializeMap(int size) {

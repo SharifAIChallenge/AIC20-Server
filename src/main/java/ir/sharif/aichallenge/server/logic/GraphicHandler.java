@@ -21,6 +21,7 @@ public class GraphicHandler {
         }
 
         graphicTurn.setPlayerTurnEvents(playerTurnEvents);
+        graphicTurn.setTurnAttacks(game.getCurrentAttacks());
 
         return graphicTurn;
     }

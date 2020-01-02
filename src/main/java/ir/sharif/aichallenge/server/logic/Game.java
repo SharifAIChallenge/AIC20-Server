@@ -8,7 +8,6 @@ import ir.sharif.aichallenge.server.logic.dto.client.turn.ClientTurnMessage;
 import ir.sharif.aichallenge.server.logic.dto.client.turn.TurnCastSpell;
 import ir.sharif.aichallenge.server.logic.dto.client.turn.TurnKing;
 import ir.sharif.aichallenge.server.logic.dto.client.turn.TurnUnit;
-import ir.sharif.aichallenge.server.logic.dto.graphic.GraphicCell;
 import ir.sharif.aichallenge.server.logic.dto.graphic.GraphicMessage;
 import ir.sharif.aichallenge.server.logic.dto.graphic.turn.*;
 import ir.sharif.aichallenge.server.logic.entities.Player;
@@ -36,7 +35,11 @@ public class Game {
     private int numberOfSpells;
     private int numberOfBaseUnits;
 
+    @Getter
+    private List<TurnAttack> currentAttacks = new ArrayList<>();
+
     private Random randomMaker = new Random();
+
 
     @Getter
     private Map map;
@@ -274,12 +277,17 @@ public class Game {
     }
 
     private void attack() {
+
+        currentAttacks.clear();
+
         for (Unit unit : unitsWithId.values()) {
             Unit targetUnit = unit.getTarget(map);
             if (targetUnit == null) {
                 unit.setHasAttacked(false);
                 continue;
             }
+
+            currentAttacks.add(TurnKing.getTurnKing(unit, targetUnit));
 
             unit.setHasAttacked(true);
             if (unit.isMultiTarget())

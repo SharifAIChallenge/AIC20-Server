@@ -1,4 +1,4 @@
-package ir.sharif.aichallenge.server.logic.dto.init;
+package ir.sharif.aichallenge.server.logic.dto.client.init;
 
 import ir.sharif.aichallenge.server.logic.entities.spells.SpellTargetType;
 import ir.sharif.aichallenge.server.logic.entities.spells.SpellType;

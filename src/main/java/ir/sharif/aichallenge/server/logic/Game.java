@@ -2,12 +2,12 @@ package ir.sharif.aichallenge.server.logic;
 
 import ir.sharif.aichallenge.server.common.network.data.*;
 import ir.sharif.aichallenge.server.engine.core.GameServer;
-import ir.sharif.aichallenge.server.logic.dto.ClientCell;
-import ir.sharif.aichallenge.server.logic.dto.init.*;
-import ir.sharif.aichallenge.server.logic.dto.turn.ClientTurnMessage;
-import ir.sharif.aichallenge.server.logic.dto.turn.TurnCastSpell;
-import ir.sharif.aichallenge.server.logic.dto.turn.TurnKing;
-import ir.sharif.aichallenge.server.logic.dto.turn.TurnUnit;
+import ir.sharif.aichallenge.server.logic.dto.client.ClientCell;
+import ir.sharif.aichallenge.server.logic.dto.client.init.*;
+import ir.sharif.aichallenge.server.logic.dto.client.turn.ClientTurnMessage;
+import ir.sharif.aichallenge.server.logic.dto.client.turn.TurnCastSpell;
+import ir.sharif.aichallenge.server.logic.dto.client.turn.TurnKing;
+import ir.sharif.aichallenge.server.logic.dto.client.turn.TurnUnit;
 import ir.sharif.aichallenge.server.logic.entities.Player;
 import ir.sharif.aichallenge.server.logic.entities.spells.BaseSpell;
 import ir.sharif.aichallenge.server.logic.entities.spells.Spell;

@@ -14,7 +14,7 @@ public class BaseSpell {
     private static HashMap<Integer, BaseSpell> instances = new HashMap<>();
 
     private static HashMap<Integer, SpellType> typeIdsToTypes = new HashMap<>();
-    private static HashMap<SpellType, Integer> typesToTypeIds = new HashMap<>();
+    private static HashMap<SpellType, Integer> typesToTypeIds = new HashMap<>(); //TODO chera niaz be in drim?
 
     public static BaseSpell getInstance(SpellType type) {
         return getInstance(typesToTypeIds.get(type));

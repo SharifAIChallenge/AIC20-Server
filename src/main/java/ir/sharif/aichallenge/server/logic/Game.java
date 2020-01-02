@@ -9,14 +9,16 @@ import ir.sharif.aichallenge.server.logic.dto.turn.TurnCastSpell;
 import ir.sharif.aichallenge.server.logic.dto.turn.TurnKing;
 import ir.sharif.aichallenge.server.logic.dto.turn.TurnUnit;
 import ir.sharif.aichallenge.server.logic.entities.Player;
-import ir.sharif.aichallenge.server.logic.entities.spells.*;
+import ir.sharif.aichallenge.server.logic.entities.spells.BaseSpell;
+import ir.sharif.aichallenge.server.logic.entities.spells.Spell;
+import ir.sharif.aichallenge.server.logic.entities.spells.SpellFactory;
+import ir.sharif.aichallenge.server.logic.entities.spells.SpellType;
 import ir.sharif.aichallenge.server.logic.entities.units.*;
 import ir.sharif.aichallenge.server.logic.exceptions.*;
 import ir.sharif.aichallenge.server.logic.map.Cell;
 import ir.sharif.aichallenge.server.logic.map.Map;
 import ir.sharif.aichallenge.server.logic.map.Path;
 import ir.sharif.aichallenge.server.logic.map.PathCell;
-import javafx.util.Pair;
 import lombok.Getter;
 
 import java.util.*;
@@ -35,7 +37,7 @@ public class Game {
 
     @Getter
     private Map map;
-    private SortedSet<Spell> spells = new TreeSet<Spell>(Comparator.comparing(Spell::getPriority));
+    private SortedSet<Spell> spells = new TreeSet<>(Comparator.comparing(Spell::getPriority));
 
     private Player[] players = new Player[4];
     private HashMap<Integer, Unit> unitsWithId = new HashMap<>();

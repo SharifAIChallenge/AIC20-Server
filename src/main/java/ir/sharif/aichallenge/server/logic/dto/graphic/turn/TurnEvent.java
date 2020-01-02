@@ -1,20 +1,16 @@
 package ir.sharif.aichallenge.server.logic.dto.graphic.turn;
 
-import ir.sharif.aichallenge.server.logic.Game;
-import ir.sharif.aichallenge.server.logic.dto.graphic.GraphicCell;
-import ir.sharif.aichallenge.server.logic.entities.Player;
-import ir.sharif.aichallenge.server.logic.entities.spells.Spell;
-import ir.sharif.aichallenge.server.logic.entities.units.King;
-import ir.sharif.aichallenge.server.logic.entities.units.Unit;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.ArrayList;
 import java.util.List;
 
-@Setter
 @Getter
-
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class TurnEvent {
     private boolean isAlive;
     private int ap;

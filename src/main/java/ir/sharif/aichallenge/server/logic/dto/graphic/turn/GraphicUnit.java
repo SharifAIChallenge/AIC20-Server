@@ -1,11 +1,14 @@
 package ir.sharif.aichallenge.server.logic.dto.graphic.turn;
 
-import ir.sharif.aichallenge.server.logic.entities.units.Unit;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class GraphicUnit {
     private int id;
     private int typeId;

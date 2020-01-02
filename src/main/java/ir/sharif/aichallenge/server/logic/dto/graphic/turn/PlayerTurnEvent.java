@@ -1,5 +1,7 @@
 package ir.sharif.aichallenge.server.logic.dto.graphic.turn;
 
+import ir.sharif.aichallenge.server.logic.Game;
+import ir.sharif.aichallenge.server.logic.entities.Player;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

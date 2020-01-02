@@ -184,6 +184,7 @@ public class Game {
         rangeUpgradedUnits = new HashSet<>();
     }
 
+    //TODO upgrade exception handling.
     private void applyUpgrades(Stream<ClientMessageInfo> upgradeMessages) {
         upgradeMessages.map(info -> (UpgradeInfo) info)
                 .forEach(message -> {
@@ -208,7 +209,7 @@ public class Game {
                 .map(message -> (UnitPutInfo) message)
                 .forEach(info -> {
                     try {
-                        Player player = players[info.getPathId()];
+                        Player player = players[info.getPlayerId()];
                         BaseUnit baseUnit = BaseUnit.getInstance(info.getTypeId());
                         player.putUnit(baseUnit);
                         GeneralUnit generalUnit = new GeneralUnit(baseUnit, player);

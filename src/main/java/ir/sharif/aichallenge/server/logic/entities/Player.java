@@ -42,8 +42,7 @@ public class Player {
 
     public void initDeck(List<Integer> baseUnitIds, int numberOfBaseUnits) {
 
-        Set<Integer> ids = new HashSet<>();
-        ids.addAll(baseUnitIds);
+        Set<Integer> ids = new HashSet<>(baseUnitIds);
 
         while (ids.size() < DECK_SIZE) {
             int random_id = getRandom(0, numberOfBaseUnits);

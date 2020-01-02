@@ -343,12 +343,13 @@ public class Game {
     //region Token Givings
 
     private void checkToGiveSpells() {
-        if (currentTurn.get() % gameConstants.getTurnsToSpell() != 0) return;
-
         for (int pId = 0; pId < 4; pId++) {
             clientTurnMessages[pId].setReceivedSpell(-1);
             clientTurnMessages[pId].setFriendReceivedSpell(-1);
         }
+
+        if (currentTurn.get() % gameConstants.getTurnsToSpell() != 0) return;
+
         giveSpells();
     }
 
@@ -381,13 +382,14 @@ public class Game {
     }
 
     private void checkToGiveUpgradeTokens() {
-        if (currentTurn.get() % gameConstants.getTurnsToUpgrade() != 0)
-            return;
-
         for (int pId = 0; pId < 4; pId++) {
             clientTurnMessages[pId].setGotDamageUpgrade(false);
             clientTurnMessages[pId].setGotRangeUpgrade(false);
         }
+
+        if (currentTurn.get() % gameConstants.getTurnsToUpgrade() != 0)
+            return;
+
         giveUpgradeTokens();
     }
 

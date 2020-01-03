@@ -23,6 +23,7 @@ import ir.sharif.aichallenge.server.logic.map.Map;
 import ir.sharif.aichallenge.server.logic.map.Path;
 import ir.sharif.aichallenge.server.logic.map.PathCell;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -64,11 +65,14 @@ public class Game {
     private GraphicHandler graphicHandler = new GraphicHandler();
 
     @Getter
-    private AtomicInteger currentTurn = new AtomicInteger(0);
+    @Setter
+    private AtomicInteger currentTurn;
 
 
     public static void main(String[] args) throws InterruptedException {
-        GameServer gameServer = new GameServer(new GameHandler(), args);
+        AtomicInteger currentTurn = new AtomicInteger(0);
+
+        GameServer gameServer = new GameServer(new GameHandler(currentTurn), args, currentTurn);
         gameServer.start();
         gameServer.waitForFinish();
     }
@@ -145,20 +149,28 @@ public class Game {
             players[playerId].initDeck(pickInfo.getUnits(), numberOfBaseUnits);
         }
 
+        initializeTurn();
+        checkToGiveUpgradeTokens();
+        checkToGiveSpells();
+        fillClientMessage();
+
         currentTurn.incrementAndGet();
     }
 
     public void turn(java.util.Map<String, List<ClientMessageInfo>> messages) {
         initializeTurn();
 
-        applyUpgrades(Stream.concat(messages.get(MessageTypes.UPGRADE_DAMAGE).stream(),
-                messages.get(MessageTypes.UPGRADE_RANGE).stream()));
+        List<ClientMessageInfo> clientMessageInfos = messages.get(MessageTypes.UPGRADE_DAMAGE);
+        if (clientMessageInfos != null) {
+            applyUpgrades(Stream.concat(clientMessageInfos.stream(),
+                    messages.get(MessageTypes.UPGRADE_RANGE).stream()));    //todo asap null pointer exception
+        }
 
 
         applyPutUnits(messages.get(MessageTypes.PUT_UNIT));
 
         evaluateSpells();
-        applySpells(messages.get(MessageTypes.CAST_SPELL)); //todo
+        applySpells(messages.get(MessageTypes.CAST_SPELL));
 
 
         attack();
@@ -209,6 +221,8 @@ public class Game {
     }
 
     private void applyPutUnits(List<ClientMessageInfo> putUnitMessages) {
+        if (putUnitMessages == null)
+            return;
         putUnitMessages.stream()
                 .map(message -> (UnitPutInfo) message)
                 .forEach(info -> {
@@ -240,6 +254,8 @@ public class Game {
     }
 
     private void applySpells(List<ClientMessageInfo> castSpellMessages) {
+        if (castSpellMessages == null)
+            return;
         castSpellMessages.stream().map(info -> (SpellCastInfo) info).forEach(info -> {
             try {
                 final Player player = players[info.getPlayerId()];
@@ -348,6 +364,8 @@ public class Game {
             clientTurnMessages[pId].setFriendReceivedSpell(-1);
         }
 
+        if (currentTurn.get() == 0)
+            return;
         if (currentTurn.get() % gameConstants.getTurnsToSpell() != 0) return;
 
         giveSpells();
@@ -387,6 +405,8 @@ public class Game {
             clientTurnMessages[pId].setGotRangeUpgrade(false);
         }
 
+        if (currentTurn.get() == 0)
+            return;
         if (currentTurn.get() % gameConstants.getTurnsToUpgrade() != 0)
             return;
 
@@ -470,8 +490,9 @@ public class Game {
 
         final ArrayList<Unit> units = new ArrayList<>(unitsWithId.values());
         final List<TurnUnit> turnUnits = units.stream()
+                .filter(unit -> !(unit instanceof KingUnit))
                 .map(this::buildTurnUnit)
-                .collect(Collectors.toCollection(() -> new ArrayList<>(units.size())));
+                .collect(Collectors.toList());
 
         for (int pId = 0; pId < 4; pId++) {
             int friendId = pId ^ 2;
@@ -480,7 +501,7 @@ public class Game {
             final Player player = players[pId];
 
             for (int i = 0; i < units.size(); i++)
-                bindPathId(turnUnits.get(i), pId, units.get(i));
+                bindPathId(turnUnits.get(i), pId, units.get(i));    //todo asap IndexOutOfBoundsException
             message.setUnits(turnUnits);
             message.setCurrTurn(currentTurn.get());
 

@@ -14,10 +14,8 @@ import ir.sharif.aichallenge.server.logic.dto.client.turn.ClientTurnMessage;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class GameHandler implements GameLogic {
@@ -25,6 +23,10 @@ public class GameHandler implements GameLogic {
 
     private Game game = new Game();
     private InitialMessage initialMessage;
+
+    public GameHandler(AtomicInteger currentTurn) {
+        game.setCurrentTurn(currentTurn);
+    }
 
     @Override
     public int getClientsNum() {
@@ -115,6 +117,10 @@ public class GameHandler implements GameLogic {
     public void simulateEvents(Map<String, List<ClientMessageInfo>> messages) { //todo filter messages to be this turn
         if (game.getCurrentTurn().get() == 0) {
             List<ClientMessageInfo> clientMessageInfos = messages.get(MessageTypes.PICK);
+            if (clientMessageInfos == null) {
+                game.pick(new ArrayList<>());
+                return;
+            }
             List<PickInfo> pickInfos = clientMessageInfos.stream().map(
                     clientMessageInfo -> (PickInfo) clientMessageInfo).collect(Collectors.toList());
             game.pick(pickInfos);

@@ -160,18 +160,13 @@ public class Game {
     public void turn(java.util.Map<String, List<ClientMessageInfo>> messages) {
         initializeTurn();
 
-        List<ClientMessageInfo> clientMessageInfos = messages.get(MessageTypes.UPGRADE_DAMAGE);
-        if (clientMessageInfos != null) {
-            applyUpgrades(Stream.concat(clientMessageInfos.stream(),
-                    messages.get(MessageTypes.UPGRADE_RANGE).stream()));    //todo asap null pointer exception
-        }
-
+        applyUpgrades(messages.get(MessageTypes.UPGRADE_DAMAGE));
+        applyUpgrades(messages.get(MessageTypes.UPGRADE_RANGE));
 
         applyPutUnits(messages.get(MessageTypes.PUT_UNIT));
 
         evaluateSpells();
         applySpells(messages.get(MessageTypes.CAST_SPELL));
-
 
         attack();
         move();
@@ -197,11 +192,14 @@ public class Game {
     }
 
     //TODO upgrade exception handling.
-    private void applyUpgrades(Stream<ClientMessageInfo> upgradeMessages) {
-        upgradeMessages.map(info -> (UpgradeInfo) info)
+    private void applyUpgrades(List<ClientMessageInfo> upgradeMessages) {
+        if (upgradeMessages == null)
+            return;
+
+        upgradeMessages.stream().map(info -> (UpgradeInfo) info)
                 .forEach(message -> {
                     try {
-                        Unit unit = unitsWithId.get(message.getUnitId());
+                        Unit unit = unitsWithId.get(message.getUnitId());   //todo if unit is kingUnit?
 
                         if (unit == null) throw new UnitNotInMapException();
                         if (unit.getPlayer().getId() != message.getPlayerId())
@@ -216,13 +214,16 @@ public class Game {
                             unit.upgradeRange();
                             rangeUpgradedUnits.add(unit.getId());
                         }
-                    } catch(Exception ex) {}
+                    } catch(LogicException ex) {
+                        System.out.println("logic exception!");
+                    }
                 });
     }
 
     private void applyPutUnits(List<ClientMessageInfo> putUnitMessages) {
         if (putUnitMessages == null)
             return;
+
         putUnitMessages.stream()
                 .map(message -> (UnitPutInfo) message)
                 .forEach(info -> {
@@ -256,6 +257,7 @@ public class Game {
     private void applySpells(List<ClientMessageInfo> castSpellMessages) {
         if (castSpellMessages == null)
             return;
+
         castSpellMessages.stream().map(info -> (SpellCastInfo) info).forEach(info -> {
             try {
                 final Player player = players[info.getPlayerId()];

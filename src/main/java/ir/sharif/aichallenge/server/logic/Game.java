@@ -156,7 +156,7 @@ public class Game {
 
         for (int pId = 0; pId < 4; pId++)
             if (!players[pId].getDeckInit())
-                players[pId].initDeck(new ArrayList<Integer>(), numberOfBaseUnits);
+                players[pId].initDeck(new ArrayList<>(), numberOfBaseUnits);
 
         initializeTurn();
         checkToGiveUpgradeTokens();

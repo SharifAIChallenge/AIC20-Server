@@ -11,7 +11,6 @@ import java.util.*;
 public class Player {
 
     private static final int HAND_SIZE = 6, DECK_SIZE = 9;
-
     private int id;
     private int ap;
     private int maxAP;
@@ -27,6 +26,8 @@ public class Player {
 
     @Setter
     private boolean upgradeUsed, spellUsed, putUsed;
+    @Setter
+    private boolean deckInit;
 
     HashMap<BaseUnit, Integer> baseUnitId = new HashMap<>();
 
@@ -38,9 +39,12 @@ public class Player {
         this.maxAP = ap;
 
         upgradeUsed = putUsed = spellUsed = false;
+        deckInit = false;
     }
 
     public void initDeck(List<Integer> baseUnitIds, int numberOfBaseUnits) {
+
+        setDeckInit(true);
 
         Set<Integer> ids = new HashSet<>(baseUnitIds);
 
@@ -222,6 +226,10 @@ public class Player {
             if (spell.getValue() > 0) availableSpells.add(spell.getKey());
         }
         return availableSpells;
+    }
+
+    public boolean getDeckInit(){
+        return deckInit;
     }
 
 }

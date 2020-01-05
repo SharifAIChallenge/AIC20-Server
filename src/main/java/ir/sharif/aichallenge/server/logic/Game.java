@@ -1,5 +1,6 @@
 package ir.sharif.aichallenge.server.logic;
 
+import com.google.gson.Gson;
 import ir.sharif.aichallenge.server.common.network.data.*;
 import ir.sharif.aichallenge.server.engine.core.GameServer;
 import ir.sharif.aichallenge.server.logic.dto.client.ClientCell;
@@ -153,8 +154,8 @@ public class Game {
             players[playerId].initDeck(pickInfo.getUnits(), numberOfBaseUnits);
         }
 
-        for (int pId=0; pId<4; pId++)
-            if(!players[pId].getDeckInit())
+        for (int pId = 0; pId < 4; pId++)
+            if (!players[pId].getDeckInit())
                 players[pId].initDeck(new ArrayList<Integer>(), numberOfBaseUnits);
 
         initializeTurn();
@@ -580,6 +581,8 @@ public class Game {
     private void addTurnToGraphicMessage() {
         GraphicTurn graphicTurn = graphicHandler.getGraphicTurn(this);
         graphicMessage.getTurns().add(graphicTurn);
+        graphicHandler.saveGraphicLog(graphicMessage);
+
     }
 
 

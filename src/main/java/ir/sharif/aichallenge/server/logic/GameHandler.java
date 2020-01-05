@@ -162,7 +162,7 @@ public class GameHandler implements GameLogic {
 
     @Override
     public boolean isGameFinished() {
-        return false;
+        return game.isGameFinished();
     }
 
     @Override

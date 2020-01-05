@@ -180,7 +180,9 @@ public class Game {
         fillClientMessage();
         addTurnToGraphicMessage();
 
-        currentTurn.incrementAndGet();
+
+        if (!checkForGameEnd())
+            currentTurn.incrementAndGet();
     }
 
     private void initializeTurn() {
@@ -358,6 +360,47 @@ public class Game {
         return this.unitsWithId.get(id);
     }
 
+    private boolean checkForGameEnd() {
+        if (currentTurn.get() >= gameConstants.getMaxTurns())
+            finishAndGiveScores();
+        if (!kings.get(0).isAlive() && !kings.get(2).isAlive() ||
+                !kings.get(1).isAlive() && !kings.get(3).isAlive())
+            finishAndGiveScores();
+        return false;
+    }
+
+    private void finishAndGiveScores() {
+        int[] scores = new int[4];
+
+        int[] healthsSum = new int[2];
+        int[] healths = kings.stream().mapToInt(King::getHealth).map(h -> Math.max(0, h)).toArray();
+        for (int i = 0; i < 4; i++)
+            healthsSum[i % 2] += healths[i];
+
+        //TODO: move scores to game constants
+        if (healthsSum[0] == healthsSum[1]) {
+            for (int i = 0; i < 2; i++) {
+                scores[i] = healths[i] > healths[i + 2] ? 6 : healths[i] < healths[i + 2] ? 4 : 5;
+                scores[i + 2] = 10 - scores[i];
+            }
+        } else {
+            int winningTeam = healthsSum[0] > healthsSum[1] ? 0 : 1;
+            for (int i = 0; i < 2; i++) {
+                if (i == winningTeam)
+                    scores[i] = healths[i] > healths[i + 2] ? 8 : healths[i] < healths[i + 2] ? 6 : 7;
+                else
+                    scores[i] = healths[i] > healths[i + 2] ? 4 : healths[i] < healths[i + 2] ? 2 : 3;
+                scores[i + 2] = (i == winningTeam ? 14 : 6) - scores[i];
+            }
+        }
+
+        finishGame(scores);
+    }
+
+    private void finishGame(int[] scores) {
+        //TODO: end loop, shutdown, ...
+    }
+
     //region Token Givings
 
     private void checkToGiveSpells() {
@@ -484,7 +527,7 @@ public class Game {
         List<TurnKing> turnKings = IntStream.range(0, 4).boxed()
                 .map(pId -> {
                     final King king = kings.get(pId); //TODO
-                    int health = king.getHealthComponent().getHealth();
+                    int health = king.getHealth();
                     final Unit targetUnit = king.getMainUnit().getTargetUnit();
                     return new TurnKing(pId, health > 0, health, targetUnit == null ? -1 : targetUnit.getId());
                 })
@@ -528,10 +571,9 @@ public class Game {
     }
 
 
-
     public King getKingWithId(int id) {
         for (King king : kings)
-            if(king.getMainUnit().getPlayer().getId() == id)
+            if (king.getMainUnit().getPlayer().getId() == id)
                 return king;
         return null;
     }

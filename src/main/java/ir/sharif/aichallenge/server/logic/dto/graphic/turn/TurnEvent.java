@@ -5,6 +5,7 @@ import ir.sharif.aichallenge.server.logic.dto.graphic.GraphicCell;
 import ir.sharif.aichallenge.server.logic.entities.Player;
 import ir.sharif.aichallenge.server.logic.entities.spells.Spell;
 import ir.sharif.aichallenge.server.logic.entities.units.King;
+import ir.sharif.aichallenge.server.logic.entities.units.KingUnit;
 import ir.sharif.aichallenge.server.logic.entities.units.Unit;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -46,6 +47,7 @@ public class TurnEvent {
         ArrayList<GraphicUnit> graphicUnits = new ArrayList<>();
         for (Unit unit : game.getUnitsWithId().values()) {
             if(unit.getPlayer().getId() != player.getId()) continue ;
+            if(unit instanceof KingUnit) continue ;
             GraphicUnit graphicUnit = GraphicUnit.getGraphicUnit(unit);
             graphicUnits.add(graphicUnit);
         }

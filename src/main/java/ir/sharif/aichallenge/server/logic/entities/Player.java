@@ -15,10 +15,10 @@ public class Player {
     private int ap;
     private int maxAP;
 
-    private HashMap<Integer, Integer> spellCount = new HashMap<>();
+    private Map<Integer, Integer> spellCount = new HashMap<>();
 
-    private ArrayList<BaseUnit> deck = new ArrayList<>();
-    private ArrayList<BaseUnit> hand = new ArrayList<>();
+    private List<BaseUnit> deck = new ArrayList<>();
+    private List<BaseUnit> hand = new ArrayList<>();
     private int[] numberOfUse = new int[DECK_SIZE];
 
     private int numberOfDamageUpgrades = 0;
@@ -29,9 +29,9 @@ public class Player {
     @Setter
     private boolean deckInit;
 
-    HashMap<BaseUnit, Integer> baseUnitId = new HashMap<>();
+    private Map<BaseUnit, Integer> baseUnitId = new HashMap<>();
 
-    BaseUnit currentPutUnit;
+    private BaseUnit currentPutUnit;
 
     public Player(int id, int ap) {
         this.id = id;
@@ -152,8 +152,8 @@ public class Player {
 
         if (currentPutUnit == null) return;
 
-        ArrayList<BaseUnit> chances = new ArrayList<>();
-        ArrayList<Double> probs = new ArrayList<>();
+        List<BaseUnit> chances = new ArrayList<>();
+        List<Double> probs = new ArrayList<>();
         double normalize = 0;
 
         for (BaseUnit baseUnit : deck) {
@@ -207,23 +207,25 @@ public class Player {
     }
 
     public List<Integer> getDeckIds() {
-        ArrayList<Integer> ids = new ArrayList<>();
+        List<Integer> ids = new ArrayList<>();
         for (BaseUnit baseUnit : this.deck)
             ids.add(baseUnit.getType());
         return ids;
     }
 
     public List<Integer> getHandIds() {
-        ArrayList<Integer> ids = new ArrayList<>();
+        List<Integer> ids = new ArrayList<>();
         for (BaseUnit baseUnit : this.hand)
             ids.add(baseUnit.getType());
         return ids;
     }
 
     public List<Integer> getAvailableSpellIds() {
-        ArrayList<Integer> availableSpells = new ArrayList<>();
-        for (java.util.Map.Entry<Integer, Integer> spell : spellCount.entrySet()) {
-            if (spell.getValue() > 0) availableSpells.add(spell.getKey());
+        List<Integer> availableSpells = new ArrayList<>();
+        for (int spellId: spellCount.keySet()) {
+            for (int i = 0; i < spellCount.get(spellId); i++) {
+                availableSpells.add(spellId);
+            }
         }
         return availableSpells;
     }

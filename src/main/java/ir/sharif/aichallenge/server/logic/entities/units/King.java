@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-@Getter
 public class King {
 
     private static int KING_TYPE_1 = 100, KING_TYPE_2 = 101;
@@ -20,6 +19,7 @@ public class King {
 
     private KingUnit.HealthComponent healthComponent = new KingUnit.HealthComponent();
 
+    @Getter
     private KingUnit mainUnit;
 
     public King(Player player, Cell center, int health, int damage, int range) {
@@ -48,6 +48,14 @@ public class King {
 
     public List<KingUnit> getUnits() {
         return units;
+    }
+
+    public int getHealth() {
+        return healthComponent.getHealth();
+    }
+
+    public boolean isAlive() {
+        return getMainUnit().isAlive();
     }
 
 }

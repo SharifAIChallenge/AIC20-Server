@@ -32,10 +32,10 @@ public class TurnEvent {
 
         assert (king.getMainUnit().getPlayer().getId() == player.getId());
 
-        turnEvent.setAlive(king.getHealthComponent().getHealth() > 0);
+        turnEvent.setAlive(king.getHealth() > 0);
         turnEvent.setAp(player.getAp());
         turnEvent.setHand(player.getHandIds());
-        turnEvent.setHp(king.getHealthComponent().getHealth());
+        turnEvent.setHp(king.getHealth());
         turnEvent.setUnits(getGraphicUnits(player, game));
         turnEvent.setMapSpells(getGraphicMapSpells(player, game));
 

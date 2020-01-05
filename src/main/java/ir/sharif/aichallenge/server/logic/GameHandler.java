@@ -126,7 +126,7 @@ public class GameHandler implements GameLogic {
             game.pick(pickInfos);
             return;
         }
-        game.turn(messages); //TODO filter messages with dead kings.
+        game.turn(messages);
     }
 
     @Override

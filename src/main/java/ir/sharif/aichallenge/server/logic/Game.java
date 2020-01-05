@@ -158,6 +158,9 @@ public class Game {
     }
 
     public void turn(java.util.Map<String, List<ClientMessageInfo>> messages) {
+        //Ignore dead players' messages
+        messages.values().forEach(list -> list.removeIf(info -> isPlayerAlive(info.getPlayerId())));
+
         initializeTurn();
 
         applyUpgrades(messages.get(MessageTypes.UPGRADE_DAMAGE));
@@ -581,4 +584,8 @@ public class Game {
     }
 
     //endregion
+
+    private boolean isPlayerAlive(int playerId) {
+        return kings.get(playerId).isAlive();
+    }
 }

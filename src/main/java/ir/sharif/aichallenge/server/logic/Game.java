@@ -10,7 +10,8 @@ import ir.sharif.aichallenge.server.logic.dto.client.turn.TurnKing;
 import ir.sharif.aichallenge.server.logic.dto.client.turn.TurnUnit;
 import ir.sharif.aichallenge.server.logic.dto.graphic.GraphicMessage;
 import ir.sharif.aichallenge.server.logic.dto.graphic.init.GraphicInit;
-import ir.sharif.aichallenge.server.logic.dto.graphic.turn.*;
+import ir.sharif.aichallenge.server.logic.dto.graphic.turn.GraphicTurn;
+import ir.sharif.aichallenge.server.logic.dto.graphic.turn.TurnAttack;
 import ir.sharif.aichallenge.server.logic.entities.Player;
 import ir.sharif.aichallenge.server.logic.entities.spells.BaseSpell;
 import ir.sharif.aichallenge.server.logic.entities.spells.Spell;
@@ -29,7 +30,6 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 public class Game {
 
@@ -67,6 +67,8 @@ public class Game {
     @Getter
     @Setter
     private AtomicInteger currentTurn;
+    @Getter
+    private boolean isGameFinished;
 
 
     public static void main(String[] args) throws InterruptedException {
@@ -144,6 +146,8 @@ public class Game {
     //endregion
 
     public void pick(List<PickInfo> messages) {
+        currentTurn.incrementAndGet();
+
         for (PickInfo pickInfo : messages) {
             int playerId = pickInfo.getPlayerId();
             players[playerId].initDeck(pickInfo.getUnits(), numberOfBaseUnits);
@@ -153,11 +157,11 @@ public class Game {
         checkToGiveUpgradeTokens();
         checkToGiveSpells();
         fillClientMessage();
-
-        currentTurn.incrementAndGet();
     }
 
     public void turn(java.util.Map<String, List<ClientMessageInfo>> messages) {
+        currentTurn.incrementAndGet();
+
         //Ignore dead players' messages
         messages.values().forEach(list -> list.removeIf(info -> isPlayerAlive(info.getPlayerId())));
 
@@ -183,9 +187,7 @@ public class Game {
         fillClientMessage();
         addTurnToGraphicMessage();
 
-
-        if (!checkForGameEnd())
-            currentTurn.incrementAndGet();
+        checkForGameEnd();
     }
 
     private void initializeTurn() {
@@ -404,6 +406,7 @@ public class Game {
 
     private void finishGame(int[] scores) {
         //TODO: end loop, shutdown, ...
+        isGameFinished = true;
     }
 
     //region Token Givings

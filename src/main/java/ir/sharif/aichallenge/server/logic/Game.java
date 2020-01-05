@@ -216,7 +216,7 @@ public class Game {
                             unit.upgradeRange();
                             rangeUpgradedUnits.add(unit.getId());
                         }
-                    } catch(LogicException ex) {
+                    } catch (LogicException ex) {
                         System.out.println("logic exception!");
                     }
                 });
@@ -363,10 +363,12 @@ public class Game {
     private boolean checkForGameEnd() {
         if (currentTurn.get() >= gameConstants.getMaxTurns())
             finishAndGiveScores();
-        if (!kings.get(0).isAlive() && !kings.get(2).isAlive() ||
+        else if (!kings.get(0).isAlive() && !kings.get(2).isAlive() ||
                 !kings.get(1).isAlive() && !kings.get(3).isAlive())
             finishAndGiveScores();
-        return false;
+        else
+            return false;
+        return true;
     }
 
     private void finishAndGiveScores() {

@@ -232,7 +232,7 @@ public class ClientHandler {
             while (!receiveTerminateFlag) {
                 try {
                     receive();
-                    if (timeValidator.get() && lastReceivedMessage == null)
+                    if (!timeValidator.get() || lastReceivedMessage == null)
                         continue;
 
                     if (lastReceivedMessage.getTurn() != currentTurn.get())  //Invalid message

@@ -538,9 +538,9 @@ public class Game {
                 })
                 .collect(Collectors.toList());
 
-        final ArrayList<Unit> units = new ArrayList<>(unitsWithId.values());
+        final List<Unit> units = new ArrayList<>(unitsWithId.values())
+                .stream().filter(unit -> !(unit instanceof KingUnit)).collect(Collectors.toList());
         final List<TurnUnit> turnUnits = units.stream()
-                .filter(unit -> !(unit instanceof KingUnit))
                 .map(this::buildTurnUnit)
                 .collect(Collectors.toList());
 
@@ -551,7 +551,7 @@ public class Game {
             final Player player = players[pId];
 
             for (int i = 0; i < units.size(); i++)
-                bindPathId(turnUnits.get(i), pId, units.get(i));    //todo asap IndexOutOfBoundsException
+                bindPathId(turnUnits.get(i), pId, units.get(i));
             message.setUnits(turnUnits);
             message.setCurrTurn(currentTurn.get());
 

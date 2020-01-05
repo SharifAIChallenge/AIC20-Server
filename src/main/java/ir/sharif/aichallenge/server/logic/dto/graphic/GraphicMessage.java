@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -15,5 +16,5 @@ import java.util.List;
 @NoArgsConstructor
 public class GraphicMessage {
     private GraphicInit init;
-    private List<GraphicTurn> turns;
+    private List<GraphicTurn> turns = new ArrayList<>();
 }

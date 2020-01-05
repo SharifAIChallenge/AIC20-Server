@@ -153,6 +153,10 @@ public class Game {
             players[playerId].initDeck(pickInfo.getUnits(), numberOfBaseUnits);
         }
 
+        for (int pId=0; pId<4; pId++)
+            if(!players[pId].getDeckInit())
+                players[pId].initDeck(new ArrayList<Integer>(), numberOfBaseUnits);
+
         initializeTurn();
         checkToGiveUpgradeTokens();
         checkToGiveSpells();

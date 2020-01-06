@@ -46,10 +46,11 @@ public class Player {
         setDeckInit(true);
 
         ArrayList<Integer> validIds = new ArrayList<>();
-        for (Integer id : baseUnitIds)
-            if(id >= 0 && id < numberOfBaseUnits && !validIds.contains(id))
+        for (Integer id : baseUnitIds) {
+            if(validIds.size() >= DECK_SIZE) break;
+            if (id >= 0 && id < numberOfBaseUnits && !validIds.contains(id))
                 validIds.add(id);
-
+        }
 
         ArrayList<Integer> ids = new ArrayList<>(validIds);
 

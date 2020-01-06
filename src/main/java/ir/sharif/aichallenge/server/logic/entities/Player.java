@@ -43,20 +43,19 @@ public class Player {
     }
 
     public void initDeck(List<Integer> baseUnitIds, int numberOfBaseUnits) {
-
         setDeckInit(true);
 
         ArrayList<Integer> ids = new ArrayList<>(baseUnitIds);
 
         while (ids.size() < DECK_SIZE) {
             int random_id = getRandom(0, numberOfBaseUnits);
-            if(ids.contains(random_id)) continue ;
+            if (ids.contains(random_id)) continue;
             ids.add(random_id);
         }
 
         for (Integer id : ids) {
             if (this.deck.size() == DECK_SIZE) break;
-            this.deck.add(BaseUnit.getInstance(id));
+            this.deck.add(BaseUnit.getInstance(id));    //TODO: may throw null pointer exception
         }
 
         for (int i = 0; i < HAND_SIZE; i++)
@@ -77,26 +76,26 @@ public class Player {
         numberOfDamageUpgrades++;
     }
 
-    public void useUpgradeDamage() {
-        if (upgradeUsed) throw new UseMoreThanOneUpgradeException();
-        if (numberOfDamageUpgrades == 0) throw new UpgradeNotHaveException();
+    public void useUpgradeDamage() throws LogicException {
+        if (upgradeUsed) throw new UseMoreThanOneUpgradeException(id);
+        if (numberOfDamageUpgrades == 0) throw new NoAvailableUpgradeException(id, "Damage");
         numberOfDamageUpgrades--;
         setUpgradeUsed(true);
     }
 
-    public void useUpgradeRange() {
-        if (upgradeUsed) throw new UseMoreThanOneUpgradeException();
-        if (numberOfRangeUpgrades == 0) throw new UpgradeNotHaveException();
+    public void useUpgradeRange() throws LogicException {
+        if (upgradeUsed) throw new UseMoreThanOneUpgradeException(id);
+        if (numberOfRangeUpgrades == 0) throw new NoAvailableUpgradeException(id, "Range");
         numberOfRangeUpgrades--;
         setUpgradeUsed(true);
     }
 
-    public void putUnit(BaseUnit baseUnit) {
+    public void putUnit(BaseUnit baseUnit) throws LogicException {
         currentPutUnit = null;
 
-        if (!hand.contains(baseUnit)) throw new UnitNotInHandException();
-        if (ap < baseUnit.getCost()) throw new APNotEnoughException();
-        if (putUsed) throw new PutMoreThanOneUnitException();
+        if (!hand.contains(baseUnit)) throw new UnitNotInHandException(id, baseUnit.getType());
+        if (ap < baseUnit.getCost()) throw new NotEnoughAPException(id, baseUnit.getCost(), ap);
+        if (putUsed) throw new PutMoreThanOneUnitException(id);
 
         setPutUsed(true);
 
@@ -107,20 +106,17 @@ public class Player {
 
     }
 
-    public boolean castSpell(int type) {
+    public void castSpell(int type) throws LogicException {
         int currentCount = getSpellCountOfType(type);
         if (currentCount == 0)
-            return false;
-        //throw new SpellNotHaveException();
+            throw new SpellNotHaveException(id, type);
 
         if (spellUsed)
-            return false;
-        //throw new UseMoreThanOneSpellException();
+            throw new UseMoreThanOneSpellException(id);
         setSpellUsed(true);
 
         currentCount--;
         spellCount.put(type, currentCount);
-        return true;
     }
 
     public void unCastSpell(int type) {
@@ -222,7 +218,7 @@ public class Player {
 
     public List<Integer> getAvailableSpellIds() {
         List<Integer> availableSpells = new ArrayList<>();
-        for (int spellId: spellCount.keySet()) {
+        for (int spellId : spellCount.keySet()) {
             for (int i = 0; i < spellCount.get(spellId); i++) {
                 availableSpells.add(spellId);
             }
@@ -230,7 +226,7 @@ public class Player {
         return availableSpells;
     }
 
-    public boolean getDeckInit(){
+    public boolean getDeckInit() {
         return deckInit;
     }
 

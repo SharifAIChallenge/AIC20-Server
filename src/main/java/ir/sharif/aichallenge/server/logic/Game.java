@@ -1,6 +1,5 @@
 package ir.sharif.aichallenge.server.logic;
 
-import com.google.gson.Gson;
 import ir.sharif.aichallenge.server.common.network.data.*;
 import ir.sharif.aichallenge.server.engine.core.GameServer;
 import ir.sharif.aichallenge.server.logic.dto.client.ClientCell;
@@ -24,6 +23,7 @@ import ir.sharif.aichallenge.server.logic.map.Cell;
 import ir.sharif.aichallenge.server.logic.map.Map;
 import ir.sharif.aichallenge.server.logic.map.Path;
 import ir.sharif.aichallenge.server.logic.map.PathCell;
+import ir.sharif.aichallenge.server.utils.Log;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -146,6 +146,7 @@ public class Game {
 
     //endregion
 
+    //TODO: exception handling
     public void pick(List<PickInfo> messages) {
         currentTurn.incrementAndGet();
 
@@ -165,34 +166,38 @@ public class Game {
     }
 
     public void turn(java.util.Map<String, List<ClientMessageInfo>> messages) {
-        currentTurn.incrementAndGet();
+        try {
+            currentTurn.incrementAndGet();
 
-        //Ignore dead players' messages
-        messages.values().forEach(list -> list.removeIf(info -> isPlayerAlive(info.getPlayerId())));
+            //Ignore dead players' messages
+            messages.values().forEach(list -> list.removeIf(info -> isPlayerAlive(info.getPlayerId())));
 
-        initializeTurn();
+            initializeTurn();
 
-        applyUpgrades(messages.get(MessageTypes.UPGRADE_DAMAGE));
-        applyUpgrades(messages.get(MessageTypes.UPGRADE_RANGE));
+            applyUpgrades(messages.get(MessageTypes.UPGRADE_DAMAGE));
+            applyUpgrades(messages.get(MessageTypes.UPGRADE_RANGE));
 
-        applyPutUnits(messages.get(MessageTypes.PUT_UNIT));
+            applyPutUnits(messages.get(MessageTypes.PUT_UNIT));
 
-        evaluateSpells();
-        applySpells(messages.get(MessageTypes.CAST_SPELL));
+            evaluateSpells();
+            applySpells(messages.get(MessageTypes.CAST_SPELL));
 
-        attack();
-        move();
-        evaluateUnits();
+            attack();
+            move();
+            evaluateUnits();
 
-        resetPlayers();
+            resetPlayers();
 
-        checkToGiveUpgradeTokens();
-        checkToGiveSpells();
+            checkToGiveUpgradeTokens();
+            checkToGiveSpells();
 
-        fillClientMessage();
-        addTurnToGraphicMessage();
+            fillClientMessage();
+            addTurnToGraphicMessage();
 
-        checkForGameEnd();
+            checkForGameEnd();
+        } catch (Exception ex) {
+            Log.e("Error", "Unhandled exception", ex);
+        }
     }
 
     private void initializeTurn() {
@@ -203,7 +208,6 @@ public class Game {
         rangeUpgradedUnits = new HashSet<>();
     }
 
-    //TODO upgrade exception handling.
     private void applyUpgrades(List<ClientMessageInfo> upgradeMessages) {
         if (upgradeMessages == null)
             return;
@@ -211,11 +215,12 @@ public class Game {
         upgradeMessages.stream().map(info -> (UpgradeInfo) info)
                 .forEach(message -> {
                     try {
-                        Unit unit = unitsWithId.get(message.getUnitId());   //todo if unit is kingUnit?
+                        Unit unit = Objects.requireNonNull(unitsWithId.get(message.getUnitId()),
+                                "Unit doesn't exist. Unit id: " + message.getUnitId());   //todo if unit is kingUnit?
 
-                        if (unit == null) throw new UnitNotInMapException();
                         if (unit.getPlayer().getId() != message.getPlayerId())
-                            throw new UpgradeOtherPlayerUnitException();
+                            throw new UpgradeOtherPlayerUnitException(message.getPlayerId(), unit.getPlayer().getId());
+
                         Player player = players[unit.getPlayer().getId()];
                         if (message.getType().equals(MessageTypes.UPGRADE_DAMAGE)) {
                             player.useUpgradeDamage();
@@ -226,8 +231,8 @@ public class Game {
                             unit.upgradeRange();
                             rangeUpgradedUnits.add(unit.getId());
                         }
-                    } catch (LogicException ex) {
-                        System.out.println("logic exception!");
+                    } catch (LogicException | NullPointerException ex) {
+                        Log.i("Logic error:", ex.getMessage());
                     }
                 });
     }
@@ -241,13 +246,15 @@ public class Game {
                 .forEach(info -> {
                     try {
                         Player player = players[info.getPlayerId()];
-                        BaseUnit baseUnit = BaseUnit.getInstance(info.getTypeId()); //TODO
+                        BaseUnit baseUnit = Objects.requireNonNull(BaseUnit.getInstance(info.getTypeId()),
+                                "Invalid unit type: " + info.getTypeId()); //TODO
                         player.putUnit(baseUnit);
                         GeneralUnit generalUnit = new GeneralUnit(baseUnit, player);
                         unitsWithId.put(generalUnit.getId(), generalUnit);
 
                         playedUnits.add(generalUnit.getId());
-                    } catch (Exception ex) {
+                    } catch (LogicException | NullPointerException ex) {
+                        Log.i("Logic error:", ex.getMessage());
                     }
                 });
     }
@@ -273,12 +280,13 @@ public class Game {
         castSpellMessages.stream().map(info -> (SpellCastInfo) info).forEach(info -> {
             try {
                 final Player player = players[info.getPlayerId()];
-                if (player.castSpell(info.getTypeId())) {
-                    Spell spell = SpellFactory.createSpell(
-                            info.getTypeId(), player, info.getCell(), info.getUnitId(), map.getPath(info.getPathId()));
-                    spells.add(spell);
-                }
-            } catch (Exception ex) {
+                player.castSpell(info.getTypeId());
+                Spell spell = Objects.requireNonNull(
+                        SpellFactory.createSpell(info.getTypeId(), player, info.getCell(), info.getUnitId(), map.getPath(info.getPathId())),
+                        "Invalid spell type: " + info.getTypeId());
+                spells.add(spell);
+            } catch (LogicException | NullPointerException ex) {
+                Log.i("Logic error:", ex.getMessage());
             }
         });
 
@@ -286,7 +294,8 @@ public class Game {
             return;
 
         Spell lastSpell = spells.first();
-        for (Spell spell : spells) {
+        for (
+                Spell spell : spells) {
             if (spell.getType() != SpellType.HP && lastSpell.getType() == SpellType.HP)
                 evaluateUnits();
             lastSpell = spell;
@@ -297,6 +306,7 @@ public class Game {
             } catch (Exception ex) {
             }
         }
+
     }
 
     private void evaluateUnits() {
@@ -314,7 +324,6 @@ public class Game {
     }
 
     private void attack() {
-
         currentAttacks.clear();
 
         for (Unit unit : unitsWithId.values()) {
@@ -354,15 +363,15 @@ public class Game {
         return clonedUnit;
     }
 
-    public void teleportUnit(Unit unit, PathCell targetCell) {
-        Objects.requireNonNull(unit);
+    public void teleportUnit(Unit unit, PathCell targetCell) throws LogicException {
+        Objects.requireNonNull(unit, "Unit not found.");
 
         if (!unit.isAlive())    //Impossible
-            throw new NotAliveUnitException();
+            throw new NotAliveUnitException(unit.getId());
 
         if (unit instanceof KingUnit) throw new TeleportKingException();
         int index = targetCell.getNumberOfCell();
-        if (index >= (targetCell.getPath().getLength() + 1) / 2) throw new TeleportTooFarException();
+        if (index >= (targetCell.getPath().getLength() + 1) / 2) throw new TooFarTeleportException(targetCell);
         getMap().moveUnit(unit, targetCell);
     }
 

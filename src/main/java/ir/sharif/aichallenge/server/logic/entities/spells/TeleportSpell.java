@@ -4,6 +4,7 @@ import ir.sharif.aichallenge.server.logic.Game;
 import ir.sharif.aichallenge.server.logic.dto.client.turn.TurnCastSpell;
 import ir.sharif.aichallenge.server.logic.entities.Player;
 import ir.sharif.aichallenge.server.logic.entities.units.Unit;
+import ir.sharif.aichallenge.server.logic.exceptions.LogicException;
 import ir.sharif.aichallenge.server.logic.map.Cell;
 import ir.sharif.aichallenge.server.logic.map.PathCell;
 import lombok.Getter;
@@ -26,7 +27,7 @@ public class TeleportSpell extends Spell {
     }
 
     @Override
-    public void applyTo(Game game) {
+    public void applyTo(Game game) throws LogicException {
         if (isDisposed())
             return;
         caughtUnit = game.getUnitById(targetUnitId);

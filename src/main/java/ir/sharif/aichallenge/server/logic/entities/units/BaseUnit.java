@@ -6,6 +6,7 @@ import ir.sharif.aichallenge.server.logic.exceptions.LogicException;
 import lombok.Getter;
 
 import java.util.HashMap;
+import java.util.Objects;
 
 @Getter
 public class BaseUnit {
@@ -14,9 +15,7 @@ public class BaseUnit {
     private static HashMap<Integer, BaseUnit> instances = new HashMap<>();
 
     public static BaseUnit getInstance(int type) {
-        BaseUnit instance = instances.get(type);
-        if (instance == null) throw new LogicException();
-        return instance;
+        return instances.get(type);
     }
 
     public static BaseUnit initBaseUnits(ClientBaseUnit cBU, int deltaDamage, int deltaDamageRange) {

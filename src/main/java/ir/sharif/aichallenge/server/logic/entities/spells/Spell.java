@@ -8,6 +8,7 @@ import ir.sharif.aichallenge.server.logic.entities.Entity;
 import ir.sharif.aichallenge.server.logic.entities.Player;
 import ir.sharif.aichallenge.server.logic.entities.units.KingUnit;
 import ir.sharif.aichallenge.server.logic.entities.units.Unit;
+import ir.sharif.aichallenge.server.logic.exceptions.LogicException;
 import ir.sharif.aichallenge.server.logic.map.Cell;
 import ir.sharif.aichallenge.server.logic.map.Map;
 import lombok.Getter;
@@ -31,7 +32,7 @@ public abstract class Spell extends Entity implements Disposable {
         this.position = position;
     }
 
-    public abstract void applyTo(Game game);
+    public abstract void applyTo(Game game) throws LogicException;
 
     protected void applyEffectOn(Unit unit) {
         //Basically do nothing

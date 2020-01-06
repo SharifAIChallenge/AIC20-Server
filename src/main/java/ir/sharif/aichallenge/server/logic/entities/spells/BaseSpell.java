@@ -21,9 +21,7 @@ public class BaseSpell {
     }
 
     public static BaseSpell getInstance(int typeId) {
-        BaseSpell instance = instances.get(typeId);
-        if (instance == null) throw new LogicException();
-        return instance;
+        return instances.get(typeId);
     }
 
     public static void initSpell(ClientSpell clientSpell) {

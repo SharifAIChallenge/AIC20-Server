@@ -45,7 +45,13 @@ public class Player {
     public void initDeck(List<Integer> baseUnitIds, int numberOfBaseUnits) {
         setDeckInit(true);
 
-        ArrayList<Integer> ids = new ArrayList<>(baseUnitIds);
+        ArrayList<Integer> validIds = new ArrayList<>();
+        for (Integer id : baseUnitIds)
+            if(id >= 0 && id < numberOfBaseUnits && !validIds.contains(id))
+                validIds.add(id);
+
+
+        ArrayList<Integer> ids = new ArrayList<>(validIds);
 
         while (ids.size() < DECK_SIZE) {
             int random_id = getRandom(0, numberOfBaseUnits);

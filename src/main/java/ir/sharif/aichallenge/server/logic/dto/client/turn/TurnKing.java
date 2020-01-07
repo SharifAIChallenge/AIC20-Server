@@ -19,17 +19,4 @@ public class TurnKing {
     private int hp;
     private int target;
 
-    public static TurnAttack getTurnKing(Unit unit, Unit targetUnit) {
-        int idSource = getIdForAttack(unit);
-        int idTarget = getIdForAttack(targetUnit);
-        return new TurnAttack(idSource, idTarget);
-
-    }
-
-    private static int getIdForAttack(Unit unit) {
-        int id = unit.getId();
-        if(unit instanceof KingUnit)
-            id = unit.getPlayer().getId();
-        return id;
-    }
 }

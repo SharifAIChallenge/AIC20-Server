@@ -342,18 +342,12 @@ public class Game {
         for (Unit unit : unitsWithId.values()) {
             Unit targetUnit = unit.getTarget(map);
 
-            if(!(unit instanceof KingUnit)) {
-                System.out.println(unit.getId() + "," + unit.getCell().toString() + " target -> " + (targetUnit != null));
-                System.out.println(unit.getTargetType());
-                System.out.println(unit.getMoveType());
-            }
-
             if (targetUnit == null) {
                 unit.setHasAttacked(false);
                 continue;
             }
 
-            currentAttacks.add(TurnKing.getTurnKing(unit, targetUnit));
+            currentAttacks.add(TurnAttack.getTurnAttack(unit, targetUnit));
 
             unit.setHasAttacked(true);
             if (unit.isMultiTarget())

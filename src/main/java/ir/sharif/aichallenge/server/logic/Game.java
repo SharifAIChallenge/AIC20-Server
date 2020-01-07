@@ -342,10 +342,11 @@ public class Game {
         for (Unit unit : unitsWithId.values()) {
             Unit targetUnit = unit.getTarget(map);
 
-            if(unit instanceof KingUnit)
-                System.out.println("it's king");
-            System.out.println(unit.getId() + "," + unit.getCell().toString() + " target -> " + (targetUnit != null));
-
+            if(!(unit instanceof KingUnit)) {
+                System.out.println(unit.getId() + "," + unit.getCell().toString() + " target -> " + (targetUnit != null));
+                System.out.println(unit.getTargetType());
+                System.out.println(unit.getMoveType());
+            }
 
             if (targetUnit == null) {
                 unit.setHasAttacked(false);

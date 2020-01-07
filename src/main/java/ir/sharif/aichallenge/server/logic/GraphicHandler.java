@@ -35,7 +35,7 @@ public class GraphicHandler {
     public void saveGraphicLog(GraphicMessage graphicMessage) {
         String graphicLog = new Gson().toJson(graphicMessage);
         try {
-            BufferedWriter bw = new BufferedWriter(new FileWriter("graphic.log"));
+            BufferedWriter bw = new BufferedWriter(new FileWriter("graphic.json"));
             bw.write(graphicLog);
             bw.close();
         } catch(Exception ex){}

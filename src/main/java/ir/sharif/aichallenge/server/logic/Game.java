@@ -341,6 +341,12 @@ public class Game {
 
         for (Unit unit : unitsWithId.values()) {
             Unit targetUnit = unit.getTarget(map);
+
+            if(unit instanceof KingUnit)
+                System.out.println("it's king");
+            System.out.println(unit.getId() + "," + unit.getCell().toString() + " target -> " + (targetUnit != null));
+
+
             if (targetUnit == null) {
                 unit.setHasAttacked(false);
                 continue;

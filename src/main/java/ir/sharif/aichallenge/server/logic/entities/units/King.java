@@ -33,7 +33,7 @@ public class King {
                 BaseUnit baseUnit;
 
                 if (dr == 0 && dc == 0) {
-                    baseUnit = new BaseUnit(KING_TYPE_1, 0, damage, 0, range, 0, 0, false, 0, MoveType.BOTH, TargetType.BOTH);
+                    baseUnit = new BaseUnit(KING_TYPE_1, 0, 0, damage, range, 0, 0, false, 0, MoveType.BOTH, TargetType.BOTH);
                 } else {
                     baseUnit = new BaseUnit(KING_TYPE_2, 0, 0, 0, 0, 0, 0, false, 0, MoveType.BOTH, TargetType.NONE);
                 }

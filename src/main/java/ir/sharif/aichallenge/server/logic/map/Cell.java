@@ -3,7 +3,8 @@ package ir.sharif.aichallenge.server.logic.map;
 import java.util.Objects;
 
 public class Cell {
-    public final int row, col;
+    private final int row;
+    private final int col;
 
     public Cell(int row, int col) {
         this.row = row;

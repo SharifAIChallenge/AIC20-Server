@@ -347,7 +347,7 @@ public class Game {
                 continue;
             }
 
-            currentAttacks.add(TurnKing.getTurnKing(unit, targetUnit));
+            currentAttacks.add(TurnAttack.getTurnAttack(unit, targetUnit));
 
             unit.setHasAttacked(true);
             if (unit.isMultiTarget())

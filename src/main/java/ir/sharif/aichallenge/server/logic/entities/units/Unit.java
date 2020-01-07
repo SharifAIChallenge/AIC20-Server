@@ -102,6 +102,7 @@ public abstract class Unit extends Entity {
                 .flatMap(unit ->
                         //If present look in that distance
                         map.getUnitsWithManhattanDistance(getCell(), MapUtils.calcManhattanDistance(getCell(), unit.getCell()))
+                                .filter(this::isTarget)
                                 //To find best one with min health the max damage
                                 .min(Comparator.comparingInt(Unit::getHealth)
                                         .thenComparing(Comparator.comparingInt(Unit::getDamage).reversed())))

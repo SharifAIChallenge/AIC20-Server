@@ -18,6 +18,9 @@ public class TurnAttack {
     public static TurnAttack getTurnAttack(Unit unit, Unit targetUnit) {
         int idSource = getIdForAttack(unit);
         int idTarget = getIdForAttack(targetUnit);
+        if (idSource == idTarget) {
+            throw new IllegalStateException();
+        }
         return new TurnAttack(idSource, idTarget);
 
     }

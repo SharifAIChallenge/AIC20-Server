@@ -49,7 +49,7 @@ public abstract class Unit extends Entity {
 
     @Override
     public boolean isEnemy(Entity other) {
-        return getId() != other.getId();
+        return this.getPlayer().isEnemy(other.getPlayer());
     }
 
     public abstract int getHealth();

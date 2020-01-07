@@ -337,17 +337,25 @@ public class Game {
     }
 
     private void attack() {
-        currentAttacks.clear();
+        currentAttacks = new ArrayList<>();
 
         for (Unit unit : unitsWithId.values()) {
             Unit targetUnit = unit.getTarget(map);
+
+            if(!(unit instanceof KingUnit)) {
+                System.out.println("Unit -> " + unit.getPlayer().getId());
+                if (targetUnit != null) System.out.println(targetUnit.getPlayer().getId() + "\n");
+            }
 
             if (targetUnit == null) {
                 unit.setHasAttacked(false);
                 continue;
             }
 
+            System.out.println("Here");
             currentAttacks.add(TurnAttack.getTurnAttack(unit, targetUnit));
+            System.out.println(currentAttacks.size());
+
 
             unit.setHasAttacked(true);
             if (unit.isMultiTarget())

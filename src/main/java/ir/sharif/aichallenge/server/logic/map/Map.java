@@ -82,7 +82,7 @@ public class Map {
 
     public Stream<Unit> getUnitsInManhattanRange(int centerRow, int centerCol, int range) {
         return IntStream.rangeClosed(0, range).boxed()
-                .flatMap(i -> getUnitsWithManhattanDistance(centerRow, centerCol, range));
+                .flatMap(i -> getUnitsWithManhattanDistance(centerRow, centerCol, i));
     }
 
     public Stream<Unit> getUnitsWithManhattanDistance(Cell cell, int distance) {

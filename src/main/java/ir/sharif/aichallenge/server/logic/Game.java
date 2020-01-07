@@ -170,7 +170,7 @@ public class Game {
             currentTurn.incrementAndGet();
 
             //Ignore dead players' messages
-            messages.values().forEach(list -> list.removeIf(info -> isPlayerAlive(info.getPlayerId())));
+            messages.values().forEach(list -> list.removeIf(info -> !isPlayerAlive(info.getPlayerId())));
 
             initializeTurn();
 
@@ -256,6 +256,7 @@ public class Game {
                         player.putUnit(baseUnit);
 
                         GeneralUnit generalUnit = new GeneralUnit(baseUnit, player);
+                        map.putUnit(generalUnit, info.getPathId());
                         unitsWithId.put(generalUnit.getId(), generalUnit);
                         playedUnits.add(generalUnit.getId());
                     } catch (LogicException | NullPointerException ex) {
@@ -529,7 +530,7 @@ public class Game {
             targetCell = unit.getTargetUnit().getCell();
         }
 
-
+        ClientCell clientTargetCell = targetCell == null ? null : new ClientCell(targetCell);
         return TurnUnit.builder().unitId(unit.getId()).playerId(unit.getPlayer().getId()).typeId(unit.getBaseUnit().getType()).
                 pathId(pathId).cell(new ClientCell(unit.getCell()))
                 .hp(unit.getHealth())
@@ -540,7 +541,7 @@ public class Game {
                 .isDuplicate(unit.isDuplicate())
                 .isHasted(unit.getSpeedIncrease() > 0)
                 .affectedSpells(unit.getAffectedSpells())
-                .target(targetId).targetCell(new ClientCell(targetCell))
+                .target(targetId).targetCell(clientTargetCell)
                 .wasPlayedThisTurn(playedUnits.contains(unit.getId())).build();
     }
 

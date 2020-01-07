@@ -17,6 +17,7 @@ public class GraphicBaseUnit {
 
 
     public static GraphicBaseUnit makeGraphicBaseUnit(ClientBaseUnit clientBaseUnit) {
-        return null;
+        return new GraphicBaseUnit(clientBaseUnit.getTypeId(),
+                clientBaseUnit.getMaxHP(), clientBaseUnit.getAp());
     }
 }

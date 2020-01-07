@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,8 +22,6 @@ public class GraphicInit {
         GraphicInit graphicInit = new GraphicInit();
         graphicInit.setMaxAP(initialMessage.getGameConstants().getMaxAP());
         graphicInit.setGraphicMap(GraphicMap.makeGraphicMap(initialMessage.getMap()));
-
-        List<GraphicBaseUnit> baseUnits = new ArrayList<>();
 
         graphicInit.setBaseUnits(
                 initialMessage.getBaseUnits().stream().map(

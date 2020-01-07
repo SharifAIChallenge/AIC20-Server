@@ -133,6 +133,8 @@ public abstract class Unit extends Entity {
     }
 
     public Set<Integer> getAffectedSpells() {
+        if (affectedSpells == null)
+            return new HashSet<>();
         return Collections.unmodifiableSet(this.affectedSpells);
     }
 }

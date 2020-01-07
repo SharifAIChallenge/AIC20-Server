@@ -77,7 +77,7 @@ public class Map {
     }
 
     public Stream<Unit> getUnitsInManhattanRange(Cell cell, int range) {
-        return getUnitsInManhattanRange(cell.row, cell.col, range);
+        return getUnitsInManhattanRange(cell.getRow(), cell.getCol(), range);
     }
 
     public Stream<Unit> getUnitsInManhattanRange(int centerRow, int centerCol, int range) {

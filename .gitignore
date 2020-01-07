@@ -39,3 +39,4 @@ buildNumber.properties
 # Jetbrains
 .idea
 *.iml
+*.json

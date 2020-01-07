@@ -30,7 +30,7 @@ public class UnitsInCellsCollection {
     }
 
     public Stream<Unit> getUnits(Cell cell) {
-        return getUnits(cell.row, cell.col);
+        return getUnits(cell.getRow(), cell.getCol());
     }
 
     public boolean add(Unit unit, int row, int col) {
@@ -40,7 +40,7 @@ public class UnitsInCellsCollection {
     }
 
     public boolean add(Unit unit) {
-        return add(unit, unit.getCell().row, unit.getCell().col);
+        return add(unit, unit.getCell().getRow(), unit.getCell().getCol());
     }
 
     public boolean remove(Unit unit, int row, int col) {
@@ -48,6 +48,6 @@ public class UnitsInCellsCollection {
     }
 
     public boolean remove(Unit unit) {
-        return unitsInCell[unit.getCell().row][unit.getCell().col].remove(unit);
+        return unitsInCell[unit.getCell().getRow()][unit.getCell().getCol()].remove(unit);
     }
 }

@@ -34,6 +34,8 @@ public abstract class Spell extends Entity implements Disposable {
 
     public abstract void applyTo(Game game) throws LogicException;
 
+    public abstract void checkValid(Game game) throws LogicException;
+
     protected void applyEffectOn(Unit unit) {
         //Basically do nothing
     }

@@ -97,29 +97,37 @@ public class Player {
         setUpgradeUsed(true);
     }
 
-    public void putUnit(BaseUnit baseUnit) throws LogicException {
+    public void checkPutUnit(BaseUnit baseUnit) throws LogicException {
         currentPutUnit = null;
 
         if (!hand.contains(baseUnit)) throw new UnitNotInHandException(id, baseUnit.getType());
         if (ap < baseUnit.getCost()) throw new NotEnoughAPException(id, baseUnit.getCost(), ap);
         if (putUsed) throw new PutMoreThanOneUnitException(id);
 
+    }
+
+    public void putUnit(BaseUnit baseUnit) {
         setPutUsed(true);
 
         numberOfUse[baseUnitId.get(baseUnit)]++;
 
         currentPutUnit = baseUnit;
         ap -= baseUnit.getCost();
-
     }
 
-    public void castSpell(int type) throws LogicException {
+    public void checkSpell(int type) throws LogicException{
         int currentCount = getSpellCountOfType(type);
         if (currentCount == 0)
             throw new SpellNotHaveException(id, type);
 
         if (spellUsed)
             throw new UseMoreThanOneSpellException(id);
+
+    }
+
+    public void castSpell(int type) {
+        int currentCount = getSpellCountOfType(type);
+
         setSpellUsed(true);
 
         currentCount--;

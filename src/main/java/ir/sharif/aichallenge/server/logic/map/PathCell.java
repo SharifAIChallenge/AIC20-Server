@@ -1,5 +1,7 @@
 package ir.sharif.aichallenge.server.logic.map;
 
+import java.util.List;
+
 public class PathCell {
     private final Path path;
     private boolean reversed;
@@ -9,6 +11,17 @@ public class PathCell {
         this.path = path;
         this.reversed = reversed;
         this.numberOfCell = Math.min(numberOfCell, path.getCells().size() - 1);
+    }
+
+
+    public static PathCell creatPathCell(Path path, boolean reversed, Cell targetCell) {
+        int index = path.getCells().indexOf(targetCell);
+        if(index == -1) throw new NullPointerException("Teleported in not valid cell in path_id");
+
+        if(!reversed)
+            return new PathCell(path, false, index);
+        else return new PathCell(path, true, path.getCells().size() - index - 1);
+
     }
 
     public Path getPath() {

@@ -375,15 +375,7 @@ public class Game {
         return clonedUnit;
     }
 
-    public void teleportUnit(Unit unit, PathCell targetCell) throws LogicException {
-        Objects.requireNonNull(unit, "Unit not found.");
-
-        if (!unit.isAlive())    //Impossible
-            throw new NotAliveUnitException(unit.getId());
-
-        if (unit instanceof KingUnit) throw new TeleportKingException();
-        int index = targetCell.getNumberOfCell();
-        if (index >= (targetCell.getPath().getLength() + 1) / 2) throw new TooFarTeleportException(targetCell);
+    public void teleportUnit(Unit unit, PathCell targetCell) {
         getMap().moveUnit(unit, targetCell);
     }
 

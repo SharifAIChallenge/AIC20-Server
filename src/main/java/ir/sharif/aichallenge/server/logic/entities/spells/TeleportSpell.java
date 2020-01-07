@@ -3,8 +3,12 @@ package ir.sharif.aichallenge.server.logic.entities.spells;
 import ir.sharif.aichallenge.server.logic.Game;
 import ir.sharif.aichallenge.server.logic.dto.client.turn.TurnCastSpell;
 import ir.sharif.aichallenge.server.logic.entities.Player;
+import ir.sharif.aichallenge.server.logic.entities.units.KingUnit;
 import ir.sharif.aichallenge.server.logic.entities.units.Unit;
 import ir.sharif.aichallenge.server.logic.exceptions.LogicException;
+import ir.sharif.aichallenge.server.logic.exceptions.TeleportKingException;
+import ir.sharif.aichallenge.server.logic.exceptions.TeleportUnitIdException;
+import ir.sharif.aichallenge.server.logic.exceptions.TooFarTeleportException;
 import ir.sharif.aichallenge.server.logic.map.Cell;
 import ir.sharif.aichallenge.server.logic.map.PathCell;
 import lombok.Getter;
@@ -35,6 +39,22 @@ public class TeleportSpell extends Spell {
     }
 
     @Override
+    public void checkValid(Game game) throws LogicException {
+        Unit unit = game.getUnitById(targetUnitId);
+
+        if(unit == null) throw new TeleportUnitIdException(targetUnitId, getPlayer().getId());
+
+        if(unit.getPlayer().getId() != getPlayer().getId())
+            throw new TeleportUnitIdException(targetUnitId, getPlayer().getId());
+
+        if(unit instanceof KingUnit) throw new TeleportKingException();
+
+        int index = targetCell.getNumberOfCell();
+        if (index >= (targetCell.getPath().getLength() + 1) / 2) throw new TooFarTeleportException(targetCell);
+        //TODO vasate masir?
+    }
+
+    @Override
     public Set<Unit> getCaughtUnits() {
         return Collections.singleton(caughtUnit);
     }
@@ -47,4 +67,5 @@ public class TeleportSpell extends Spell {
         turnCastSpell.setAffectedUnits(Collections.singletonList(getTargetUnitId()));
         return turnCastSpell;
     }
+
 }

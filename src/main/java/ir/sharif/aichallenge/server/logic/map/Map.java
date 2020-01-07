@@ -2,6 +2,8 @@ package ir.sharif.aichallenge.server.logic.map;
 
 import ir.sharif.aichallenge.server.logic.entities.TargetType;
 import ir.sharif.aichallenge.server.logic.entities.units.Unit;
+import ir.sharif.aichallenge.server.logic.exceptions.InvalidPathPutUnitException;
+import ir.sharif.aichallenge.server.logic.exceptions.LogicException;
 
 import java.util.*;
 import java.util.stream.IntStream;
@@ -92,5 +94,9 @@ public class Map {
                 .flatMap(j ->
                         Stream.concat(getUnits(centerRow + j, centerCol + distance - Math.abs(j)),
                                 getUnits(centerRow + j, centerCol - distance + Math.abs(j))));
+    }
+
+    public void checkValidPut(int pathId) throws LogicException {
+        //throw new InvalidPathPutUnitException(pathId);
     }
 }

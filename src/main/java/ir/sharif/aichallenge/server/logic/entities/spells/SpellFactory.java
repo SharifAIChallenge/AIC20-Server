@@ -19,10 +19,11 @@ public class SpellFactory {
             case TELE:
                 if (player.getTeam() == 0)
                     return new TeleportSpell(id, player, position, unitId,
-                            new PathCell(path, player.getTeam() == 0, path.getLength() - path.getCells().indexOf(position) - 1));
+                            PathCell.creatPathCell(path, player.getTeam() == 0, position));
                 else
                     return new TeleportSpell(id, player, position, unitId,
-                            new PathCell(path, player.getTeam() == 0, path.getCells().indexOf(position)));
+                            PathCell.creatPathCell(path, player.getTeam() == 0, position));
+
             case DUPLICATE:
                 return new DuplicateSpell(id, player, position);
             default:

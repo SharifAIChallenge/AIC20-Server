@@ -248,10 +248,15 @@ public class Game {
                         Player player = players[info.getPlayerId()];
                         BaseUnit baseUnit = Objects.requireNonNull(BaseUnit.getInstance(info.getTypeId()),
                                 "Invalid unit type: " + info.getTypeId()); //TODO
+
+                        player.checkPutUnit(baseUnit);
+
+                        map.checkValidPut(info.getPathId());
+
                         player.putUnit(baseUnit);
+
                         GeneralUnit generalUnit = new GeneralUnit(baseUnit, player);
                         unitsWithId.put(generalUnit.getId(), generalUnit);
-
                         playedUnits.add(generalUnit.getId());
                     } catch (LogicException | NullPointerException ex) {
                         Log.i("Logic error:", ex.getMessage());
@@ -280,10 +285,17 @@ public class Game {
         castSpellMessages.stream().map(info -> (SpellCastInfo) info).forEach(info -> {
             try {
                 final Player player = players[info.getPlayerId()];
-                player.castSpell(info.getTypeId());
+
+                player.checkSpell(info.getTypeId());
+
                 Spell spell = Objects.requireNonNull(
                         SpellFactory.createSpell(info.getTypeId(), player, info.getCell(), info.getUnitId(), map.getPath(info.getPathId())),
                         "Invalid spell type: " + info.getTypeId());
+
+                spell.checkValid(this);
+
+                player.castSpell(info.getTypeId());
+
                 spells.add(spell);
             } catch (LogicException | NullPointerException ex) {
                 Log.i("Logic error:", ex.getMessage());

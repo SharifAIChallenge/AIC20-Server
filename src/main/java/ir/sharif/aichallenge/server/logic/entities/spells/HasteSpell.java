@@ -1,7 +1,9 @@
 package ir.sharif.aichallenge.server.logic.entities.spells;
 
+import ir.sharif.aichallenge.server.logic.Game;
 import ir.sharif.aichallenge.server.logic.entities.Player;
 import ir.sharif.aichallenge.server.logic.entities.units.Unit;
+import ir.sharif.aichallenge.server.logic.exceptions.LogicException;
 import ir.sharif.aichallenge.server.logic.map.Cell;
 
 public class HasteSpell extends AreaSpell {
@@ -10,6 +12,7 @@ public class HasteSpell extends AreaSpell {
         //No need to get baseSpell from constructor
         super(id, BaseSpell.getInstance(SpellType.HASTE), player, position);
     }
+
 
     @Override
     protected void applyEffectOn(Unit unit) {

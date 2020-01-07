@@ -31,11 +31,6 @@ public class KingUnit extends Unit {
     }
 
     @Override
-    public int getDamage() {
-        return 0;
-    }
-
-    @Override
     public int getSpeed() {
         return 0;
     }

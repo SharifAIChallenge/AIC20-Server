@@ -40,12 +40,6 @@ public class KingUnit extends Unit {
         return 0;
     }
 
-    @Override
-    public Unit getTarget(Map map) {
-        return null;
-    }
-
-
     public static class HealthComponent {
         private int health;
 

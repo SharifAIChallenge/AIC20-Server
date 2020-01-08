@@ -14,13 +14,14 @@ public class PathCell {
     }
 
 
-    public static PathCell creatPathCell(Path path, boolean reversed, Cell targetCell) {
+    public static PathCell createPathCell(Path path, boolean reversed, Cell targetCell) {
         int index = path.getCells().indexOf(targetCell);
-        if(index == -1) throw new NullPointerException("Teleported in not valid cell in path_id");
+        if (index == -1) throw new NullPointerException("Teleported in not valid cell in path_id");
 
-        if(!reversed)
+        if (!reversed)
             return new PathCell(path, false, index);
-        else return new PathCell(path, true, path.getCells().size() - index - 1);
+        else
+            return new PathCell(path, true, path.getCells().size() - index - 1);
 
     }
 

@@ -1,5 +1,7 @@
 package ir.sharif.aichallenge.server.logic.map;
 
+import ir.sharif.aichallenge.server.logic.dto.client.ClientCell;
+
 import java.util.Objects;
 
 public class Cell {
@@ -9,6 +11,11 @@ public class Cell {
     public Cell(int row, int col) {
         this.row = row;
         this.col = col;
+    }
+
+    public Cell(ClientCell clientCell) {
+        this.row = clientCell.getRow();
+        this.col = clientCell.getCol();
     }
 
     public int getRow() {

@@ -31,6 +31,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class Game {
 
@@ -119,20 +120,43 @@ public class Game {
         map = new Map(clientMap.getRows(), clientMap.getCols());
         List<ClientPath> clientPaths = clientMap.getPaths();
 
-        for (ClientPath clientPath : clientPaths) {
-            List<Cell> cells = new ArrayList<>();
-            for (ClientCell clientCell : clientPath.getCells())
-                cells.add(new Cell(clientCell.getRow(), clientCell.getCol()));
-
-            map.addPath(new Path(clientPath.getId(), cells));
-        }
-
+        HashMap<Cell, Integer> kingCellsWithIds = new HashMap<>();
         for (ClientBaseKing clientBaseKing : clientMap.getKings()) {
             int id = clientBaseKing.getPlayerId();
-            addKing(players[id], new Cell(clientBaseKing.getCenter().getRow(), clientBaseKing.getCenter().getCol()),
+            kingCellsWithIds.put(new Cell(clientBaseKing.getCenter()), clientBaseKing.getPlayerId());
+            addKing(players[id], new Cell(clientBaseKing.getCenter()),
                     clientBaseKing.getHp(), clientBaseKing.getAttack(), clientBaseKing.getRange());
         }
 
+        HashMap<Cell, Path> kingToKingPaths = new HashMap<>();
+        List<Path> allPaths = new ArrayList<>(clientPaths.size() - 2);
+        for (ClientPath clientPath : clientPaths) {
+            Path path = new Path(clientPath.getId(), clientPath.getCells().stream().map(Cell::new).collect(Collectors.toList()));
+            if (isKingToKingPath(path, kingCellsWithIds)) {
+                kingToKingPaths.put(path.getFirst(), path);
+                kingToKingPaths.put(path.getLast(), path.reverse());
+            } else
+                allPaths.add(path);
+        }
+        for (Path path : allPaths) {
+            final Path prependedPath = kingToKingPaths.get(path.getFirst()).reverse();
+            final Path appendedPath = kingToKingPaths.get(path.getLast());
+            int[] kingsIndices = new int[4];
+            kingsIndices[kingCellsWithIds.get(prependedPath.getFirst())] = 0;
+            kingsIndices[kingCellsWithIds.get(prependedPath.getLast())] = prependedPath.getLength() - 1;
+            kingsIndices[kingCellsWithIds.get(appendedPath.getFirst())] = prependedPath.getLength() + path.getLength() - 2;
+            kingsIndices[kingCellsWithIds.get(appendedPath.getLast())] = prependedPath.getLength() + path.getLength() + appendedPath.getLength() - 3;
+            final List<Cell> concat = Stream.of(prependedPath.getCells(), path.getCells().subList(1, path.getLength() - 1), appendedPath.getCells())
+                    .flatMap(Collection::stream)
+                    .collect(Collectors.toList());
+            map.addPath(new Path(path.getId(), concat, kingsIndices));
+        }
+    }
+
+    private boolean isKingToKingPath(Path path, java.util.Map<Cell, Integer> kingCellsWithIds) {
+        int startKing = kingCellsWithIds.get(path.getCellAt(0));
+        int endKing = kingCellsWithIds.get(path.getCellAt(path.getLength() - 1));
+        return startKing % 2 == endKing % 2;
     }
 
     public void addKing(Player player, Cell centerCell, int health, int damage, int range) {
@@ -307,8 +331,7 @@ public class Game {
             return;
 
         Spell lastSpell = spells.first();
-        for (
-                Spell spell : spells) {
+        for (Spell spell : spells) {
             if (spell.getType() != SpellType.HP && lastSpell.getType() == SpellType.HP)
                 evaluateUnits();
             lastSpell = spell;
@@ -316,7 +339,8 @@ public class Game {
                 spell.applyTo(this);
                 spell.getCaughtUnits().forEach(unit -> unit.addActiveSpell(spell.getId()));
                 turnCastSpells.add(spell.getTurnCastSpell());
-            } catch (Exception ex) {
+            } catch (LogicException ex) {
+                Log.i("Logic error:", ex.getMessage());
             }
         }
 

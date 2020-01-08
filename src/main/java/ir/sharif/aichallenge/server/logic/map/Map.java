@@ -38,8 +38,15 @@ public class Map {
 
     public void putUnit(Unit unit, int pathId) {
         final Path path = this.paths.get(pathId);
-        unit.setPosition(new PathCell(path, unit.getPlayer().getTeam() == 0, 0));
+        boolean isReversed = path.shouldReverseForTeam(unit.getPlayer().getTeam());
+        final int index = path.getIndexForKing(unit.getPlayer().getId());
+        unit.setPosition(new PathCell(path, isReversed, isReversed ? path.getLength() - index : index));
         unitsInCell.add(unit);
+    }
+
+    public void checkValidPut(int pathId) throws LogicException {
+        if (!this.paths.containsKey(pathId))
+            throw new InvalidPathPutUnitException(pathId);
     }
 
     public void putUnit(Unit unit) {
@@ -94,9 +101,5 @@ public class Map {
                 .flatMap(j ->
                         Stream.concat(getUnits(centerRow + j, centerCol + distance - Math.abs(j)),
                                 getUnits(centerRow + j, centerCol - distance + Math.abs(j))));
-    }
-
-    public void checkValidPut(int pathId) throws LogicException {
-        //throw new InvalidPathPutUnitException(pathId);
     }
 }

@@ -144,13 +144,17 @@ public class GameHandler implements GameLogic {
         return null;
     }
 
+    public ClientTurnMessage[] getClientRawMessages() {
+        return game.getClientTurnMessages();
+    }
+
     @Override
     public Message[] getClientMessages() {
-        Message[] messages = new Message[4];
         if (game.getCurrentTurn().get() == 0) {     //todo check init is 0
             return getClientInitialMessages();
         }
 
+        Message[] messages = new Message[4];
         // turn
         ClientTurnMessage[] clientTurnMessages = game.getClientTurnMessages();
         for (int i = 0; i < 4; i++) {
@@ -168,5 +172,9 @@ public class GameHandler implements GameLogic {
     @Override
     public void terminate() {
 
+    }
+
+    public int getCurrentTurn() {
+        return game.getCurrentTurn().get();
     }
 }

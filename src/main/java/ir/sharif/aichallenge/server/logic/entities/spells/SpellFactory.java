@@ -17,12 +17,8 @@ public class SpellFactory {
             case HASTE:
                 return new HasteSpell(id, player, position);
             case TELE:
-                if (player.getTeam() == 0)
-                    return new TeleportSpell(id, player, position, unitId,
-                            PathCell.creatPathCell(path, player.getTeam() == 0, position));
-                else
-                    return new TeleportSpell(id, player, position, unitId,
-                            PathCell.creatPathCell(path, player.getTeam() == 0, position));
+                return new TeleportSpell(id, player, position, unitId,
+                        PathCell.createPathCell(path, path.shouldReverseForTeam(player.getTeam()), position));
 
             case DUPLICATE:
                 return new DuplicateSpell(id, player, position);

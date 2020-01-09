@@ -225,8 +225,8 @@ public class Game {
     }
 
     private void initializeTurn() {
-        playedUnits.clear();
-        turnCastSpells.clear();
+        playedUnits = new HashSet<>();
+        turnCastSpells = new ArrayList<>();
         Arrays.setAll(clientTurnMessages, i -> new ClientTurnMessage());
         damageUpgradedUnits = new HashSet<>();
         rangeUpgradedUnits = new HashSet<>();
@@ -366,7 +366,7 @@ public class Game {
         for (Unit unit : unitsWithId.values()) {
             Unit targetUnit = unit.getTarget(map);
 
-            if(!(unit instanceof KingUnit)) {
+            if (!(unit instanceof KingUnit)) {
                 System.out.println("Unit -> " + unit.getPlayer().getId());
                 if (targetUnit != null) System.out.println(targetUnit.getPlayer().getId() + "\n");
             }
@@ -619,6 +619,7 @@ public class Game {
 
             message.setMySpells(player.getAvailableSpellIds());
             message.setFriendSpells(players[friendId].getAvailableSpellIds());
+            message.setCastSpells(turnCastSpells);
 
             message.setDeck(player.getDeckIds());
             message.setHand(player.getHandIds());

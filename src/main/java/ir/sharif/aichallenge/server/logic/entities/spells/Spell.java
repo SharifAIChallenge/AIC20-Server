@@ -30,6 +30,7 @@ public abstract class Spell extends Entity implements Disposable {
         super(id, player);
         this.baseSpell = baseSpell;
         this.position = position;
+        remainingTurns = baseSpell.getDuration();
     }
 
     public abstract void applyTo(Game game) throws LogicException;

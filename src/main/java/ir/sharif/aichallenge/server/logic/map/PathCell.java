@@ -7,10 +7,13 @@ public class PathCell {
     private boolean reversed;
     private int numberOfCell;
 
-    public PathCell(Path path, boolean reversed, int numberOfCell) {
+    public PathCell(Path path, boolean reversed, int numberOfCellInPath) {
         this.path = path;
         this.reversed = reversed;
-        this.numberOfCell = Math.min(numberOfCell, path.getCells().size() - 1);
+        this.numberOfCell = Math.min(numberOfCellInPath, path.getCells().size() - 1);
+        if (reversed) {
+            this.numberOfCell = path.getLength() - numberOfCellInPath - 1;
+        }
     }
 
 
@@ -18,11 +21,7 @@ public class PathCell {
         int index = path.getCells().indexOf(targetCell);
         if (index == -1) throw new NullPointerException("Teleported in not valid cell in path_id");
 
-        if (!reversed)
-            return new PathCell(path, false, index);
-        else
-            return new PathCell(path, true, path.getCells().size() - index - 1);
-
+        return new PathCell(path, reversed, index);
     }
 
     public Path getPath() {
@@ -33,20 +32,18 @@ public class PathCell {
         return numberOfCell;
     }
 
-    public boolean getReversed(){
+    public boolean isReversed() {
         return reversed;
     }
 
     public Cell getCell() {
-        return path.getCellAt(reversed ? path.getLength() - numberOfCell - 1: numberOfCell);
-    }
-
-    public PathCell nextCell() {
-        return nextCell(1);
+        return path.getCellAt(reversed ? path.getLength() - numberOfCell - 1 : numberOfCell);
     }
 
     public PathCell nextCell(int speed) {
-        return new PathCell(this.path, this.reversed, numberOfCell + speed);
+        PathCell cloned = new PathCell(this.path, this.reversed, numberOfCell + speed);
+        cloned.numberOfCell = numberOfCell + speed; //Forcing the index
+        return cloned;
     }
 
     @Override

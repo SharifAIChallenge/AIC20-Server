@@ -49,7 +49,7 @@ public class TeleportSpell extends Spell {
 
         if(unit instanceof KingUnit) throw new TeleportKingException();
 
-        int index = targetCell.getNumberOfCell();
+        int index = targetCell.getNumberOfCell(); //TODO: check again
         if (index >= (targetCell.getPath().getLength() + 1) / 2) throw new TooFarTeleportException(targetCell);
         //TODO vasate masir?
     }

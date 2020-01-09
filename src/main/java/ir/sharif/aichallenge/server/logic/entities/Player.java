@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Getter
 public class Player {
@@ -47,7 +48,7 @@ public class Player {
 
         ArrayList<Integer> validIds = new ArrayList<>();
         for (Integer id : baseUnitIds) {
-            if(validIds.size() >= DECK_SIZE) break;
+            if (validIds.size() >= DECK_SIZE) break;
             if (id >= 0 && id < numberOfBaseUnits && !validIds.contains(id))
                 validIds.add(id);
         }
@@ -115,7 +116,7 @@ public class Player {
         ap -= baseUnit.getCost();
     }
 
-    public void checkSpell(int type) throws LogicException{
+    public void checkSpell(int type) throws LogicException {
         int currentCount = getSpellCountOfType(type);
         if (currentCount == 0)
             throw new SpellNotHaveException(id, type);
@@ -218,17 +219,13 @@ public class Player {
     }
 
     public List<Integer> getDeckIds() {
-        List<Integer> ids = new ArrayList<>();
-        for (BaseUnit baseUnit : this.deck)
-            ids.add(baseUnit.getType());
-        return ids;
+        return this.deck.stream().map(BaseUnit::getType)
+                .collect(Collectors.toCollection(() -> new ArrayList<>(this.deck.size())));
     }
 
     public List<Integer> getHandIds() {
-        List<Integer> ids = new ArrayList<>();
-        for (BaseUnit baseUnit : this.hand)
-            ids.add(baseUnit.getType());
-        return ids;
+        return this.hand.stream().map(BaseUnit::getType)
+                .collect(Collectors.toCollection(() -> new ArrayList<>(this.hand.size())));
     }
 
     public List<Integer> getAvailableSpellIds() {

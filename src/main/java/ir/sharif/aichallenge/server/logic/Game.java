@@ -230,6 +230,9 @@ public class Game {
         Arrays.setAll(clientTurnMessages, i -> new ClientTurnMessage());
         damageUpgradedUnits = new HashSet<>();
         rangeUpgradedUnits = new HashSet<>();
+        for (Unit unit : unitsWithId.values()) {
+            unit.setSpeedIncrease(0);
+        }
     }
 
     private void applyUpgrades(List<ClientMessageInfo> upgradeMessages) {

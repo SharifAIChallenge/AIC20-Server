@@ -2,6 +2,7 @@ package ir.sharif.aichallenge.server.logic.dto.graphic.turn;
 
 import ir.sharif.aichallenge.server.logic.Game;
 import ir.sharif.aichallenge.server.logic.dto.graphic.GraphicCell;
+import ir.sharif.aichallenge.server.logic.entities.Entity;
 import ir.sharif.aichallenge.server.logic.entities.Player;
 import ir.sharif.aichallenge.server.logic.entities.spells.Spell;
 import ir.sharif.aichallenge.server.logic.entities.units.King;
@@ -14,6 +15,7 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -68,10 +70,11 @@ public class TurnEvent {
 
     private static MapSpell getMapSpell(Spell spell) {
         MapSpell mapSpell = new MapSpell();
-        mapSpell.setCenter(new GraphicCell(spell.getPosition().getRow(), spell.getPosition().getCol()));
-        mapSpell.setRange(spell.getRange());
+//        mapSpell.setCenter(new GraphicCell(spell.getPosition().getRow(), spell.getPosition().getCol()));
+//        mapSpell.setRange(spell.getRange());
         mapSpell.setTypeId(spell.getBaseSpell().getTypeId());
         mapSpell.setSpellId(spell.getId());
+        mapSpell.setUnitIds(spell.getCaughtUnits().stream().map(Entity::getId).collect(Collectors.toList()));
         return mapSpell;
     }
 }

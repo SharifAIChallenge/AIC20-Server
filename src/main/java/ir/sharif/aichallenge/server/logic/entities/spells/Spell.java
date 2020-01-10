@@ -60,7 +60,7 @@ public abstract class Spell extends Entity implements Disposable {
                 .filter(this::isTarget);
     }
 
-    public abstract Set<Unit> getCaughtUnits();
+    public abstract Set<Unit> getCaughtUnits(); //todo change to list
 
     @Override
     public int getRemainingTurns() {

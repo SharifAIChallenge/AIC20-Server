@@ -327,7 +327,6 @@ public class Game {
                 spells.add(spell);
             } catch (LogicException | NullPointerException ex) {
                 Log.i("Logic error:", ex.getMessage());
-                System.out.println("Logic error:" + ex.getMessage());
             }
         });
 

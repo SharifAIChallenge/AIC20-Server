@@ -48,7 +48,7 @@ public class Game {
     @Getter
     private Map map;
     @Getter
-    private SortedSet<Spell> spells = new TreeSet<>(Comparator.comparing(Spell::getPriority));
+    private SortedSet<Spell> spells = new TreeSet<>(Comparator.comparing(Spell::getPriority).thenComparing(Spell::getId));
 
     @Getter
     private Player[] players = new Player[4];
@@ -327,6 +327,7 @@ public class Game {
                 spells.add(spell);
             } catch (LogicException | NullPointerException ex) {
                 Log.i("Logic error:", ex.getMessage());
+                System.out.println("Logic error:" + ex.getMessage());
             }
         });
 

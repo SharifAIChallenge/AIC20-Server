@@ -14,6 +14,7 @@ import ir.sharif.aichallenge.server.logic.dto.client.turn.ClientTurnMessage;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -171,7 +172,9 @@ public class GameHandler implements GameLogic {
 
     @Override
     public void terminate() {
-
+        try {
+            game.getGraphicHandler().getFile().close();
+        } catch (Exception ex) {}
     }
 
     public int getCurrentTurn() {

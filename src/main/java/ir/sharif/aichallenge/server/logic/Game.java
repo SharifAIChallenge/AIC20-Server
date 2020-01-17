@@ -72,15 +72,6 @@ public class Game {
     @Getter
     private boolean isGameFinished;
 
-
-    public static void main(String[] args) throws InterruptedException {
-        AtomicInteger currentTurn = new AtomicInteger(0);
-
-        GameServer gameServer = new GameServer(new GameHandler(currentTurn), args, currentTurn);
-        gameServer.start();
-        gameServer.waitForFinish();
-    }
-
     //region Initializations
 
     public void init(InitialMessage initialMessage) {

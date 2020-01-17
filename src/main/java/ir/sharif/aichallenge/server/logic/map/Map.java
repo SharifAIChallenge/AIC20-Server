@@ -44,9 +44,9 @@ public class Map {
         unitsInCell.add(unit);
     }
 
-    public void checkValidPut(int pathId) throws LogicException {
+    public void checkValidPut(int pathId, int playeerId) throws LogicException {
         if (!this.paths.containsKey(pathId))
-            throw new InvalidPathPutUnitException(pathId);
+            throw new InvalidPathPutUnitException(pathId, playeerId);
     }
 
     public void putUnit(Unit unit) {

@@ -6,8 +6,7 @@ import ir.sharif.aichallenge.server.logic.dto.graphic.turn.TurnAttack;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Getter
 @Setter

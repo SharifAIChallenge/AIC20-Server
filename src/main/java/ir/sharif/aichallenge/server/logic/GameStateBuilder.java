@@ -19,53 +19,43 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Getter
 @Setter
 public class GameStateBuilder {
-    private GameConstants gameConstants;
-    private int numberOfSpells;
-    private int numberOfBaseUnits;
-    private List<TurnAttack> currentAttacks;
-    private Random randomMaker;
-    private Map map;
-    private SortedSet<Spell> spells;
-    private Player[] players;
-    private HashMap<Integer, Unit> unitsWithId;
-    private ArrayList<King> kings;
-    private ClientTurnMessage[] clientTurnMessages;
-    private Set<Integer> damageUpgradedUnits;
-    private Set<Integer> rangeUpgradedUnits;
-    private Set<Integer> playedUnits;
-    private List<TurnCastSpell> turnCastSpells;
-    private GraphicMessage graphicMessage;
-    private GraphicHandler graphicHandler;
-    private AtomicInteger currentTurn;
-    private boolean isGameFinished;
+    private final GameConstants gameConstants;
+    private final int numberOfSpells;
+    private final int numberOfBaseUnits;
+    private final Random randomMaker;
+    private final Map map;
+    private final SortedSet<Spell> spells;
+    private final Player[] players;
+    private final HashMap<Integer, Unit> unitsWithId;
+    private final ArrayList<King> kings;
+    private final GraphicMessage graphicMessage;
+    private final GraphicHandler graphicHandler;
+    private final AtomicInteger currentTurn;
+    private final boolean isGameFinished;
+    private final ClientHandler clientHandler;
 
 
     public GameStateBuilder(GameState gameState) {
         this.gameConstants = gameState.getGameConstants();
         this.numberOfSpells = gameState.getNumberOfSpells();
         this.numberOfBaseUnits = gameState.getNumberOfBaseUnits();
-        this.currentAttacks = gameState.getCurrentAttacks() == null ? null : new ArrayList<>(gameState.getCurrentAttacks());
         this.randomMaker = gameState.getRandomMaker();
         this.map = gameState.getMap();
-        this.spells = gameState.getSpells() == null ? null : new TreeSet<>(gameState.getSpells());
-        this.players = gameState.getPlayers() == null ? null : Arrays.copyOf(gameState.getPlayers(), gameState.getPlayers().length);
-        this.unitsWithId = gameState.getUnitsWithId() == null ? null : new HashMap<>(gameState.getUnitsWithId());
-        this.kings = gameState.getKings() == null ? null : new ArrayList<>(gameState.getKings());
-        this.clientTurnMessages = gameState.getClientTurnMessages() == null ? null : Arrays.copyOf(gameState.getClientTurnMessages(), gameState.getClientTurnMessages().length);
-        this.damageUpgradedUnits = gameState.getDamageUpgradedUnits() == null ? null : new HashSet<>(gameState.getDamageUpgradedUnits());
-        this.rangeUpgradedUnits = gameState.getRangeUpgradedUnits() == null ? null : new HashSet<>(gameState.getRangeUpgradedUnits());
-        this.playedUnits = gameState.getPlayedUnits() == null ? null : new HashSet<>(gameState.getPlayedUnits());
-        this.turnCastSpells = gameState.getTurnCastSpells() == null ? null : new ArrayList<>(gameState.getTurnCastSpells());
+        this.spells = gameState.getSpells();
+        this.players = gameState.getPlayers();
+        this.unitsWithId = gameState.getUnitsWithId();
+        this.kings = gameState.getKings();
         this.graphicMessage = gameState.getGraphicMessage();
         this.graphicHandler = gameState.getGraphicHandler();
         this.currentTurn = gameState.getCurrentTurn();
         this.isGameFinished = gameState.isGameFinished();
+        this.clientHandler = gameState.getClientHandler();
     }
 
     public GameState toGameState() {
-        return new GameState(gameConstants, numberOfSpells, numberOfBaseUnits, currentAttacks, randomMaker,
-                map, spells, players, unitsWithId, kings, clientTurnMessages, damageUpgradedUnits, rangeUpgradedUnits,
-                playedUnits, turnCastSpells, graphicMessage, graphicHandler, currentTurn, isGameFinished);
+        return new GameState(gameConstants, numberOfSpells, numberOfBaseUnits, randomMaker,
+                map, spells, players, unitsWithId, kings, graphicMessage, graphicHandler, currentTurn,
+                isGameFinished, clientHandler);
     }
 
     public GameStateBuilder() {

@@ -249,7 +249,7 @@ public class Game {
 
                         player.checkPutUnit(baseUnit);
 
-                        map.checkValidPut(info.getPathId());
+                        map.checkValidPut(info.getPathId(), info.getPlayerId());
 
                         player.putUnit(baseUnit);
 
@@ -603,7 +603,7 @@ public class Game {
     private void addTurnToGraphicMessage() {
         GraphicTurn graphicTurn = graphicHandler.getGraphicTurn(this);
         graphicMessage.getTurns().add(graphicTurn);
-        graphicHandler.saveGraphicLog(graphicMessage);
+        graphicHandler.saveGraphicLog(graphicMessage, graphicTurn);
 
     }
 

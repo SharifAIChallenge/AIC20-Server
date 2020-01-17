@@ -16,7 +16,7 @@ public class GraphicUnit {
     private int row;
     private int col;
     private int hp;
-    private int damageLevel;    //todo;
+    private int damageLevel;
     private int rangeLevel;
 
     public static GraphicUnit getGraphicUnit(Unit unit) {

@@ -204,10 +204,10 @@ public class Game {
             applyPutUnits(messages.get(MessageTypes.PUT_UNIT));
 
             applySpells(messages.get(MessageTypes.CAST_SPELL));
-            evaluateSpells();
 
             attack();
             move();
+            evaluateSpells();
             evaluateUnits();
 
             resetPlayers();
@@ -403,10 +403,10 @@ public class Game {
 
         GeneralUnit clonedUnit = new GeneralUnit(unit.getBaseUnit(), unit.getPlayer(),
                 unit.getHealth() / rateOfHealthOfCloneUnit, unit.getDamage() / rateOfDamageCloneUnit);
+        clonedUnit.setPosition(unit.getPosition().nextCell(0));
         clonedUnit.setDuplicate();
 
         unitsWithId.put(clonedUnit.getId(), clonedUnit);
-        getMap().putUnit(clonedUnit);
 
         return clonedUnit;
     }
@@ -485,8 +485,8 @@ public class Game {
     }
 
     private void giveSpells() {
-        int type1 = randomMaker.nextInt(numberOfSpells);
-        int type2 = randomMaker.nextInt(numberOfSpells);
+        int type1 = 4;//randomMaker.nextInt(numberOfSpells);
+        int type2 = 4;//randomMaker.nextInt(numberOfSpells);
 
         if (randomMaker.nextBoolean()) {
             giveSpellToPlayer(0, type1);

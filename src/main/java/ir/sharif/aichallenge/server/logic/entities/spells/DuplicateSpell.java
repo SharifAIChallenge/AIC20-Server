@@ -14,11 +14,13 @@ public class DuplicateSpell extends AreaSpell {
 
     @Override
     public void applyTo(Game game) {
-        if (isFirstTurn())
+        if (isFirstTurn()) {
             caughtUnits = getTargetUnitsInRange(game.getMap())      //todo what happens to caught units??
                     .filter(unit -> !unit.isDuplicate())
                     .map(unit -> game.cloneUnit(unit, getPower(), getPower()))
                     .collect(Collectors.toSet());
+            caughtUnits.forEach(unit -> game.getMap().putUnit(unit));
+        }
     }
 
     @Override

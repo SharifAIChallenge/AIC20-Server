@@ -1,19 +1,21 @@
 package ir.sharif.aichallenge.server.logic.map;
 
-import java.util.List;
-
 public class PathCell {
     private final Path path;
     private boolean reversed;
-    private int numberOfCell;
+    private int moveIndex;
 
-    public PathCell(Path path, boolean reversed, int numberOfCellInPath) {
+    private PathCell(Path path, boolean reversed, int moveIndex) {
         this.path = path;
         this.reversed = reversed;
-        this.numberOfCell = Math.min(numberOfCellInPath, path.getCells().size() - 1);
-        if (reversed) {
-            this.numberOfCell = path.getLength() - numberOfCellInPath - 1;
-        }
+        this.moveIndex = Math.min(path.getLength() - 1, moveIndex);
+    }
+
+    public static PathCell createPathCell(Path path, boolean reversed, int rawIndexInPath) {
+        int moveIndex = Math.min(rawIndexInPath, path.getLength() - 1);
+        if (reversed)
+            moveIndex = path.getLength() - moveIndex - 1;
+        return new PathCell(path, reversed, moveIndex);
     }
 
 
@@ -21,15 +23,16 @@ public class PathCell {
         int index = path.getCells().indexOf(targetCell);
         if (index == -1) throw new NullPointerException("Teleported in not valid cell in path_id");
 
-        return new PathCell(path, reversed, index);
+        return createPathCell(path, reversed, index);
     }
+
 
     public Path getPath() {
         return path;
     }
 
-    public int getNumberOfCell() {
-        return numberOfCell;
+    public int getMoveIndex() {
+        return moveIndex;
     }
 
     public boolean isReversed() {
@@ -37,20 +40,18 @@ public class PathCell {
     }
 
     public Cell getCell() {
-        return path.getCellAt(reversed ? path.getLength() - numberOfCell - 1 : numberOfCell);
+        return path.getCellAt(reversed ? path.getLength() - moveIndex - 1 : moveIndex);
     }
 
     public PathCell nextCell(int speed) {
-        PathCell cloned = new PathCell(this.path, this.reversed, numberOfCell + speed);
-        cloned.numberOfCell = Math.min(cloned.getPath().getLength() - 1, numberOfCell + speed); //Forcing the index
-        return cloned;
+        return new PathCell(this.path, this.reversed, moveIndex + speed);
     }
 
     @Override
     public String toString() {
         return "{" +
                 "pathId=" + path.getId() +
-                ", numberOfCell=" + numberOfCell +
+                ", numberOfCell=" + moveIndex +
                 '}';
     }
 }

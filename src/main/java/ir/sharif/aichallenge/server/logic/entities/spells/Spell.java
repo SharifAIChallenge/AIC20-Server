@@ -13,7 +13,7 @@ import ir.sharif.aichallenge.server.logic.map.Map;
 import lombok.Getter;
 import lombok.experimental.Delegate;
 
-import java.util.Set;
+import java.util.Collection;
 import java.util.stream.Stream;
 
 @Getter
@@ -59,7 +59,7 @@ public abstract class Spell extends Entity {
                 .filter(this::isTarget);
     }
 
-    public abstract Set<Unit> getCaughtUnits(); //todo change to list
+    public abstract Collection<Unit> getCaughtUnits(); //todo bring caughtUnits here
 
     public int getRemainingTurns() {
         return remainingTurns;

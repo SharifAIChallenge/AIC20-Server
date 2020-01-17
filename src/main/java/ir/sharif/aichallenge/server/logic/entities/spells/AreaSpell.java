@@ -10,13 +10,13 @@ import ir.sharif.aichallenge.server.logic.exceptions.SpellNotInMapException;
 import ir.sharif.aichallenge.server.logic.map.Cell;
 import lombok.Getter;
 
-import java.util.Set;
+import java.util.Collection;
 import java.util.stream.Collectors;
 
 public abstract class AreaSpell extends Spell {
 
     @Getter
-    protected Set<Unit> caughtUnits;
+    protected Collection<Unit> caughtUnits;
 
     public AreaSpell(int id, BaseSpell baseSpell, Player player, Cell position) {
         super(id, baseSpell, player, position);
@@ -28,7 +28,7 @@ public abstract class AreaSpell extends Spell {
             return;
 
         if (isFirstTurn())
-            caughtUnits = getTargetUnitsInRange(game.getMap()).collect(Collectors.toSet());
+            caughtUnits = getTargetUnitsInRange(game.getMap()).collect(Collectors.toList());
 
         caughtUnits.forEach(this::applyEffectOn);
     }

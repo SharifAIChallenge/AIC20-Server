@@ -17,7 +17,7 @@ public class DuplicateSpell extends AreaSpell {
         if (isFirstTurn())
             caughtUnits = getTargetUnitsInRange(game.getMap())      //todo what happens to caught units??
                     .map(unit -> game.cloneUnit(unit, getPower(), getPower()))  //todo filter cloned units
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toList());
 
         //Killing all cloned units after spell is disposed
         if (isDisposed())   //todo we check to kill cloned units twice

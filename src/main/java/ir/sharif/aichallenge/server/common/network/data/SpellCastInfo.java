@@ -1,9 +1,13 @@
 package ir.sharif.aichallenge.server.common.network.data;
 
 import ir.sharif.aichallenge.server.logic.map.Cell;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class SpellCastInfo extends ClientMessageInfo {
 
     private int typeId;

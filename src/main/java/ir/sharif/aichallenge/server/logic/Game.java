@@ -153,7 +153,7 @@ public class Game {
                 players[pId].initDeck(new ArrayList<>(), numberOfBaseUnits);
 
         gameState = initializeTurn(gameState);
-        checkToGiveUpgradeTokens();
+        gameState = checkToGiveUpgradeTokens(gameState);
         checkToGiveSpells();
         fillClientMessage();
     }
@@ -167,21 +167,22 @@ public class Game {
 
             gameState = initializeTurn(gameState);
 
-            applyUpgrades(messages.get(MessageTypes.UPGRADE_DAMAGE));
-            applyUpgrades(messages.get(MessageTypes.UPGRADE_RANGE));
+            gameState = applyUpgrades(messages.get(MessageTypes.UPGRADE_DAMAGE), gameState);
+            gameState = applyUpgrades(messages.get(MessageTypes.UPGRADE_RANGE), gameState);
 
-            applyPutUnits(messages.get(MessageTypes.PUT_UNIT));
+            gameState = applyPutUnits(messages.get(MessageTypes.PUT_UNIT), gameState);
 
-            evaluateSpells();
-            applySpells(messages.get(MessageTypes.CAST_SPELL));
+            gameState = evaluateSpells(gameState);
+            gameState = applySpells(messages.get(MessageTypes.CAST_SPELL), gameState);
 
-            attack();
-            move();
-            evaluateUnits();
+            gameState = attack(gameState);
+            gameState = move(gameState);
 
-            resetPlayers();
+            gameState = evaluateUnits(gameState);
 
-            checkToGiveUpgradeTokens();
+            gameState = resetPlayers(gameState);
+
+            gameState = checkToGiveUpgradeTokens(gameState);
             checkToGiveSpells();
 
             fillClientMessage();
@@ -206,67 +207,73 @@ public class Game {
         return gameStateBuilder.toGameState();
     }
 
-    private void applyUpgrades(List<ClientMessageInfo> upgradeMessages) {
+    private GameState applyUpgrades(List<ClientMessageInfo> upgradeMessages, GameState gameState) {
         if (upgradeMessages == null)
-            return;
+            return gameState;
+        GameStateBuilder gameStateBuilder = new GameStateBuilder(gameState);
 
         upgradeMessages.stream().map(info -> (UpgradeInfo) info)
                 .forEach(message -> {
                     try {
-                        Unit unit = Objects.requireNonNull(unitsWithId.get(message.getUnitId()),
+                        Unit unit = Objects.requireNonNull(gameStateBuilder.getUnitsWithId().get(message.getUnitId()),
                                 "Unit doesn't exist. Unit id: " + message.getUnitId());   //todo if unit is kingUnit?
 
                         if (unit.getPlayer().getId() != message.getPlayerId())
                             throw new UpgradeOtherPlayerUnitException(message.getPlayerId(), unit.getPlayer().getId());
 
-                        Player player = players[unit.getPlayer().getId()];
+                        Player player = gameStateBuilder.getPlayers()[unit.getPlayer().getId()];
                         if (message.getType().equals(MessageTypes.UPGRADE_DAMAGE)) {
                             player.useUpgradeDamage();
                             unit.upgradeDamage();
-                            damageUpgradedUnits.add(unit.getId());
+                            gameStateBuilder.getClientHandler().getDamageUpgradedUnits().add(unit.getId());
                         } else {
                             player.useUpgradeRange();
                             unit.upgradeRange();
-                            rangeUpgradedUnits.add(unit.getId());
+                            gameStateBuilder.getClientHandler().getRangeUpgradedUnits().add(unit.getId());
                         }
                     } catch (LogicException | NullPointerException ex) {
                         Log.i("Logic error:", ex.getMessage());
                     }
                 });
+        return gameStateBuilder.toGameState();
     }
 
-    private void applyPutUnits(List<ClientMessageInfo> putUnitMessages) {
+    private GameState applyPutUnits(List<ClientMessageInfo> putUnitMessages, GameState gameState) {
         if (putUnitMessages == null)
-            return;
+            return gameState;
+
+        GameStateBuilder gameStateBuilder = new GameStateBuilder(gameState);
 
         putUnitMessages.stream()
                 .map(message -> (UnitPutInfo) message)
                 .forEach(info -> {
                     try {
-                        Player player = players[info.getPlayerId()];
+                        Player player = gameStateBuilder.getPlayers()[info.getPlayerId()];
                         BaseUnit baseUnit = Objects.requireNonNull(BaseUnit.getInstance(info.getTypeId()),
                                 "Invalid unit type: " + info.getTypeId()); //TODO
 
                         player.checkPutUnit(baseUnit);
 
-                        map.checkValidPut(info.getPathId(), info.getPlayerId());
+                        gameStateBuilder.getMap().checkValidPut(info.getPathId(), info.getPlayerId());
 
                         player.putUnit(baseUnit);
 
                         GeneralUnit generalUnit = new GeneralUnit(baseUnit, player);
-                        map.putUnit(generalUnit, info.getPathId());
-                        unitsWithId.put(generalUnit.getId(), generalUnit);
-                        playedUnits.add(generalUnit.getId());
+                        gameStateBuilder.getMap().putUnit(generalUnit, info.getPathId());
+                        gameStateBuilder.getUnitsWithId().put(generalUnit.getId(), generalUnit);
+                        gameStateBuilder.getClientTurnMessages().getPlayedUnits().add(generalUnit.getId());
                     } catch (LogicException | NullPointerException ex) {
                         Log.i("Logic error:", ex.getMessage());
                     }
                 });
+        return gameStateBuilder.toGameState();
     }
 
-    private void evaluateSpells() {
+    private GameState evaluateSpells(GameState gameState) {
+        GameStateBuilder gameStateBuilder = new GameStateBuilder(gameState);
         List<Spell> removeSpells = new ArrayList<>();
 
-        for (Spell spell : spells) {
+        for (Spell spell : gameStateBuilder.getSpells()) {
             spell.decreaseRemainingTurns();
             if (spell.shouldRemove()) {
                 spell.getCaughtUnits().forEach(unit -> unit.removeActiveSpell(spell.getId()));
@@ -274,71 +281,85 @@ public class Game {
             }
         }
 
-        spells.removeAll(removeSpells);
+        gameStateBuilder.getSpells().removeAll(removeSpells);
+        return gameStateBuilder.toGameState();
     }
 
-    private void applySpells(List<ClientMessageInfo> castSpellMessages) {
+    private GameState applySpells(List<ClientMessageInfo> castSpellMessages, GameState gameState) {
         if (castSpellMessages == null)
-            return;
+            return gameState;
 
-        castSpellMessages.stream().map(info -> (SpellCastInfo) info).forEach(info -> {
+        GameStateBuilder gameStateBuilder = new GameStateBuilder(gameState);
+
+        for (ClientMessageInfo castMessage : castSpellMessages) {
+            SpellCastInfo info = (SpellCastInfo) castMessage;
             try {
-                final Player player = players[info.getPlayerId()];
+                final Player player = gameStateBuilder.getPlayers()[info.getPlayerId()];
 
                 player.checkSpell(info.getTypeId());
 
                 Spell spell = Objects.requireNonNull(
-                        SpellFactory.createSpell(info.getTypeId(), player, info.getCell(), info.getUnitId(), map.getPath(info.getPathId())),
+                        SpellFactory.createSpell(info.getTypeId(), player, info.getCell(), info.getUnitId(), gameStateBuilder.getMap().getPath(info.getPathId())),
                         "Invalid spell type: " + info.getTypeId());
 
                 spell.checkValid(this);
 
                 player.castSpell(info.getTypeId());
 
-                spells.add(spell);
+                gameStateBuilder.getSpells().add(spell);
             } catch (LogicException | NullPointerException ex) {
                 Log.i("Logic error:", ex.getMessage());
             }
-        });
+        }
 
-        if (spells.isEmpty())
-            return;
+        if (gameStateBuilder.getSpells().isEmpty())
+            return gameStateBuilder.toGameState();
 
-        Spell lastSpell = spells.first();
-        for (Spell spell : spells) {
-            if (spell.getType() != SpellType.HP && lastSpell.getType() == SpellType.HP)
-                evaluateUnits();
+        Spell lastSpell = gameStateBuilder.getSpells().first();
+        for (Spell spell : gameStateBuilder.getSpells()) {
+            if (spell.getType() != SpellType.HP && lastSpell.getType() == SpellType.HP) {
+                GameState newGameState = evaluateUnits(gameStateBuilder.toGameState()); //TODO ???
+                gameStateBuilder = new GameStateBuilder(newGameState);
+            }
+
             lastSpell = spell;
             try {
                 spell.applyTo(this);
                 spell.getCaughtUnits().forEach(unit -> unit.addActiveSpell(spell.getId()));
-                turnCastSpells.add(spell.getTurnCastSpell());
+                gameStateBuilder.getClientHandler().getTurnCastSpells().add(spell.getTurnCastSpell());
             } catch (LogicException ex) {
                 Log.i("Logic error:", ex.getMessage());
             }
         }
-
+        return gameStateBuilder.toGameState();
     }
 
-    private void evaluateUnits() {
-        for (Iterator<java.util.Map.Entry<Integer, Unit>> iterator = unitsWithId.entrySet().iterator(); iterator.hasNext(); ) {
+    private GameState evaluateUnits(GameState gameState) {
+        GameStateBuilder gameStateBuilder = new GameStateBuilder(gameState);
+
+        for (Iterator<java.util.Map.Entry<Integer, Unit>> iterator = gameStateBuilder.getUnitsWithId().entrySet().iterator(); iterator.hasNext(); ) {
             Unit unit = iterator.next().getValue();
             if (!unit.isAlive()) {
-                map.removeUnit(unit);
+                gameStateBuilder.getMap().removeUnit(unit);
                 iterator.remove();
             }
         }
+
+        return gameStateBuilder.toGameState();
     }
 
-    private void resetPlayers() {
-        Arrays.stream(players).forEach(Player::reset);
+    private GameState resetPlayers(GameState gameState) {
+        GameStateBuilder gameStateBuilder = new GameStateBuilder(gameState);
+        Arrays.stream(gameStateBuilder.getPlayers()).forEach(Player::reset);
+        return gameStateBuilder.toGameState();
     }
 
-    private void attack() {
-        currentAttacks = new ArrayList<>();
+    private GameState attack(GameState gameState) {
+        GameStateBuilder gameStateBuilder = new GameStateBuilder(gameState);
+        gameStateBuilder.getClientHandler().getCurrentAttacks() = new ArrayList<>();
 
-        for (Unit unit : unitsWithId.values()) {
-            Unit targetUnit = unit.getTarget(map);
+        for (Unit unit : gameStateBuilder.getUnitsWithId().values()) {
+            Unit targetUnit = unit.getTarget(gameStateBuilder.getMap());
 
             if (!(unit instanceof KingUnit)) {
                 System.out.println("Unit -> " + unit.getPlayer().getId());
@@ -351,24 +372,29 @@ public class Game {
             }
 
             System.out.println("Here");
-            currentAttacks.add(TurnAttack.getTurnAttack(unit, targetUnit));
-            System.out.println(currentAttacks.size());
+            gameStateBuilder.getClientHandler().getCurrentAttacks().add(TurnAttack.getTurnAttack(unit, targetUnit));
+            System.out.println(gameStateBuilder.getClientHandler().currentAttacks().size());
 
 
             unit.setHasAttacked(true);
             if (unit.isMultiTarget())
-                map.getUnits(targetUnit.getCell())
+                gameStateBuilder.getMap().getUnits(targetUnit.getCell())
                         .filter(unit::isTarget)
                         .forEach(target -> target.decreaseHealth(unit.getDamage()));
             else
                 targetUnit.decreaseHealth(unit.getDamage());
         }
+        return gameStateBuilder.toGameState();
     }
 
-    private void move() {
-        for (Unit unit : unitsWithId.values())
+    private GameState move(GameState gameState) {
+        GameStateBuilder gameStateBuilder = new GameStateBuilder(gameState);
+
+        for (Unit unit : gameStateBuilder.getUnitsWithId().values())
             if (unit.isAlive() && !unit.hasAttacked())
-                map.moveUnit(unit, unit.getNextMoveCell());
+                gameStateBuilder.getMap().moveUnit(unit, unit.getNextMoveCell());
+
+        return gameStateBuilder.toGameState();
     }
 
     public GeneralUnit cloneUnit(Unit unit, int rateOfHealthOfCloneUnit, int rateOfDamageCloneUnit) {
@@ -478,46 +504,48 @@ public class Game {
 
     }
 
-    private void checkToGiveUpgradeTokens() {
+    private GameState checkToGiveUpgradeTokens(GameState gameState) {
+        GameStateBuilder gameStateBuilder = new GameStateBuilder(gameState);
         for (int pId = 0; pId < 4; pId++) {
-            clientTurnMessages[pId].setGotDamageUpgrade(false);
-            clientTurnMessages[pId].setGotRangeUpgrade(false);
+            gameStateBuilder.getClientHandler().getClientTurnMessages()[pId].setGotDamageUpgrade(false);
+            gameStateBuilder.getClientHandler().getClientTurnMessages()[pId].setGotRangeUpgrade(false);
         }
 
-        if (currentTurn.get() == 0)
-            return;
-        if (currentTurn.get() % gameConstants.getTurnsToUpgrade() != 0)
-            return;
+        if (gameStateBuilder.getCurrentTurn().get() == 0)
+            return gameStateBuilder.toGameState();
+        if (gameStateBuilder.getCurrentTurn().get() % gameStateBuilder.getGameConstants().getTurnsToUpgrade() != 0)
+            return gameStateBuilder.toGameState();
 
-        giveUpgradeTokens();
+        giveUpgradeTokens(gameStateBuilder);
+        return gameStateBuilder.toGameState();
     }
 
-    private void giveUpgradeTokens() {
-        if (randomMaker.nextBoolean()) {
-            giveUpgradeDamageToPlayer(0);
-            giveUpgradeRangeToPlayer(2);
+    private void giveUpgradeTokens(GameStateBuilder gameStateBuilder) {
+        if (gameStateBuilder.getRandomMaker().nextBoolean()) {
+            giveUpgradeDamageToPlayer(0, gameStateBuilder);
+            giveUpgradeRangeToPlayer(2, gameStateBuilder);
         } else {
-            giveUpgradeDamageToPlayer(2);
-            giveUpgradeRangeToPlayer(0);
+            giveUpgradeDamageToPlayer(2, gameStateBuilder);
+            giveUpgradeRangeToPlayer(0, gameStateBuilder);
         }
 
-        if (randomMaker.nextBoolean()) {
-            giveUpgradeDamageToPlayer(1);
-            giveUpgradeRangeToPlayer(3);
+        if (gameStateBuilder.getRandomMaker().nextBoolean()) {
+            giveUpgradeDamageToPlayer(1, gameStateBuilder);
+            giveUpgradeRangeToPlayer(3, gameStateBuilder);
         } else {
-            giveUpgradeDamageToPlayer(3);
-            giveUpgradeRangeToPlayer(1);
+            giveUpgradeDamageToPlayer(3, gameStateBuilder);
+            giveUpgradeRangeToPlayer(1, gameStateBuilder);
         }
     }
 
-    private void giveUpgradeDamageToPlayer(int playerId) {
-        players[playerId].addUpgradeDamageToken();
-        clientTurnMessages[playerId].setGotDamageUpgrade(true);
+    private void giveUpgradeDamageToPlayer(int playerId, GameStateBuilder gameStateBuilder) {
+        gameStateBuilder.getPlayers()[playerId].addUpgradeDamageToken();
+        gameStateBuilder.getClientHandler().getClientTurnMessages()[playerId].setGotDamageUpgrade(true);
     }
 
-    private void giveUpgradeRangeToPlayer(int playerId) {
-        players[playerId].addUpgradeRangeToken();
-        clientTurnMessages[playerId].setGotRangeUpgrade(true);
+    private void giveUpgradeRangeToPlayer(int playerId, GameStateBuilder gameStateBuilder) {
+        gameStateBuilder.getPlayers()[playerId].addUpgradeRangeToken();
+        gameStateBuilder.getClientHandler().getClientTurnMessages()[playerId].setGotRangeUpgrade(true);
     }
 
     //endregion

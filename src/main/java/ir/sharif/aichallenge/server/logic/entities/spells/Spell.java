@@ -3,7 +3,6 @@ package ir.sharif.aichallenge.server.logic.entities.spells;
 import ir.sharif.aichallenge.server.logic.Game;
 import ir.sharif.aichallenge.server.logic.dto.client.ClientCell;
 import ir.sharif.aichallenge.server.logic.dto.client.turn.TurnCastSpell;
-import ir.sharif.aichallenge.server.logic.entities.Disposable;
 import ir.sharif.aichallenge.server.logic.entities.Entity;
 import ir.sharif.aichallenge.server.logic.entities.Player;
 import ir.sharif.aichallenge.server.logic.entities.units.KingUnit;
@@ -18,7 +17,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 @Getter
-public abstract class Spell extends Entity implements Disposable {
+public abstract class Spell extends Entity {
 
     @Delegate
     private BaseSpell baseSpell;
@@ -62,7 +61,6 @@ public abstract class Spell extends Entity implements Disposable {
 
     public abstract Set<Unit> getCaughtUnits(); //todo change to list
 
-    @Override
     public int getRemainingTurns() {
         return remainingTurns;
     }
@@ -88,5 +86,9 @@ public abstract class Spell extends Entity implements Disposable {
                 .typeId(getTypeId())
                 .remainingTurns(getRemainingTurns())
                 .build();
+    }
+
+    boolean isDisposed() {
+        return getRemainingTurns() == 0;
     }
 }

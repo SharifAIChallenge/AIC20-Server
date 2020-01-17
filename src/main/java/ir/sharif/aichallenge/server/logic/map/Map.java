@@ -40,7 +40,7 @@ public class Map {
         final Path path = this.paths.get(pathId);
         boolean isReversed = path.shouldReverseForTeam(unit.getPlayer().getTeam());
         final int index = path.getIndexForKing(unit.getPlayer().getId());
-        unit.setPosition(new PathCell(path, isReversed, index));
+        unit.setPosition(PathCell.createPathCell(path, isReversed, index));
         unitsInCell.add(unit);
     }
 

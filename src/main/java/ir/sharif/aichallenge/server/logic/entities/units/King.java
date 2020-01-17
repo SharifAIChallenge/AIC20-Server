@@ -39,7 +39,7 @@ public class King {
                 }
 
                 KingUnit kingUnit = new KingUnit(baseUnit, player, healthComponent);
-                kingUnit.setPosition(new PathCell(new Path(-1, new Cell(nr, nc)), false, 0));
+                kingUnit.setPosition(PathCell.createPathCell(new Path(-1, new Cell(nr, nc)), false, 0));
                 units.add(kingUnit);
                 if (dr == 0 && dc == 0)
                     mainUnit = kingUnit;

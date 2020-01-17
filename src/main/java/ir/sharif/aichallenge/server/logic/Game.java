@@ -203,8 +203,8 @@ public class Game {
 
             applyPutUnits(messages.get(MessageTypes.PUT_UNIT));
 
-            evaluateSpells();
             applySpells(messages.get(MessageTypes.CAST_SPELL));
+            evaluateSpells();
 
             attack();
             move();
@@ -294,7 +294,6 @@ public class Game {
 
     private void evaluateSpells() {
         List<Spell> removeSpells = new ArrayList<>();
-
         for (Spell spell : spells) {
             spell.decreaseRemainingTurns();
             if (spell.shouldRemove()) {

@@ -1,11 +1,9 @@
 package ir.sharif.aichallenge.server.logic;
 
 import ir.sharif.aichallenge.server.common.network.data.*;
-import ir.sharif.aichallenge.server.engine.core.GameServer;
 import ir.sharif.aichallenge.server.logic.dto.client.ClientCell;
 import ir.sharif.aichallenge.server.logic.dto.client.init.*;
 import ir.sharif.aichallenge.server.logic.dto.client.turn.ClientTurnMessage;
-import ir.sharif.aichallenge.server.logic.dto.client.turn.TurnCastSpell;
 import ir.sharif.aichallenge.server.logic.dto.client.turn.TurnKing;
 import ir.sharif.aichallenge.server.logic.dto.client.turn.TurnUnit;
 import ir.sharif.aichallenge.server.logic.dto.graphic.GraphicMessage;
@@ -28,87 +26,60 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class Game {
 
-    private GameConstants gameConstants;
-    private int numberOfSpells;
-    private int numberOfBaseUnits;
-
-    @Getter
-    private List<TurnAttack> currentAttacks = new ArrayList<>();
-
-    private Random randomMaker = new Random();
-
-
-    @Getter
-    private Map map;
-    @Getter
-    private SortedSet<Spell> spells = new TreeSet<>(Comparator.comparing(Spell::getPriority).thenComparing(Spell::getId));
-
-    @Getter
-    private Player[] players = new Player[4];
-    @Getter
-    private HashMap<Integer, Unit> unitsWithId = new HashMap<>();
-    private ArrayList<King> kings = new ArrayList<>();
-    @Getter
-    private ClientTurnMessage[] clientTurnMessages = new ClientTurnMessage[4];  //todo set each turn
-    private Set<Integer> damageUpgradedUnits;
-    private Set<Integer> rangeUpgradedUnits;
-    private Set<Integer> playedUnits = new HashSet<>();
-    private List<TurnCastSpell> turnCastSpells = new ArrayList<>();
-
-
-    private GraphicMessage graphicMessage = new GraphicMessage();
-    private GraphicHandler graphicHandler = new GraphicHandler();
-
-    @Getter
     @Setter
-    private AtomicInteger currentTurn;
     @Getter
-    private boolean isGameFinished;
+    private GameState gameState;
 
     //region Initializations
 
     public void init(InitialMessage initialMessage) {
-        gameConstants = initialMessage.getGameConstants();
+        GameStateBuilder gameStateBuilder = new GameStateBuilder();
+
+        GameConstants gameConstants = initialMessage.getGameConstants();
+        gameStateBuilder.setGameConstants(gameConstants);
 
         //init players
+        Player[] players = new Player[4];
         for (int i = 0; i < 4; i++)
             players[i] = new Player(i, gameConstants.getMaxAP());
+        gameStateBuilder.setPlayers(players);
 
-        initMap(initialMessage.getMap());
+        Map map = initMap(initialMessage.getMap(), players, gameStateBuilder);
+        gameStateBuilder.setMap(map);
 
-        initBaseUnits(initialMessage.getBaseUnits());
+        initBaseUnits(initialMessage.getBaseUnits(), gameStateBuilder);
 
-        initSpells(initialMessage.getSpells());
+        initSpells(initialMessage.getSpells(), gameStateBuilder);
 
+        GraphicMessage graphicMessage = new GraphicMessage();
         graphicMessage.setInit(GraphicInit.makeGraphicInit(initialMessage));
+        gameStateBuilder.setGraphicMessage(graphicMessage);
     }
 
-    public void initializeMap(int size) {
-        map = new Map(size, size);
-    }
-
-    private void initSpells(List<ClientSpell> spells) {
-        numberOfSpells = spells.size();
+    private void initSpells(List<ClientSpell> spells, GameStateBuilder gameStateBuilder) {
+        int numberOfSpells = spells.size();
+        gameStateBuilder.setNumberOfSpells(numberOfSpells);
         for (ClientSpell clientSpell : spells)
             BaseSpell.initSpell(clientSpell);
     }
 
-    private void initBaseUnits(List<ClientBaseUnit> baseUnits) {
-        numberOfBaseUnits = baseUnits.size();
+    private void initBaseUnits(List<ClientBaseUnit> baseUnits, GameStateBuilder gameStateBuilder) {
+        int numberOfBaseUnits = baseUnits.size();
+        gameStateBuilder.setNumberOfBaseUnits(numberOfBaseUnits);
         for (ClientBaseUnit cBU : baseUnits) {
-            BaseUnit.initBaseUnits(cBU, gameConstants.getDamageUpgradeAddition(), gameConstants.getRangeUpgradeAddition());
+            BaseUnit.initBaseUnits(cBU, gameStateBuilder.getGameConstants().getDamageUpgradeAddition(),
+                    gameStateBuilder.getGameConstants().getRangeUpgradeAddition());
         }
     }
 
-    private void initMap(ClientMap clientMap) {
-        map = new Map(clientMap.getRows(), clientMap.getCols());
+    private Map initMap(ClientMap clientMap, Player[] players, GameStateBuilder gameStateBuilder) {
+        Map map = new Map(clientMap.getRows(), clientMap.getCols());
         List<ClientPath> clientPaths = clientMap.getPaths();
 
         HashMap<Cell, Integer> kingCellsWithIds = new HashMap<>();
@@ -116,7 +87,8 @@ public class Game {
             int id = clientBaseKing.getPlayerId();
             kingCellsWithIds.put(new Cell(clientBaseKing.getCenter()), clientBaseKing.getPlayerId());
             addKing(players[id], new Cell(clientBaseKing.getCenter()),
-                    clientBaseKing.getHp(), clientBaseKing.getAttack(), clientBaseKing.getRange());
+                    clientBaseKing.getHp(), clientBaseKing.getAttack(),
+                    clientBaseKing.getRange(), gameStateBuilder, map);
         }
 
         HashMap<Cell, Path> kingToKingPaths = new HashMap<>();
@@ -142,6 +114,8 @@ public class Game {
                     .collect(Collectors.toList());
             map.addPath(new Path(path.getId(), concat, kingsIndices));
         }
+
+        return map;
     }
 
     private boolean isKingToKingPath(Path path, java.util.Map<Cell, Integer> kingCellsWithIds) {
@@ -150,20 +124,24 @@ public class Game {
         return startKing % 2 == endKing % 2;
     }
 
-    public void addKing(Player player, Cell centerCell, int health, int damage, int range) {
+    public void addKing(Player player, Cell centerCell, int health, int damage, int range,
+                        GameStateBuilder gameStateBuilder, Map map) {
         King king = new King(player, centerCell, health, damage, range);
+        HashMap<Integer, Unit> unitsWithId = gameStateBuilder.getUnitsWithId();
         for (KingUnit kingUnit : king.getUnits()) {
             unitsWithId.put(kingUnit.getId(), kingUnit);
             map.putUnit(kingUnit);
         }
-        kings.add(king);
+        gameStateBuilder.getKings().add(king);
     }
 
     //endregion
 
     //TODO: exception handling
     public void pick(List<PickInfo> messages) {
-        currentTurn.incrementAndGet();
+        gameState.getCurrentTurn().incrementAndGet();
+        Player[] players = gameState.getPlayers();
+        int numberOfBaseUnits = gameState.getNumberOfBaseUnits();
 
         for (PickInfo pickInfo : messages) {
             int playerId = pickInfo.getPlayerId();
@@ -174,7 +152,7 @@ public class Game {
             if (!players[pId].getDeckInit())
                 players[pId].initDeck(new ArrayList<>(), numberOfBaseUnits);
 
-        initializeTurn();
+        gameState = initializeTurn(gameState);
         checkToGiveUpgradeTokens();
         checkToGiveSpells();
         fillClientMessage();
@@ -182,12 +160,12 @@ public class Game {
 
     public void turn(java.util.Map<String, List<ClientMessageInfo>> messages) {
         try {
-            currentTurn.incrementAndGet();
+            gameState.getCurrentTurn().incrementAndGet();
 
             //Ignore dead players' messages
             messages.values().forEach(list -> list.removeIf(info -> !isPlayerAlive(info.getPlayerId())));
 
-            initializeTurn();
+            gameState = initializeTurn(gameState);
 
             applyUpgrades(messages.get(MessageTypes.UPGRADE_DAMAGE));
             applyUpgrades(messages.get(MessageTypes.UPGRADE_RANGE));
@@ -215,15 +193,17 @@ public class Game {
         }
     }
 
-    private void initializeTurn() {
-        playedUnits = new HashSet<>();
-        turnCastSpells = new ArrayList<>();
-        Arrays.setAll(clientTurnMessages, i -> new ClientTurnMessage());
-        damageUpgradedUnits = new HashSet<>();
-        rangeUpgradedUnits = new HashSet<>();
-        for (Unit unit : unitsWithId.values()) {
+    private GameState initializeTurn(GameState gameState) {
+        GameStateBuilder gameStateBuilder = new GameStateBuilder(gameState);
+        gameStateBuilder.setPlayedUnits(new HashSet<>());
+        gameStateBuilder.setTurnCastSpells(new ArrayList<>());
+        Arrays.setAll(gameStateBuilder.getClientTurnMessages(), i -> new ClientTurnMessage());
+        gameStateBuilder.setDamageUpgradedUnits(new HashSet<>());
+        gameStateBuilder.setRangeUpgradedUnits(new HashSet<>());
+        for (Unit unit : gameStateBuilder.getUnitsWithId().values()) {
             unit.setSpeedIncrease(0);
         }
+        return gameStateBuilder.toGameState();
     }
 
     private void applyUpgrades(List<ClientMessageInfo> upgradeMessages) {

@@ -25,7 +25,9 @@ public class GameHandler implements GameLogic {
     private InitialMessage initialMessage;
 
     public GameHandler(AtomicInteger currentTurn) {
-        game.setCurrentTurn(currentTurn);
+        GameStateBuilder gameStateBuilder = new GameStateBuilder();
+        gameStateBuilder.setCurrentTurn(currentTurn);
+        game.setGameState(gameStateBuilder.toGameState());
     }
 
     @Override
@@ -35,7 +37,7 @@ public class GameHandler implements GameLogic {
 
     @Override
     public long getClientResponseTimeout() {
-        if(game.getCurrentTurn().get() == 0) {
+        if(game.getGameState().getCurrentTurn().get() == 0) {
             return initialMessage.getGameConstants().getPickTimeout();
         }
         return initialMessage.getGameConstants().getTurnTimeout();
@@ -115,7 +117,7 @@ public class GameHandler implements GameLogic {
 
     @Override
     public void simulateEvents(Map<String, List<ClientMessageInfo>> messages) { //todo filter messages to be this turn
-        if (game.getCurrentTurn().get() == 0) {
+        if (game.getGameState().getCurrentTurn().get() == 0) {
             List<ClientMessageInfo> clientMessageInfos = messages.get(MessageTypes.PICK);
             if (clientMessageInfos == null) {
                 game.pick(new ArrayList<>());
@@ -145,18 +147,18 @@ public class GameHandler implements GameLogic {
     }
 
     public ClientTurnMessage[] getClientRawMessages() {
-        return game.getClientTurnMessages();
+        return game.getGameState().getClientTurnMessages();
     }
 
     @Override
     public Message[] getClientMessages() {
-        if (game.getCurrentTurn().get() == 0) {     //todo check init is 0
+        if (game.getGameState().getCurrentTurn().get() == 0) {
             return getClientInitialMessages();
         }
 
         Message[] messages = new Message[4];
         // turn
-        ClientTurnMessage[] clientTurnMessages = game.getClientTurnMessages();
+        ClientTurnMessage[] clientTurnMessages = game.getGameState().getClientTurnMessages();
         for (int i = 0; i < 4; i++) {
             messages[i] = new Message(MessageTypes.TURN,
                     Json.GSON.toJsonTree(clientTurnMessages[i], ClientTurnMessage.class).getAsJsonObject());
@@ -166,7 +168,7 @@ public class GameHandler implements GameLogic {
 
     @Override
     public boolean isGameFinished() {
-        return game.isGameFinished();
+        return game.getGameState().isGameFinished();
     }
 
     @Override
@@ -175,6 +177,6 @@ public class GameHandler implements GameLogic {
     }
 
     public int getCurrentTurn() {
-        return game.getCurrentTurn().get();
+        return game.getGameState().getCurrentTurn().get();
     }
 }

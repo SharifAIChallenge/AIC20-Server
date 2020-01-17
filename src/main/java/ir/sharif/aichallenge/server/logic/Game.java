@@ -207,7 +207,6 @@ public class Game {
 
             attack();
             move();
-            evaluateSpells();
             evaluateUnits();
 
             resetPlayers();
@@ -217,6 +216,7 @@ public class Game {
 
             fillClientMessage();
             addTurnToGraphicMessage();
+            evaluateSpells();
 
             checkForGameEnd();
         } catch (Exception ex) {
@@ -295,7 +295,6 @@ public class Game {
     private void evaluateSpells() {
         List<Spell> removeSpells = new ArrayList<>();
         for (Spell spell : spells) {
-            spell.decreaseRemainingTurns();
             if (spell.shouldRemove()) {
                 spell.getCaughtUnits().forEach(unit -> unit.removeActiveSpell(spell.getId()));
                 removeSpells.add(spell);
@@ -340,6 +339,7 @@ public class Game {
             try {
                 spell.applyTo(this);
                 spell.getCaughtUnits().forEach(unit -> unit.addActiveSpell(spell.getId()));
+                spell.decreaseRemainingTurns();
                 turnCastSpells.add(spell.getTurnCastSpell());
             } catch (LogicException ex) {
                 Log.i("Logic error:", ex.getMessage());

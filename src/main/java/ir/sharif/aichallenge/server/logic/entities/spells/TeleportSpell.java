@@ -13,8 +13,8 @@ import ir.sharif.aichallenge.server.logic.map.Cell;
 import ir.sharif.aichallenge.server.logic.map.PathCell;
 import lombok.Getter;
 
+import java.util.Collection;
 import java.util.Collections;
-import java.util.Set;
 
 @Getter
 public class TeleportSpell extends Spell {
@@ -55,8 +55,8 @@ public class TeleportSpell extends Spell {
     }
 
     @Override
-    public Set<Unit> getCaughtUnits() {
-        return Collections.singleton(caughtUnit);
+    public Collection<Unit> getCaughtUnits() {
+        return Collections.singletonList(caughtUnit);
     }
 
     @Override

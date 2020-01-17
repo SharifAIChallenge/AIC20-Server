@@ -1,9 +1,7 @@
 package ir.sharif.aichallenge.server.logic.entities.spells;
 
-import ir.sharif.aichallenge.server.logic.Game;
 import ir.sharif.aichallenge.server.logic.entities.Player;
 import ir.sharif.aichallenge.server.logic.entities.units.Unit;
-import ir.sharif.aichallenge.server.logic.exceptions.LogicException;
 import ir.sharif.aichallenge.server.logic.map.Cell;
 
 public class HasteSpell extends AreaSpell {

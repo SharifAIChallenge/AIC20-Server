@@ -42,12 +42,12 @@ public class TeleportSpell extends Spell {
     public void checkValid(Game game) throws LogicException {
         Unit unit = game.getUnitById(targetUnitId);
 
-        if(unit == null) throw new TeleportUnitIdException(targetUnitId, getPlayer().getId());
+        if (unit == null) throw new TeleportUnitIdException(targetUnitId, getPlayer().getId());
 
-        if(unit.getPlayer().getId() != getPlayer().getId())
+        if (unit.getPlayer().getId() != getPlayer().getId())
             throw new TeleportUnitIdException(targetUnitId, getPlayer().getId());
 
-        if(unit instanceof KingUnit) throw new TeleportKingException();
+        if (unit instanceof KingUnit) throw new TeleportKingException();
 
         int index = targetCell.getNumberOfCell(); //TODO: check again
         if (index >= (targetCell.getPath().getLength() + 1) / 2) throw new TooFarTeleportException(targetCell);

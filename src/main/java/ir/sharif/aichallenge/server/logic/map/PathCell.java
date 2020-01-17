@@ -42,7 +42,7 @@ public class PathCell {
 
     public PathCell nextCell(int speed) {
         PathCell cloned = new PathCell(this.path, this.reversed, numberOfCell + speed);
-        cloned.numberOfCell = numberOfCell + speed; //Forcing the index
+        cloned.numberOfCell = Math.min(cloned.getPath().getLength() - 1, numberOfCell + speed); //Forcing the index
         return cloned;
     }
 

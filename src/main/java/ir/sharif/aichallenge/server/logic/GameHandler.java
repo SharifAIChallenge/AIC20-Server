@@ -148,7 +148,7 @@ public class GameHandler implements GameLogic {
     }
 
     public ClientTurnMessage[] getClientRawMessages() {
-        return game.getGameState().getClientTurnMessages();
+        return game.getGameState().getClientHandler().getClientTurnMessages();
     }
 
     @Override
@@ -159,7 +159,7 @@ public class GameHandler implements GameLogic {
 
         Message[] messages = new Message[4];
         // turn
-        ClientTurnMessage[] clientTurnMessages = game.getGameState().getClientTurnMessages();
+        ClientTurnMessage[] clientTurnMessages = game.getGameState().getClientHandler().getClientTurnMessages();
         for (int i = 0; i < 4; i++) {
             messages[i] = new Message(MessageTypes.TURN,
                     Json.GSON.toJsonTree(clientTurnMessages[i], ClientTurnMessage.class).getAsJsonObject());
@@ -175,7 +175,7 @@ public class GameHandler implements GameLogic {
     @Override
     public void terminate() {
         try {
-            game.getGraphicHandler().getFile().close();
+            game.getGameState().getGraphicHandler().getFile().close();
         } catch (Exception ex) {}
     }
 

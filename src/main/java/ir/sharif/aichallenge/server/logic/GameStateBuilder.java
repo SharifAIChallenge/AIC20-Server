@@ -1,10 +1,7 @@
 package ir.sharif.aichallenge.server.logic;
 
 import ir.sharif.aichallenge.server.logic.dto.client.init.GameConstants;
-import ir.sharif.aichallenge.server.logic.dto.client.turn.ClientTurnMessage;
-import ir.sharif.aichallenge.server.logic.dto.client.turn.TurnCastSpell;
 import ir.sharif.aichallenge.server.logic.dto.graphic.GraphicMessage;
-import ir.sharif.aichallenge.server.logic.dto.graphic.turn.TurnAttack;
 import ir.sharif.aichallenge.server.logic.entities.Player;
 import ir.sharif.aichallenge.server.logic.entities.spells.Spell;
 import ir.sharif.aichallenge.server.logic.entities.units.King;
@@ -13,26 +10,29 @@ import ir.sharif.aichallenge.server.logic.map.Map;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Random;
+import java.util.SortedSet;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Getter
 @Setter
 public class GameStateBuilder {
-    private final GameConstants gameConstants;
-    private final int numberOfSpells;
-    private final int numberOfBaseUnits;
-    private final Random randomMaker;
-    private final Map map;
-    private final SortedSet<Spell> spells;
-    private final Player[] players;
-    private final HashMap<Integer, Unit> unitsWithId;
-    private final ArrayList<King> kings;
-    private final GraphicMessage graphicMessage;
-    private final GraphicHandler graphicHandler;
-    private final AtomicInteger currentTurn;
-    private final boolean isGameFinished;
-    private final ClientHandler clientHandler;
+    private GameConstants gameConstants;
+    private int numberOfSpells;
+    private int numberOfBaseUnits;
+    private Random randomMaker;
+    private Map map;
+    private SortedSet<Spell> spells;
+    private Player[] players;
+    private HashMap<Integer, Unit> unitsWithId;
+    private ArrayList<King> kings;
+    private GraphicMessage graphicMessage;
+    private GraphicHandler graphicHandler;
+    private AtomicInteger currentTurn;
+    private boolean isGameFinished;
+    private ClientHandler clientHandler;
 
 
     public GameStateBuilder(GameState gameState) {

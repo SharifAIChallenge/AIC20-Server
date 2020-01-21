@@ -22,12 +22,11 @@ public class TurnAttack {
             throw new IllegalStateException();
         }
         return new TurnAttack(idSource, idTarget);
-
     }
 
     private static int getIdForAttack(Unit unit) {
         int id = unit.getId();
-        if(unit instanceof KingUnit)
+        if (unit instanceof KingUnit)
             id = unit.getPlayer().getId();
         return id;
     }

@@ -12,6 +12,9 @@ import ir.sharif.aichallenge.server.logic.dto.graphic.GraphicMessage;
 import ir.sharif.aichallenge.server.logic.dto.graphic.init.GraphicInit;
 import ir.sharif.aichallenge.server.logic.dto.graphic.turn.GraphicTurn;
 import ir.sharif.aichallenge.server.logic.dto.graphic.turn.TurnAttack;
+import ir.sharif.aichallenge.server.logic.dto.serverlog.ServerLogHandler;
+import ir.sharif.aichallenge.server.logic.dto.serverlog.ServerViewLog;
+import ir.sharif.aichallenge.server.logic.dto.serverlog.TurnInfo;
 import ir.sharif.aichallenge.server.logic.entities.Player;
 import ir.sharif.aichallenge.server.logic.entities.spells.BaseSpell;
 import ir.sharif.aichallenge.server.logic.entities.spells.Spell;
@@ -40,6 +43,14 @@ public class Game {
     private int numberOfBaseUnits;
 
     @Getter
+    private List<Integer> currentPutUnits;
+    @Getter
+    private List<Integer> currentUpgradedUnits;
+
+    @Getter
+    private List<Integer> diedUnits;
+
+    @Getter
     private List<TurnAttack> currentAttacks = new ArrayList<>();
 
     private Random randomMaker = new Random();
@@ -62,6 +73,10 @@ public class Game {
     private Set<Integer> playedUnits = new HashSet<>();
     private List<TurnCastSpell> turnCastSpells = new ArrayList<>();
 
+    @Getter
+    private ServerViewLog serverViewLog = new ServerViewLog();
+    @Getter
+    private ServerLogHandler serverLogHandler = new ServerLogHandler();
 
     private GraphicMessage graphicMessage = new GraphicMessage();
     @Getter
@@ -89,6 +104,8 @@ public class Game {
         initSpells(initialMessage.getSpells());
 
         graphicMessage.setInit(GraphicInit.makeGraphicInit(initialMessage));
+        serverViewLog.setInit(ServerLogHandler.makeInitMessage(initialMessage));
+
     }
 
     public void initializeMap(int size) {
@@ -190,6 +207,7 @@ public class Game {
 
             initializeTurn();
 
+            currentUpgradedUnits = new ArrayList<>();
             applyUpgrades(messages.get(MessageTypes.UPGRADE_DAMAGE));
             applyUpgrades(messages.get(MessageTypes.UPGRADE_RANGE));
 
@@ -208,12 +226,19 @@ public class Game {
 
             fillClientMessage();
             addTurnToGraphicMessage();
+            addTurnInfoToLog();
             evaluateSpells();
 
             checkForGameEnd();
         } catch (Exception ex) {
             Log.e("Error", "Unhandled exception", ex);
         }
+    }
+
+    private void addTurnInfoToLog() {
+        TurnInfo turnInfo = ServerLogHandler.getTurnInfo(this);
+        serverViewLog.getTurns().add(turnInfo);
+        ServerLogHandler.saveServerLog(serverViewLog);
     }
 
     private void initializeTurn() {
@@ -228,6 +253,7 @@ public class Game {
     }
 
     private void applyUpgrades(List<ClientMessageInfo> upgradeMessages) {
+
         if (upgradeMessages == null)
             return;
 
@@ -250,6 +276,9 @@ public class Game {
                             unit.upgradeRange();
                             rangeUpgradedUnits.add(unit.getId());
                         }
+
+                        currentUpgradedUnits.add(unit.getId());
+
                     } catch (LogicException | NullPointerException ex) {
                         Log.i("Logic error:", ex.getMessage());
                     }
@@ -257,6 +286,8 @@ public class Game {
     }
 
     private void applyPutUnits(List<ClientMessageInfo> putUnitMessages) {
+        currentPutUnits = new ArrayList<>();
+
         if (putUnitMessages == null)
             return;
 
@@ -278,6 +309,8 @@ public class Game {
                         map.putUnit(generalUnit, info.getPathId());
                         unitsWithId.put(generalUnit.getId(), generalUnit);
                         playedUnits.add(generalUnit.getId());
+                        currentPutUnits.add(generalUnit.getId());
+
                     } catch (LogicException | NullPointerException ex) {
                         Log.i("Logic error:", ex.getMessage());
                     }
@@ -341,10 +374,14 @@ public class Game {
     }
 
     private void evaluateUnits() {
+        diedUnits = new ArrayList<>();
+
         for (Iterator<java.util.Map.Entry<Integer, Unit>> iterator = unitsWithId.entrySet().iterator(); iterator.hasNext(); ) {
             Unit unit = iterator.next().getValue();
             if (!unit.isAlive()) {
                 map.removeUnit(unit);
+                diedUnits.add(unit.getId());
+
                 iterator.remove();
             }
         }
@@ -461,6 +498,9 @@ public class Game {
         for (int pId = 0; pId < 4; pId++) {
             clientTurnMessages[pId].setReceivedSpell(-1);
             clientTurnMessages[pId].setFriendReceivedSpell(-1);
+
+            players[pId].setReceivedSpell(-1);
+
         }
 
         if (currentTurn.get() == 0)
@@ -474,6 +514,9 @@ public class Game {
         players[playerId].addSpell(type);
         clientTurnMessages[playerId].setReceivedSpell(type);
         clientTurnMessages[playerId ^ 2].setFriendReceivedSpell(type);
+
+        players[playerId].setReceivedSpell(type);
+
     }
 
     private void giveSpells() {
@@ -502,6 +545,10 @@ public class Game {
         for (int pId = 0; pId < 4; pId++) {
             clientTurnMessages[pId].setGotDamageUpgrade(false);
             clientTurnMessages[pId].setGotRangeUpgrade(false);
+
+            players[pId].setGotDamageUpgrade(false);
+            players[pId].setGotRangeUpgrade(false);
+
         }
 
         if (currentTurn.get() == 0)
@@ -533,11 +580,13 @@ public class Game {
     private void giveUpgradeDamageToPlayer(int playerId) {
         players[playerId].addUpgradeDamageToken();
         clientTurnMessages[playerId].setGotDamageUpgrade(true);
+        players[playerId].setGotDamageUpgrade(true);
     }
 
     private void giveUpgradeRangeToPlayer(int playerId) {
         players[playerId].addUpgradeRangeToken();
         clientTurnMessages[playerId].setGotRangeUpgrade(true);
+        players[playerId].setGotRangeUpgrade(true);
     }
 
     //endregion

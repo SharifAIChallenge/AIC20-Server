@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Setter
@@ -14,5 +15,5 @@ import java.util.List;
 @NoArgsConstructor
 public class ServerViewLog {
     private InitialMessage init;
-    private List<TurnInfo> turns;
+    private List<TurnInfo> turns = new ArrayList<>();
 }

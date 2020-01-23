@@ -9,6 +9,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Getter
+@Setter
 public class Player {
 
     private static final int HAND_SIZE = 6, DECK_SIZE = 9;
@@ -29,6 +30,11 @@ public class Player {
     private boolean upgradeUsed, spellUsed, putUsed;
     @Setter
     private boolean deckInit;
+
+    @Getter
+    private int receivedSpell;
+    @Getter
+    private boolean gotDamageUpgrade, gotRangeUpgrade;
 
     private Map<BaseUnit, Integer> baseUnitId = new HashMap<>();
 

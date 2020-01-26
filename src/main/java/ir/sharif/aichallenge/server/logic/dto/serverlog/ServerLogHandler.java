@@ -59,7 +59,8 @@ public class ServerLogHandler {
         RandomAccessFile file;
         String serverLog = new Gson().toJson(serverViewLog);
         try {
-            file = new RandomAccessFile("server_log.json", "w");
+            file = new RandomAccessFile("server_log.json", "rwd");
+            file.setLength(0);
             file.write(serverLog.getBytes());
             file.close();
         } catch (IOException e) {

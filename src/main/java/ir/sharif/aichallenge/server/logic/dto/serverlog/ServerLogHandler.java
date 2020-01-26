@@ -1,10 +1,13 @@
 package ir.sharif.aichallenge.server.logic.dto.serverlog;
 
+import com.google.gson.Gson;
 import ir.sharif.aichallenge.server.logic.Game;
 import ir.sharif.aichallenge.server.logic.dto.client.init.InitialMessage;
 import ir.sharif.aichallenge.server.logic.dto.client.turn.TurnUnit;
 import ir.sharif.aichallenge.server.logic.entities.Player;
 
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,5 +56,14 @@ public class ServerLogHandler {
     }
 
     public static void saveServerLog(ServerViewLog serverViewLog) {
+        RandomAccessFile file;
+        String serverLog = new Gson().toJson(serverViewLog);
+        try {
+            file = new RandomAccessFile("server_log.json", "w");
+            file.write(serverLog.getBytes());
+            file.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

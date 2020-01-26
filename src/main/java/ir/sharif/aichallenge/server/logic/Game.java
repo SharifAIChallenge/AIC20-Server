@@ -238,7 +238,6 @@ public class Game {
     private void addTurnInfoToLog() {
         TurnInfo turnInfo = ServerLogHandler.getTurnInfo(this);
         serverViewLog.getTurns().add(turnInfo);
-        ServerLogHandler.saveServerLog(serverViewLog);
     }
 
     private void initializeTurn() {

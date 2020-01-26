@@ -11,6 +11,7 @@ import ir.sharif.aichallenge.server.logic.dto.client.init.ClientBaseKing;
 import ir.sharif.aichallenge.server.logic.dto.client.init.ClientMap;
 import ir.sharif.aichallenge.server.logic.dto.client.init.InitialMessage;
 import ir.sharif.aichallenge.server.logic.dto.client.turn.ClientTurnMessage;
+import ir.sharif.aichallenge.server.logic.dto.serverlog.ServerLogHandler;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -174,6 +175,7 @@ public class GameHandler implements GameLogic {
     public void terminate() {
         try {
             game.getGraphicHandler().getFile().close();
+            ServerLogHandler.saveServerLog(game.getServerViewLog());
         } catch (Exception ex) {}
     }
 

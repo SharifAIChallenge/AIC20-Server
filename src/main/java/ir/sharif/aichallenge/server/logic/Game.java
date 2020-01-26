@@ -330,28 +330,26 @@ public class Game {
     }
 
     private void applySpells(List<ClientMessageInfo> castSpellMessages) {
-        if (castSpellMessages == null)
-            return;
+        if (castSpellMessages != null)
+            castSpellMessages.stream().map(info -> (SpellCastInfo) info).forEach(info -> {
+                try {
+                    final Player player = players[info.getPlayerId()];
 
-        castSpellMessages.stream().map(info -> (SpellCastInfo) info).forEach(info -> {
-            try {
-                final Player player = players[info.getPlayerId()];
+                    player.checkSpell(info.getTypeId());
 
-                player.checkSpell(info.getTypeId());
+                    Spell spell = Objects.requireNonNull(
+                            SpellFactory.createSpell(info.getTypeId(), player, info.getCell(), info.getUnitId(), map.getPath(info.getPathId())),
+                            "Invalid spell type: " + info.getTypeId());
 
-                Spell spell = Objects.requireNonNull(
-                        SpellFactory.createSpell(info.getTypeId(), player, info.getCell(), info.getUnitId(), map.getPath(info.getPathId())),
-                        "Invalid spell type: " + info.getTypeId());
+                    spell.checkValid(this);
 
-                spell.checkValid(this);
+                    player.castSpell(info.getTypeId());
 
-                player.castSpell(info.getTypeId());
-
-                spells.add(spell);
-            } catch (LogicException | NullPointerException ex) {
-                Log.i("Logic error:", ex.getMessage());
-            }
-        });
+                    spells.add(spell);
+                } catch (LogicException | NullPointerException ex) {
+                    Log.i("Logic error:", ex.getMessage());
+                }
+            });
 
         if (spells.isEmpty())
             return;
@@ -520,8 +518,8 @@ public class Game {
     }
 
     private void giveSpells() {
-        int type1 = 4;//randomMaker.nextInt(numberOfSpells);
-        int type2 = 4;//randomMaker.nextInt(numberOfSpells);
+        int type1 = 3;//randomMaker.nextInt(numberOfSpells);
+        int type2 = 3;//randomMaker.nextInt(numberOfSpells);
 
         if (randomMaker.nextBoolean()) {
             giveSpellToPlayer(0, type1);

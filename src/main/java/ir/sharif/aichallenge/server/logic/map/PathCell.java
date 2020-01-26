@@ -21,7 +21,7 @@ public class PathCell {
 
     public static PathCell createPathCell(Path path, boolean reversed, Cell targetCell) {
         int index = path.getCells().indexOf(targetCell);
-        if (index == -1) throw new NullPointerException("Teleported in not valid cell in path_id");
+        if (index == -1) throw new NullPointerException("Cell is not in the path.");
 
         return createPathCell(path, reversed, index);
     }

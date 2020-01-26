@@ -13,8 +13,10 @@ import ir.sharif.aichallenge.server.logic.map.Cell;
 import ir.sharif.aichallenge.server.logic.map.PathCell;
 import lombok.Getter;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 @Getter
 public class TeleportSpell extends Spell {
@@ -42,16 +44,25 @@ public class TeleportSpell extends Spell {
     public void checkValid(Game game) throws LogicException {
         Unit unit = game.getUnitById(targetUnitId);
 
-        if (unit == null) throw new TeleportUnitIdException(targetUnitId, getPlayer().getId());
+        if (unit == null)
+            throw new TeleportUnitIdException(targetUnitId, getPlayer().getId());
 
         if (unit.getPlayer().getId() != getPlayer().getId())
             throw new TeleportUnitIdException(targetUnitId, getPlayer().getId());
 
-        if (unit instanceof KingUnit) throw new TeleportKingException();
+        if (unit instanceof KingUnit)
+            throw new TeleportKingException();
 
-        int index = targetCell.getMoveIndex(); //TODO: check again
-        if (index >= (targetCell.getPath().getLength() + 1) / 2) throw new TooFarTeleportException(targetCell);
-        //TODO vasate masir?
+        int index = targetCell.getMoveIndex();
+        List<Integer> list = new ArrayList<>(2);
+        for (int i = 0; i < 4; i++) {
+            int kingIndex = targetCell.getPath().getIndexForKing(i);
+            if (kingIndex != 0 && kingIndex != targetCell.getPath().getLength() - 1)
+                list.add(kingIndex);
+        }
+
+        if (index > (list.get(0) + list.get(1)) / 2)
+            throw new TooFarTeleportException(getPlayer().getId(), targetCell);
     }
 
     @Override

@@ -49,6 +49,7 @@ public class Game {
 
     @Getter
     private List<Integer> diedUnits;
+    private List<Unit> deadUnits;
 
     @Getter
     private List<TurnAttack> currentAttacks = new ArrayList<>();
@@ -372,12 +373,17 @@ public class Game {
 
     private void evaluateUnits() {
         diedUnits = new ArrayList<>();
+        deadUnits = new ArrayList<>();
 
         for (Iterator<java.util.Map.Entry<Integer, Unit>> iterator = unitsWithId.entrySet().iterator(); iterator.hasNext(); ) {
             Unit unit = iterator.next().getValue();
             if (!unit.isAlive()) {
                 map.removeUnit(unit);
+
                 diedUnits.add(unit.getId());
+                deadUnits.add(unit);
+
+                //todo refactor
 
                 iterator.remove();
             }
@@ -639,6 +645,14 @@ public class Game {
                 .map(this::buildTurnUnit)
                 .collect(Collectors.toList());
 
+
+        List<TurnUnit> deadTurnUnits = new ArrayList<>();
+        for (Unit deadUnit : deadUnits) {
+            TurnUnit turnUnit = buildTurnUnit(deadUnit);
+            deadTurnUnits.add(turnUnit);
+        }
+
+
         for (int pId = 0; pId < 4; pId++) {
             int friendId = pId ^ 2;
 
@@ -650,6 +664,7 @@ public class Game {
             message.setUnits(turnUnits);
             message.setCurrTurn(currentTurn.get());
 
+            message.setDeadUnits(deadTurnUnits);
             message.setKings(turnKings);
 
             message.setAvailableRangeUpgrades(player.getNumberOfRangeUpgrades());

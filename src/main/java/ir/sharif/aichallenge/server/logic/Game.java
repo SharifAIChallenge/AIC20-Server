@@ -48,8 +48,8 @@ public class Game {
     private List<Integer> currentUpgradedUnits;
 
     @Getter
-    private List<Integer> diedUnits;
-    private List<Unit> deadUnits;
+    private List<Integer> diedUnits;    //todo should this get new too?
+    private List<Unit> deadUnits = new ArrayList<>();
 
     @Getter
     private List<TurnAttack> currentAttacks = new ArrayList<>();

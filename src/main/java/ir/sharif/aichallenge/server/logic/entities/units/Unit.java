@@ -86,11 +86,10 @@ public abstract class Unit extends Entity {
         return position.nextCell(getSpeed());
     }
 
-    public Unit getTarget(Map map) {
+    public void findTarget(Map map) {
         if (targetUnit == null || !targetUnit.isAlive() ||
                 MapUtils.calcManhattanDistance(getCell(), targetUnit.getCell()) > getRange())
             resetTargetUnit(map);
-        return targetUnit;
     }
 
     private void resetTargetUnit(Map map) {

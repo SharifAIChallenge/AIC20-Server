@@ -1,7 +1,6 @@
 package ir.sharif.aichallenge.server.logic;
 
 import ir.sharif.aichallenge.server.common.network.data.*;
-import ir.sharif.aichallenge.server.engine.core.GameServer;
 import ir.sharif.aichallenge.server.logic.dto.client.ClientCell;
 import ir.sharif.aichallenge.server.logic.dto.client.init.*;
 import ir.sharif.aichallenge.server.logic.dto.client.turn.ClientTurnMessage;
@@ -216,9 +215,11 @@ public class Game {
 
             applySpells(messages.get(MessageTypes.CAST_SPELL));
 
+            setUnitsTargets();
             attack();
             move();
             evaluateUnits();
+            setUnitsTargets();
 
             resetPlayers();
 
@@ -394,11 +395,15 @@ public class Game {
         Arrays.stream(players).forEach(Player::reset);
     }
 
+    private void setUnitsTargets() {
+        unitsWithId.values().forEach(unit -> unit.findTarget(map));
+    }
+
     private void attack() {
         currentAttacks = new ArrayList<>();
 
         for (Unit unit : unitsWithId.values()) {
-            Unit targetUnit = unit.getTarget(map);
+            Unit targetUnit = unit.getTargetUnit();
 
             if (!(unit instanceof KingUnit)) {
                 System.out.println("Unit -> " + unit.getPlayer().getId());

@@ -1,5 +1,6 @@
 package ir.sharif.aichallenge.server.logic.dto.graphic;
 
+import ir.sharif.aichallenge.server.logic.dto.client.end.EndMessage;
 import ir.sharif.aichallenge.server.logic.dto.graphic.init.GraphicInit;
 import ir.sharif.aichallenge.server.logic.dto.graphic.turn.GraphicTurn;
 import lombok.AllArgsConstructor;
@@ -17,4 +18,5 @@ import java.util.List;
 public class GraphicMessage {
     private GraphicInit init;
     private List<GraphicTurn> turns = new ArrayList<>();
+    private EndMessage end;
 }

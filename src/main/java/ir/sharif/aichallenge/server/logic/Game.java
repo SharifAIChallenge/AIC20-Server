@@ -619,9 +619,7 @@ public class Game {
                 pathId(pathId).cell(new ClientCell(unit.getCell()))
                 .hp(unit.getHealth())
                 .attack(unit.getDamage()).damageLevel(unit.getDamageLevel())
-                .wasDamageUpgraded(damageUpgradedUnits.contains(unit.getId()))
                 .range(unit.getRange()).rangeLevel(unit.getRangeLevel())
-                .wasRangeUpgraded(rangeUpgradedUnits.contains(unit.getId()))
                 .isDuplicate(unit.isDuplicate())
                 .isHasted(unit.getSpeedIncrease() > 0)
                 .affectedSpells(unit.getAffectedSpells())
@@ -631,6 +629,18 @@ public class Game {
 
     private void bindPathId(TurnUnit tunit, int sendToId, Unit unit) {
         tunit.setPathId(unit.getPlayer().isAlly(sendToId) ? unit.getPath().getId() : -1);
+    }
+
+    private int getPlayerId(int unitId) {
+        int pId = 0;
+        if(unitsWithId.containsKey(unitId))
+            pId = unitsWithId.get(unitId).getPlayer().getId();
+        else {
+            for (Unit dead : deadUnits)
+                if(dead.getId() == unitId)
+                    pId = dead.getPlayer().getId();
+        }
+        return pId;
     }
 
     private void fillClientMessage() {
@@ -657,6 +667,20 @@ public class Game {
             deadTurnUnits.add(turnUnit);
         }
 
+        for (int pId=0; pId<4; pId++) {
+            clientTurnMessages[pId].setDamageUpgradedUnit(-1);
+            clientTurnMessages[pId].setRangeUpgradedUnit(-1);
+        }
+
+        for (Integer id : damageUpgradedUnits) {
+            int pId = getPlayerId(id);
+            clientTurnMessages[pId].setDamageUpgradedUnit(id);
+        }
+
+        for (Integer id : rangeUpgradedUnits) {
+            int pId = getPlayerId(id);
+            clientTurnMessages[pId].setRangeUpgradedUnit(id);
+        }
 
         for (int pId = 0; pId < 4; pId++) {
             int friendId = pId ^ 2;

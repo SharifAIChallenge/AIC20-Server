@@ -10,7 +10,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class Map {
-    HashMap<Integer, Path> paths;
+    public HashMap<Integer, Path> paths;
 
     UnitsInCellsCollection unitsInCell;
     ArrayList<Unit> kings;

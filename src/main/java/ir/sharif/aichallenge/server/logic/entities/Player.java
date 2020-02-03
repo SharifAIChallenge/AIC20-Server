@@ -21,7 +21,7 @@ public class Player {
 
     private List<BaseUnit> deck = new ArrayList<>();
     private List<BaseUnit> hand = new ArrayList<>();
-    private int[] numberOfUse = new int[deckSize];
+    private int[] numberOfUse;
 
     private int numberOfDamageUpgrades = 0;
     private int numberOfRangeUpgrades = 0;
@@ -50,6 +50,8 @@ public class Player {
 
         upgradeUsed = putUsed = spellUsed = false;
         deckInit = false;
+
+        numberOfUse = new int[deckSize];
     }
 
     public void initDeck(List<Integer> baseUnitIds, int numberOfBaseUnits) {
@@ -162,7 +164,6 @@ public class Player {
     }
 
     public void reset() {
-        currentPutUnit = null;
 
         setPutUsed(false);
         setSpellUsed(false);
@@ -205,6 +206,7 @@ public class Player {
         }
 
         hand.add(chances.get(ptr));
+        currentPutUnit = null;
     }
 
     public int getTeam() {

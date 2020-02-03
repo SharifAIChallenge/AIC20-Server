@@ -69,7 +69,7 @@ public abstract class Unit extends Entity {
     }
 
     public int getRange() {
-        return this.baseUnit.getBaseDamageRange() + rangeLevel + this.baseUnit.getDeltaDamageRange();
+        return this.baseUnit.getBaseDamageRange() + rangeLevel * this.baseUnit.getDeltaDamageRange();
     }
 
     public abstract int getSpeed();

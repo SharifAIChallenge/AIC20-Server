@@ -571,11 +571,8 @@ public class Game {
     }
 
     private void giveSpells() {
-        //int type1 = randomMaker.nextInt(numberOfSpells);
-        //int type2 = randomMaker.nextInt(numberOfSpells);
-
-        int type1 = TeleportSpell.TYPE;
-        int type2 = TeleportSpell.TYPE;
+        int type1 = randomMaker.nextInt(numberOfSpells);
+        int type2 = randomMaker.nextInt(numberOfSpells);
 
         if (randomMaker.nextBoolean()) {
             giveSpellToPlayer(0, type1);

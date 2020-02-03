@@ -15,10 +15,7 @@ import ir.sharif.aichallenge.server.logic.dto.serverlog.ServerLogHandler;
 import ir.sharif.aichallenge.server.logic.dto.serverlog.ServerViewLog;
 import ir.sharif.aichallenge.server.logic.dto.serverlog.TurnInfo;
 import ir.sharif.aichallenge.server.logic.entities.Player;
-import ir.sharif.aichallenge.server.logic.entities.spells.BaseSpell;
-import ir.sharif.aichallenge.server.logic.entities.spells.Spell;
-import ir.sharif.aichallenge.server.logic.entities.spells.SpellFactory;
-import ir.sharif.aichallenge.server.logic.entities.spells.SpellType;
+import ir.sharif.aichallenge.server.logic.entities.spells.*;
 import ir.sharif.aichallenge.server.logic.entities.units.*;
 import ir.sharif.aichallenge.server.logic.exceptions.*;
 import ir.sharif.aichallenge.server.logic.map.Cell;
@@ -201,7 +198,42 @@ public class Game {
         fillClientMessage();
     }
 
+    private void debug() {
+
+        System.out.println("Paths");
+        for (Path path : getMap().paths.values()) {
+            System.out.println(path.getId());
+        }
+        System.out.println();
+
+        System.out.println("Debug Players");
+        for (Player player : players)
+        {
+            System.out.println(player.getId() + " --> " + player.getAp());
+            for (int id : player.getHandIds())
+                System.out.print(id + ", ");
+            System.out.println();
+
+            for (int id : player.getDeckIds())
+                System.out.print(id + ", ");
+            System.out.println();
+        }
+
+        System.out.println("Debug Units");
+        for (Unit unit : unitsWithId.values()) {
+            if(unit instanceof KingUnit) continue ;
+            System.out.println(unit.getPlayer().getId() + " , " + unit.getId());
+            System.out.println(unit.getCell().getRow() + " , " + unit.getCell().getCol());
+            System.out.println();
+        }
+
+
+    }
+
     public void turn(java.util.Map<String, List<ClientMessageInfo>> messages) {
+
+        debug();
+
         try {
             currentTurn.incrementAndGet();
 
@@ -306,8 +338,10 @@ public class Game {
                         player.checkPutUnit(baseUnit);
 
                         map.checkValidPut(info.getPathId(), info.getPlayerId());
+                        map.checkValidPut(info.getPathId(), info.getPlayerId());
 
                         player.putUnit(baseUnit);
+
 
                         GeneralUnit generalUnit = new GeneralUnit(baseUnit, player);
                         map.putUnit(generalUnit, info.getPathId());
@@ -409,7 +443,6 @@ public class Game {
             Unit targetUnit = unit.getTargetUnit();
 
             if (!(unit instanceof KingUnit)) {
-                System.out.println("Unit -> " + unit.getPlayer().getId());
                 if (targetUnit != null) System.out.println(targetUnit.getPlayer().getId() + "\n");
             }
 
@@ -418,10 +451,7 @@ public class Game {
                 continue;
             }
 
-            System.out.println("Here");
             currentAttacks.add(TurnAttack.getTurnAttack(unit, targetUnit));
-            System.out.println(currentAttacks.size());
-
 
             unit.setHasAttacked(true);
             if (unit.isMultiTarget())
@@ -514,14 +544,19 @@ public class Game {
 
         }
 
+        System.out.println("Check To Give Spell");
+
         if (currentTurn.get() == 0)
             return;
         if (currentTurn.get() % gameConstants.getTurnsToSpell() != 0) return;
 
+        System.out.println("Spell added");
         giveSpells();
     }
 
     private void giveSpellToPlayer(int playerId, int type) {
+        System.out.println("OKAY");
+
         players[playerId].addSpell(type);
         clientTurnMessages[playerId].setReceivedSpell(type);
         clientTurnMessages[playerId ^ 2].setFriendReceivedSpell(type);
@@ -531,8 +566,11 @@ public class Game {
     }
 
     private void giveSpells() {
-        int type1 = randomMaker.nextInt(numberOfSpells);
-        int type2 = randomMaker.nextInt(numberOfSpells);
+        //int type1 = randomMaker.nextInt(numberOfSpells);
+        //int type2 = randomMaker.nextInt(numberOfSpells);
+
+        int type1 = TeleportSpell.TYPE;
+        int type2 = TeleportSpell.TYPE;
 
         if (randomMaker.nextBoolean()) {
             giveSpellToPlayer(0, type1);
@@ -693,6 +731,7 @@ public class Game {
 
             for (int i = 0; i < units.size(); i++)
                 bindPathId(turnUnits.get(i), pId, units.get(i));
+
             message.setUnits(turnUnits);
             message.setCurrTurn(currentTurn.get());
 
@@ -711,6 +750,7 @@ public class Game {
             message.setDeck(player.getDeckIds());
             message.setHand(player.getHandIds());
         }
+
     }
 
     private void addTurnToGraphicMessage() {

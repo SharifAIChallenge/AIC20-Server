@@ -37,10 +37,8 @@ public class GraphicHandler {
 
     private void initSaver() {
         try {
-
-            File deleteLastLog = new File("graphic.json");
-            deleteLastLog.delete();
             file = new RandomAccessFile("graphic.json", "rwd");
+            file.setLength(0);
 
         } catch (Exception ex) {
             System.out.println("Cannot Open graphic.json");

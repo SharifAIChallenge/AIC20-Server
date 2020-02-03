@@ -24,6 +24,8 @@ public class PlayerInfo {
     private boolean gotDamageUpgrade;
     private int availableRangeUpgrades;
     private int availableDamageUpgrades;
+    private int rangeUpgradedUnit;
+    private int damageUpgradedUnit;
     private int remainingAP;
 
     public static PlayerInfo getPlayerInfo(Player player, Game game) {

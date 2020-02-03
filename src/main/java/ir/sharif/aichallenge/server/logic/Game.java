@@ -95,7 +95,7 @@ public class Game {
 
         //init players
         for (int i = 0; i < 4; i++)
-            players[i] = new Player(i, gameConstants.getMaxAP());
+            players[i] = new Player(i, gameConstants.getMaxAP(), gameConstants.getHandSize(), gameConstants.getDeckSize());
 
         initMap(initialMessage.getMap());
 

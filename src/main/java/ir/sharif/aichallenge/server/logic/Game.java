@@ -230,7 +230,7 @@ public class Game {
 
     public void turn(java.util.Map<String, List<ClientMessageInfo>> messages) {
 
-        debug();
+        //debug();
 
         try {
             currentTurn.incrementAndGet();
@@ -312,6 +312,9 @@ public class Game {
                             rangeUpgradedUnits.add(unit.getId());
                         }
 
+                        Log.i("game_upgrade_unit", "Player " + unit.getPlayer().getId() + " " +
+                                message.getType() + " " + unit.getId());
+
                         currentUpgradedUnits.add(unit.getId());
 
                     } catch (LogicException | NullPointerException ex) {
@@ -341,9 +344,11 @@ public class Game {
 
                         player.putUnit(baseUnit);
 
-                        System.out.println("What ->>> " + info.getPathId());
-
                         GeneralUnit generalUnit = new GeneralUnit(baseUnit, player);
+
+                        Log.i("game_put_unit", "Player : " + player.getId() +
+                                " Put Unit " + generalUnit.getId() + " In Path " + info.getPathId());
+
                         map.putUnit(generalUnit, info.getPathId());
                         unitsWithId.put(generalUnit.getId(), generalUnit);
                         playedUnits.add(generalUnit.getId());
@@ -370,9 +375,7 @@ public class Game {
     private void applySpells(List<ClientMessageInfo> castSpellMessages) {
         if (castSpellMessages != null)
             castSpellMessages.stream().map(info -> (SpellCastInfo) info).forEach(info -> {
-                if (info.getTypeId()==3) {
-                    int s=0;
-                }
+
                 try {
                     final Player player = players[info.getPlayerId()];
 
@@ -404,7 +407,9 @@ public class Game {
                 spell.applyTo(this);
                 spell.getCaughtUnits().forEach(unit -> unit.addActiveSpell(spell.getId()));
                 spell.decreaseRemainingTurns();
-                turnCastSpells.add(spell.getTurnCastSpell());
+                TurnCastSpell turnCastSpell = spell.getTurnCastSpell();
+                turnCastSpells.add(turnCastSpell);
+                Log.i("game_cast_spell", turnCastSpell.toString());
             } catch (LogicException ex) {
                 Log.i("Logic error:", ex.getMessage());
             }
@@ -441,9 +446,6 @@ public class Game {
         for (Unit unit : unitsWithId.values()) {
             Unit targetUnit = unit.getTargetUnit();
 
-            if (!(unit instanceof KingUnit)) {
-                if (targetUnit != null) System.out.println(targetUnit.getPlayer().getId() + "\n");
-            }
 
             if (targetUnit == null) {
                 unit.setHasAttacked(false);
@@ -551,18 +553,14 @@ public class Game {
 
         }
 
-        System.out.println("Check To Give Spell");
-
         if (currentTurn.get() == 0)
             return;
         if (currentTurn.get() % gameConstants.getTurnsToSpell() != 0) return;
 
-        System.out.println("Spell added");
         giveSpells();
     }
 
     private void giveSpellToPlayer(int playerId, int type) {
-        System.out.println("OKAY");
 
         players[playerId].addSpell(type);
         clientTurnMessages[playerId].setReceivedSpell(type);

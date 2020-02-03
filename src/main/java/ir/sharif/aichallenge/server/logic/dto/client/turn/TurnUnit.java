@@ -26,6 +26,8 @@ public class TurnUnit {
     private int range;
     private int attack;
     private boolean wasPlayedThisTurn;
+    private boolean wasRangeUpgraded;
+    private boolean wasDamageUpgraded;
     private int target;
     private ClientCell targetCell;
 }

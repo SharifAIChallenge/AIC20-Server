@@ -5,6 +5,9 @@ import ir.sharif.aichallenge.server.logic.exceptions.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -28,7 +31,6 @@ public class Player {
 
     @Setter
     private boolean upgradeUsed, spellUsed, putUsed;
-    @Setter
     private boolean deckInit;
 
     @Getter
@@ -55,7 +57,8 @@ public class Player {
     }
 
     public void initDeck(List<Integer> baseUnitIds, int numberOfBaseUnits) {
-        setDeckInit(true);
+
+        deckInit = true;
 
         ArrayList<Integer> validIds = new ArrayList<>();
         for (Integer id : baseUnitIds) {

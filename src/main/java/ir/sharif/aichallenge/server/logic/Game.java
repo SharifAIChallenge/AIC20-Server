@@ -44,13 +44,12 @@ public class Game {
     private List<Integer> currentUpgradedUnits;
 
     @Getter
-    private List<Unit> deadUnits = new ArrayList<>();
+    private List<Unit> diedUnits = new ArrayList<>();
 
     @Getter
     private List<TurnAttack> currentAttacks = new ArrayList<>();
 
     private Random randomMaker = new Random();
-
 
     @Getter
     private Map map;
@@ -241,7 +240,6 @@ public class Game {
 
             initializeTurn();
 
-            currentUpgradedUnits = new ArrayList<>();
             applyUpgrades(messages.get(MessageTypes.UPGRADE_DAMAGE));
             applyUpgrades(messages.get(MessageTypes.UPGRADE_RANGE));
 
@@ -285,6 +283,8 @@ public class Game {
         for (Unit unit : unitsWithId.values()) {
             unit.setSpeedIncrease(0);
         }
+        diedUnits = new ArrayList<>();
+        currentUpgradedUnits = new ArrayList<>();
     }
 
     private void applyUpgrades(List<ClientMessageInfo> upgradeMessages) {
@@ -413,14 +413,12 @@ public class Game {
     }
 
     private void evaluateUnits() {
-        deadUnits = new ArrayList<>();
-
         for (Iterator<java.util.Map.Entry<Integer, Unit>> iterator = unitsWithId.entrySet().iterator(); iterator.hasNext(); ) {
             Unit unit = iterator.next().getValue();
             if (!unit.isAlive()) {
                 map.removeUnit(unit);
 
-                deadUnits.add(unit);
+                diedUnits.add(unit);
 
                 //todo refactor
 
@@ -688,7 +686,7 @@ public class Game {
         if(unitsWithId.containsKey(unitId))
             pId = unitsWithId.get(unitId).getPlayer().getId();
         else {
-            for (Unit dead : deadUnits)
+            for (Unit dead : diedUnits)
                 if(dead.getId() == unitId)
                     pId = dead.getPlayer().getId();
         }
@@ -714,7 +712,7 @@ public class Game {
 
 
         List<TurnUnit> deadTurnUnits = new ArrayList<>();
-        for (Unit deadUnit : deadUnits) {
+        for (Unit deadUnit : diedUnits) {
             TurnUnit turnUnit = buildTurnUnit(deadUnit);
             deadTurnUnits.add(turnUnit);
         }
@@ -731,7 +729,7 @@ public class Game {
             message.setUnits(turnUnits);
             message.setCurrTurn(currentTurn.get());
 
-            message.setDeadUnits(deadTurnUnits);
+            message.setDiedUnits(deadTurnUnits);
             message.setKings(turnKings);
 
             message.setAvailableRangeUpgrades(player.getNumberOfRangeUpgrades());

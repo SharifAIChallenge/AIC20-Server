@@ -48,7 +48,7 @@ public class ServerLogHandler {
         turnInfo.setPutUnits(game.getCurrentPutUnits());
 
         List<TurnUnit> diedUnits = new ArrayList<>();
-        for (Unit deadUnit : game.getDeadUnits())
+        for (Unit deadUnit : game.getDiedUnits())
             diedUnits.add(game.buildTurnUnit(deadUnit));
 
         turnInfo.setDiedUnits(diedUnits);

@@ -15,7 +15,7 @@ public class ClientTurnMessage {
     private List<Integer> hand;
     private List<TurnKing> kings;
     private List<TurnUnit> units;
-    private List<TurnUnit> deadUnits;
+    private List<TurnUnit> diedUnits;
     private List<TurnCastSpell> castSpells;
     private int receivedSpell;
     private int friendReceivedSpell;

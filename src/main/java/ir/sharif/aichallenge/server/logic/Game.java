@@ -44,7 +44,6 @@ public class Game {
     private List<Integer> currentUpgradedUnits;
 
     @Getter
-    private List<Integer> diedUnits;    //todo should this get new too?
     private List<Unit> deadUnits = new ArrayList<>();
 
     @Getter
@@ -342,6 +341,7 @@ public class Game {
 
                         player.putUnit(baseUnit);
 
+                        System.out.println("What ->>> " + info.getPathId());
 
                         GeneralUnit generalUnit = new GeneralUnit(baseUnit, player);
                         map.putUnit(generalUnit, info.getPathId());
@@ -410,7 +410,6 @@ public class Game {
     }
 
     private void evaluateUnits() {
-        diedUnits = new ArrayList<>();
         deadUnits = new ArrayList<>();
 
         for (Iterator<java.util.Map.Entry<Integer, Unit>> iterator = unitsWithId.entrySet().iterator(); iterator.hasNext(); ) {
@@ -418,7 +417,6 @@ public class Game {
             if (!unit.isAlive()) {
                 map.removeUnit(unit);
 
-                diedUnits.add(unit.getId());
                 deadUnits.add(unit);
 
                 //todo refactor
@@ -642,8 +640,8 @@ public class Game {
 
     //region Client Message
 
-    private TurnUnit buildTurnUnit(Unit unit) {
-        int pathId = -1;
+    public TurnUnit buildTurnUnit(Unit unit) {
+        int pathId = unit.getPath().getId();
 
         int targetId = -1;
         Cell targetCell = null;

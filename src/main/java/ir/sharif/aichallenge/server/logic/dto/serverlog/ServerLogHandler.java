@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import ir.sharif.aichallenge.server.logic.Game;
 import ir.sharif.aichallenge.server.logic.dto.client.init.InitialMessage;
 import ir.sharif.aichallenge.server.logic.dto.client.turn.TurnUnit;
+import ir.sharif.aichallenge.server.logic.entities.units.KingUnit;
+import ir.sharif.aichallenge.server.logic.entities.units.Unit;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -36,17 +38,19 @@ public class ServerLogHandler {
         turnInfo.setKings(game.getClientTurnMessages()[0].getKings());
         turnInfo.setCastSpells(game.getClientTurnMessages()[0].getCastSpells());
 
-        turnInfo.setUnits(game.getClientTurnMessages()[0].getUnits());
+        List<TurnUnit> units = new ArrayList<>();
+        for (Unit unit : game.getUnitsWithId().values())
+            if(!(unit instanceof KingUnit))
+                units.add(game.buildTurnUnit(unit));
 
-        //todo
+        turnInfo.setUnits(units);
+
         turnInfo.setPutUnits(game.getCurrentPutUnits());
 
         List<TurnUnit> diedUnits = new ArrayList<>();
-        for (int id : game.getDiedUnits()) {
-            for (TurnUnit turnUnit : turnInfo.getUnits())
-                if(turnUnit.getUnitId() == id)
-                    diedUnits.add(turnUnit);
-        }
+        for (Unit deadUnit : game.getDeadUnits())
+            diedUnits.add(game.buildTurnUnit(deadUnit));
+
         turnInfo.setDiedUnits(diedUnits);
 
         turnInfo.setDamageUpgradedUnits(new ArrayList<Integer>(game.getDamageUpgradedUnits()));

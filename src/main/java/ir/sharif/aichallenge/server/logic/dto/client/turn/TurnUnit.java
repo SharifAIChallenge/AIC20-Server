@@ -20,8 +20,6 @@ public class TurnUnit {
     private int hp;
     private int damageLevel;
     private int rangeLevel;
-    private boolean wasDamageUpgraded;
-    private boolean wasRangeUpgraded;
     private boolean isDuplicate;
     private boolean isHasted;
     private Set<Integer> affectedSpells;

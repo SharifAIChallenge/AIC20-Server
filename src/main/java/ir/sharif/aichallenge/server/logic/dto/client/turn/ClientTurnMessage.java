@@ -25,5 +25,7 @@ public class ClientTurnMessage {
     private boolean gotDamageUpgrade;
     private int availableRangeUpgrades;
     private int availableDamageUpgrades;
+    private int rangeUpgradedUnit;
+    private int damageUpgradedUnit;
     private int remainingAP;
 }

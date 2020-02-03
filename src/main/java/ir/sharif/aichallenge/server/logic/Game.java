@@ -68,8 +68,11 @@ public class Game {
     private ArrayList<King> kings = new ArrayList<>();
     @Getter
     private ClientTurnMessage[] clientTurnMessages = new ClientTurnMessage[4];  //todo set each turn
+    @Getter
     private Set<Integer> damageUpgradedUnits;
+    @Getter
     private Set<Integer> rangeUpgradedUnits;
+
     private Set<Integer> playedUnits = new HashSet<>();
     private List<TurnCastSpell> turnCastSpells = new ArrayList<>();
 

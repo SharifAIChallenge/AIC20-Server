@@ -50,7 +50,8 @@ public class ServerLogHandler {
         }
         turnInfo.setDiedUnits(diedUnits);
 
-        turnInfo.setUpgradedUnits(game.getCurrentUpgradedUnits());
+        turnInfo.setDamageUpgradedUnits(new ArrayList<Integer>(game.getDamageUpgradedUnits()));
+        turnInfo.setRangeUpgradedUnits(new ArrayList<Integer>(game.getRangeUpgradedUnits()));
 
         return turnInfo;
     }

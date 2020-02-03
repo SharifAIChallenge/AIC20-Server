@@ -672,6 +672,8 @@ public class Game {
                 .range(unit.getRange()).rangeLevel(unit.getRangeLevel())
                 .isDuplicate(unit.isDuplicate())
                 .isHasted(unit.getSpeedIncrease() > 0)
+                .wasDamageUpgraded(damageUpgradedUnits.contains(unit.getId()))
+                .wasRangeUpgraded(rangeUpgradedUnits.contains(unit.getId()))
                 .affectedSpells(unit.getAffectedSpells())
                 .target(targetId).targetCell(clientTargetCell)
                 .wasPlayedThisTurn(playedUnits.contains(unit.getId())).build();
@@ -715,21 +717,6 @@ public class Game {
         for (Unit deadUnit : deadUnits) {
             TurnUnit turnUnit = buildTurnUnit(deadUnit);
             deadTurnUnits.add(turnUnit);
-        }
-
-        for (int pId=0; pId<4; pId++) {
-            clientTurnMessages[pId].setDamageUpgradedUnit(-1);
-            clientTurnMessages[pId].setRangeUpgradedUnit(-1);
-        }
-
-        for (Integer id : damageUpgradedUnits) {
-            int pId = getPlayerId(id);
-            clientTurnMessages[pId].setDamageUpgradedUnit(id);
-        }
-
-        for (Integer id : rangeUpgradedUnits) {
-            int pId = getPlayerId(id);
-            clientTurnMessages[pId].setRangeUpgradedUnit(id);
         }
 
         for (int pId = 0; pId < 4; pId++) {

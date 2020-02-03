@@ -18,4 +18,6 @@ public class GameConstants {
     private int turnsToSpell;
     private int damageUpgradeAddition;
     private int rangeUpgradeAddition;
+    private int deckSize;
+    private int handSize;
 }

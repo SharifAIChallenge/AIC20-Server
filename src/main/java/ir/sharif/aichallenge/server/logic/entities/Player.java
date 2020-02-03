@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 @Setter
 public class Player {
 
-    private static final int HAND_SIZE = 6, DECK_SIZE = 9;
+    private int handSize, deckSize;
     private int id;
     private int ap;
     private int maxAP;
@@ -21,7 +21,7 @@ public class Player {
 
     private List<BaseUnit> deck = new ArrayList<>();
     private List<BaseUnit> hand = new ArrayList<>();
-    private int[] numberOfUse = new int[DECK_SIZE];
+    private int[] numberOfUse = new int[deckSize];
 
     private int numberOfDamageUpgrades = 0;
     private int numberOfRangeUpgrades = 0;
@@ -40,10 +40,13 @@ public class Player {
 
     private BaseUnit currentPutUnit;
 
-    public Player(int id, int ap) {
+    public Player(int id, int ap, int handSize, int deckSize) {
         this.id = id;
         this.ap = ap;
         this.maxAP = ap;
+
+        this.handSize = handSize;
+        this.deckSize = deckSize;
 
         upgradeUsed = putUsed = spellUsed = false;
         deckInit = false;
@@ -54,30 +57,30 @@ public class Player {
 
         ArrayList<Integer> validIds = new ArrayList<>();
         for (Integer id : baseUnitIds) {
-            if (validIds.size() >= DECK_SIZE) break;
+            if (validIds.size() >= deckSize) break;
             if (id >= 0 && id < numberOfBaseUnits && !validIds.contains(id))
                 validIds.add(id);
         }
 
         ArrayList<Integer> ids = new ArrayList<>(validIds);
 
-        while (ids.size() < DECK_SIZE) {
+        while (ids.size() < deckSize) {
             int random_id = getRandom(0, numberOfBaseUnits);
             if (ids.contains(random_id)) continue;
             ids.add(random_id);
         }
 
         for (Integer id : ids) {
-            if (this.deck.size() == DECK_SIZE) break;
+            if (this.deck.size() == deckSize) break;
             this.deck.add(BaseUnit.getInstance(id));    //TODO: may throw null pointer exception
         }
 
-        for (int i = 0; i < HAND_SIZE; i++)
+        for (int i = 0; i < handSize; i++)
             hand.add(deck.get(i));
 
-        for (int i = 0; i < DECK_SIZE; i++) numberOfUse[i] = 0;
+        for (int i = 0; i < deckSize; i++) numberOfUse[i] = 0;
 
-        for (int i = 0; i < DECK_SIZE; i++)
+        for (int i = 0; i < deckSize; i++)
             baseUnitId.put(deck.get(i), i);
 
     }
@@ -105,7 +108,6 @@ public class Player {
     }
 
     public void checkPutUnit(BaseUnit baseUnit) throws LogicException {
-        currentPutUnit = null;
 
         if (!hand.contains(baseUnit)) throw new UnitNotInHandException(id, baseUnit.getType());
         if (ap < baseUnit.getCost()) throw new NotEnoughAPException(id, baseUnit.getCost(), ap);
@@ -160,6 +162,8 @@ public class Player {
     }
 
     public void reset() {
+        currentPutUnit = null;
+
         setPutUsed(false);
         setSpellUsed(false);
         setUpgradeUsed(false);
@@ -174,33 +178,33 @@ public class Player {
 
         if (currentPutUnit == null) return;
 
+        hand.remove(currentPutUnit);
+
         List<BaseUnit> chances = new ArrayList<>();
-        List<Double> probs = new ArrayList<>();
+        List<Double> probabilities = new ArrayList<>();
         double normalize = 0;
 
         for (BaseUnit baseUnit : deck) {
             if (hand.contains(baseUnit)) continue;
             chances.add(baseUnit);
             double prob = (double) 1 / (1 + numberOfUse[baseUnitId.get(baseUnit)]);
-            probs.add(prob);
+            probabilities.add(prob);
             normalize += prob;
         }
 
         double random = Math.random() * normalize;
 
-        int ptr = 2;
+        int ptr = chances.size() - 1;
 
-        for (int i = 0; i < 3; i++) {
-            if (random <= probs.get(i)) {
+        for (int i = 0; i < chances.size(); i++) {
+            if (random <= probabilities.get(i)) {
                 ptr = i;
                 break;
             }
-            random -= probs.get(i);
+            random -= probabilities.get(i);
         }
 
         hand.add(chances.get(ptr));
-
-        hand.remove(currentPutUnit);
     }
 
     public int getTeam() {

@@ -21,7 +21,8 @@ public class TurnInfo {
     private List<TurnUnit> units;
     private List<TurnUnit> diedUnits;
     private List<Integer> putUnits;
-    private List<Integer> upgradedUnits;    //is it better to separate range and damage upgrades?
+    private List<Integer> rangeUpgradedUnits;
+    private List<Integer> damageUpgradedUnits;
     private List<TurnCastSpell> castSpells;
     private List<TurnAttack> attacks;
     private List<PlayerInfo> players;

@@ -370,6 +370,9 @@ public class Game {
     private void applySpells(List<ClientMessageInfo> castSpellMessages) {
         if (castSpellMessages != null)
             castSpellMessages.stream().map(info -> (SpellCastInfo) info).forEach(info -> {
+                if (info.getTypeId()==3) {
+                    int s=0;
+                }
                 try {
                     final Player player = players[info.getPlayerId()];
 
@@ -449,15 +452,23 @@ public class Game {
                 continue;
             }
 
-            currentAttacks.add(TurnAttack.getTurnAttack(unit, targetUnit));
-
             unit.setHasAttacked(true);
-            if (unit.isMultiTarget())
+            if (unit.isMultiTarget()) {
                 map.getUnits(targetUnit.getCell())
                         .filter(unit::isTarget)
                         .forEach(target -> target.decreaseHealth(unit.getDamage()));
-            else
+
+                map.getUnits(targetUnit.getCell())
+                        .filter(unit::isTarget)
+                        .forEach(
+                        defender -> currentAttacks.add(TurnAttack.getTurnAttack(unit, defender))
+                );
+
+            }
+            else {
+                currentAttacks.add(TurnAttack.getTurnAttack(unit, targetUnit));
                 targetUnit.decreaseHealth(unit.getDamage());
+            }
         }
     }
 

@@ -1,6 +1,7 @@
 package ir.sharif.aichallenge.server.logic.entities.spells;
 
 import ir.sharif.aichallenge.server.logic.Game;
+import ir.sharif.aichallenge.server.logic.dto.client.ClientCell;
 import ir.sharif.aichallenge.server.logic.dto.client.turn.TurnCastSpell;
 import ir.sharif.aichallenge.server.logic.entities.Player;
 import ir.sharif.aichallenge.server.logic.entities.units.KingUnit;
@@ -73,6 +74,7 @@ public class TeleportSpell extends Spell {
     @Override
     public TurnCastSpell getTurnCastSpell() {
         final TurnCastSpell turnCastSpell = super.getTurnCastSpell();
+        turnCastSpell.setCell(new ClientCell(targetCell.getCell()));
         turnCastSpell.setUnitId(getTargetUnitId());
         turnCastSpell.setPathId(getTargetCell().getPath().getId());
         turnCastSpell.setAffectedUnits(Collections.singletonList(getTargetUnitId()));

@@ -7,6 +7,7 @@ import ir.sharif.aichallenge.server.common.network.data.MessageTypes;
 import ir.sharif.aichallenge.server.common.network.data.PickInfo;
 import ir.sharif.aichallenge.server.engine.config.FileParam;
 import ir.sharif.aichallenge.server.engine.core.GameLogic;
+import ir.sharif.aichallenge.server.logic.dto.client.end.ClientEndMessage;
 import ir.sharif.aichallenge.server.logic.dto.client.init.ClientBaseKing;
 import ir.sharif.aichallenge.server.logic.dto.client.init.ClientMap;
 import ir.sharif.aichallenge.server.logic.dto.client.init.InitialMessage;
@@ -15,7 +16,6 @@ import ir.sharif.aichallenge.server.logic.dto.serverlog.ServerLogHandler;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -162,6 +162,17 @@ public class GameHandler implements GameLogic {
         for (int i = 0; i < 4; i++) {
             messages[i] = new Message(MessageTypes.TURN,
                     Json.GSON.toJsonTree(clientTurnMessages[i], ClientTurnMessage.class).getAsJsonObject());
+        }
+        return messages;
+    }
+
+    @Override
+    public Message[] getClientEndMessages() {
+        Message[] messages = new Message[4];
+        ClientEndMessage[] clientEndMessages = game.getClientEndMessages();
+        for (int i = 0; i < 4; i++) {
+            messages[i] = new Message(MessageTypes.SHUTDOWN,
+                    Json.GSON.toJsonTree(clientEndMessages[i], ClientEndMessage.class).getAsJsonObject());
         }
         return messages;
     }

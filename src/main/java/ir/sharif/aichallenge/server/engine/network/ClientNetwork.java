@@ -417,4 +417,13 @@ public class ClientNetwork extends NetServer {
         sendAllBlocking();
         mClients.forEach(ClientHandler::terminateSending);
     }
+
+    public void shutdownAll(Message[] endMessages) {
+        mClients.forEach(ClientHandler::terminateReceiving);
+        for (int i = 0; i < endMessages.length; ++i) {
+            queue(i, endMessages[i]);
+        }
+        sendAllBlocking();
+        mClients.forEach(ClientHandler::terminateSending);
+    }
 }

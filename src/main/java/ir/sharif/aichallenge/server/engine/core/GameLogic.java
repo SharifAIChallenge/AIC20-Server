@@ -62,6 +62,7 @@ public interface GameLogic {
 
     public Message[] getClientMessages();
 
+    public Message[] getClientEndMessages();   //Added at AIC20
 
     public boolean isGameFinished();
 

@@ -2,6 +2,7 @@ package ir.sharif.aichallenge.server.logic;
 
 import ir.sharif.aichallenge.server.common.network.data.*;
 import ir.sharif.aichallenge.server.logic.dto.client.ClientCell;
+import ir.sharif.aichallenge.server.logic.dto.client.end.ClientEndMessage;
 import ir.sharif.aichallenge.server.logic.dto.client.init.*;
 import ir.sharif.aichallenge.server.logic.dto.client.turn.ClientTurnMessage;
 import ir.sharif.aichallenge.server.logic.dto.client.turn.TurnCastSpell;
@@ -62,7 +63,9 @@ public class Game {
     private HashMap<Integer, Unit> unitsWithId = new HashMap<>();
     private ArrayList<King> kings = new ArrayList<>();
     @Getter
-    private ClientTurnMessage[] clientTurnMessages = new ClientTurnMessage[4];  //todo set each turn
+    private ClientTurnMessage[] clientTurnMessages = new ClientTurnMessage[4];
+    @Getter
+    private ClientEndMessage[] clientEndMessages = new ClientEndMessage[4]; //todo set in end of game
     @Getter
     private Set<Integer> damageUpgradedUnits;
     @Getter

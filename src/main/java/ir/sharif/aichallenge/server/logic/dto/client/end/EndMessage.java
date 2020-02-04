@@ -12,6 +12,5 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EndMessage {
-    private int winnerTeam;     //0, 1, -1 if draw
-    private List<PlayerEndInfo> players;
+    private List<PlayerScore> scores;
 }

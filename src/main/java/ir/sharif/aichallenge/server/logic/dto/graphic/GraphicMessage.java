@@ -17,6 +17,6 @@ import java.util.List;
 @NoArgsConstructor
 public class GraphicMessage {
     private GraphicInit init;
-    private List<GraphicTurn> turns = new ArrayList<>();
     private List<PlayerScore> end;
-}
+    private List<GraphicTurn> turns = new ArrayList<>();
+    }

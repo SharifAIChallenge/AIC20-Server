@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PlayerEndInfo {
+public class PlayerScore {
     private int playerId;
-    private int winInTeam;      //0, 1, -1 if draw
+    private int score;
 }

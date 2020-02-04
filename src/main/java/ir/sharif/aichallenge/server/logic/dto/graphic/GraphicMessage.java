@@ -1,6 +1,6 @@
 package ir.sharif.aichallenge.server.logic.dto.graphic;
 
-import ir.sharif.aichallenge.server.logic.dto.client.end.EndMessage;
+import ir.sharif.aichallenge.server.logic.dto.graphic.end.EndMessage;
 import ir.sharif.aichallenge.server.logic.dto.graphic.init.GraphicInit;
 import ir.sharif.aichallenge.server.logic.dto.graphic.turn.GraphicTurn;
 import lombok.AllArgsConstructor;

@@ -273,7 +273,8 @@ public class GameServer {
                     try {
                         mGameLogic.generateOutputs(); // added at AIC 2019
                         mGameLogic.terminate();
-                        mClientNetwork.shutdownAll();
+                        Message[] endMessages = mGameLogic.getClientEndMessages(); // added at AIC 2020
+                        mClientNetwork.shutdownAll(endMessages);
                         Thread.sleep(1000); // wait for clients to shutdown
                         mClientNetwork.terminate();
                         Message uiShutdown = new Message(MessageTypes.SHUTDOWN, new JsonObject());

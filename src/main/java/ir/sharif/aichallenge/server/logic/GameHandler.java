@@ -6,6 +6,7 @@ import ir.sharif.aichallenge.server.common.network.data.Message;
 import ir.sharif.aichallenge.server.common.network.data.MessageTypes;
 import ir.sharif.aichallenge.server.common.network.data.PickInfo;
 import ir.sharif.aichallenge.server.engine.config.FileParam;
+import ir.sharif.aichallenge.server.engine.config.StringParam;
 import ir.sharif.aichallenge.server.engine.core.GameLogic;
 import ir.sharif.aichallenge.server.logic.dto.client.end.ClientEndMessage;
 import ir.sharif.aichallenge.server.logic.dto.client.init.ClientBaseKing;
@@ -21,7 +22,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class GameHandler implements GameLogic {
-    public static final FileParam PARAM_MAP = new FileParam("Map", null, ".*\\.map");
+    private static final FileParam PARAM_MAP = new FileParam("Map", null, ".*\\.map");
+    private static final StringParam[] CLIENT_NAMES = new StringParam[4];
 
     private Game game = new Game();
     private InitialMessage initialMessage;
@@ -30,6 +32,9 @@ public class GameHandler implements GameLogic {
     public GameHandler(AtomicInteger currentTurn, int extraTime) {
         game.setCurrentTurn(currentTurn);
         this.extraTime = extraTime;
+        for (int i = 0; i < 4; i++) {
+            CLIENT_NAMES[i] = new StringParam("TeamName"+i, "Team"+i);
+        }
     }
 
     @Override
@@ -63,7 +68,12 @@ public class GameHandler implements GameLogic {
             System.exit(0);
         }
 
-        game.init(initialMessage);
+        String[] clientNames = new String[4];
+        for (int i = 0; i < 4; i++) {
+            clientNames[i] = CLIENT_NAMES[i].getValue();
+        }
+
+        game.init(initialMessage, clientNames);
     }
 
     private String readMapFile(FileParam paramMap) {

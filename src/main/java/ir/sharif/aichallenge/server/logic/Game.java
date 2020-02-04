@@ -94,7 +94,7 @@ public class Game {
 
     //region Initializations
 
-    public void init(InitialMessage initialMessage) {
+    public void init(InitialMessage initialMessage, String[] clientNames) {
         gameConstants = initialMessage.getGameConstants();
 
         //init players
@@ -108,6 +108,9 @@ public class Game {
         initSpells(initialMessage.getSpells());
 
         graphicMessage.setInit(GraphicInit.makeGraphicInit(initialMessage));
+        graphicMessage.getInit().getGraphicMap().getKings().forEach(
+                graphicKing -> graphicKing.setName(clientNames[graphicKing.getPId()])
+        );
         serverViewLog.setInit(ServerLogHandler.makeInitMessage(initialMessage));
 
     }

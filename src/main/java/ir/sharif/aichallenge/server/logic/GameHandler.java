@@ -25,9 +25,11 @@ public class GameHandler implements GameLogic {
 
     private Game game = new Game();
     private InitialMessage initialMessage;
+    private final int extraTime;
 
-    public GameHandler(AtomicInteger currentTurn) {
+    public GameHandler(AtomicInteger currentTurn, int extraTime) {
         game.setCurrentTurn(currentTurn);
+        this.extraTime = extraTime;
     }
 
     @Override
@@ -38,9 +40,9 @@ public class GameHandler implements GameLogic {
     @Override
     public long getClientResponseTimeout() {
         if(game.getCurrentTurn().get() == 0) {
-            return initialMessage.getGameConstants().getPickTimeout();
+            return initialMessage.getGameConstants().getPickTimeout() + extraTime;
         }
-        return initialMessage.getGameConstants().getTurnTimeout();
+        return initialMessage.getGameConstants().getTurnTimeout() + extraTime;
     }
 
     @Override

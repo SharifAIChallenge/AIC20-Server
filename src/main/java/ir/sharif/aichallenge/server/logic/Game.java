@@ -3,6 +3,7 @@ package ir.sharif.aichallenge.server.logic;
 import ir.sharif.aichallenge.server.common.network.data.*;
 import ir.sharif.aichallenge.server.logic.dto.client.ClientCell;
 import ir.sharif.aichallenge.server.logic.dto.client.end.ClientEndMessage;
+import ir.sharif.aichallenge.server.logic.dto.client.end.PlayerScore;
 import ir.sharif.aichallenge.server.logic.dto.client.init.*;
 import ir.sharif.aichallenge.server.logic.dto.client.turn.ClientTurnMessage;
 import ir.sharif.aichallenge.server.logic.dto.client.turn.TurnCastSpell;
@@ -79,7 +80,9 @@ public class Game {
     @Getter
     private ServerLogHandler serverLogHandler = new ServerLogHandler();
 
+    @Getter
     private GraphicMessage graphicMessage = new GraphicMessage();
+
     @Getter
     private GraphicHandler graphicHandler = new GraphicHandler();
 
@@ -541,7 +544,21 @@ public class Game {
     }
 
     private void finishGame(int[] scores) {
-        //TODO: end loop, shutdown, ...
+
+        List<PlayerScore> playerScoreList = new ArrayList<>();
+        for (int pId=0; pId<4; pId++) {
+            PlayerScore playerScore = new PlayerScore(pId, scores[pId]);
+            playerScoreList.add(playerScore);
+        }
+
+        for (int pId=0; pId<4; pId++) {
+            clientEndMessages[pId] = new ClientEndMessage();
+            clientEndMessages[pId].setTurnMessage(clientTurnMessages[pId]);
+            clientEndMessages[pId].setScores(playerScoreList);
+        }
+
+        graphicMessage.setEnd(playerScoreList);
+
         isGameFinished = true;
     }
 

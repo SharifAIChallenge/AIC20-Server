@@ -185,6 +185,7 @@ public class GameHandler implements GameLogic {
     @Override
     public void terminate() {
         try {
+            game.getGraphicHandler().saveLastLog(game.getGraphicMessage());
             game.getGraphicHandler().getFile().close();
             ServerLogHandler.saveServerLog(game.getServerViewLog());
         } catch (Exception ex) {}

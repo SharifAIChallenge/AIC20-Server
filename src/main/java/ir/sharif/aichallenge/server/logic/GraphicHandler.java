@@ -72,4 +72,14 @@ public class GraphicHandler {
             } catch (Exception ex) { }
         }
     }
+
+    public void saveLastLog(GraphicMessage graphicMessage) {
+        String graphicLog = new Gson().toJson(graphicMessage);
+        try {
+            file.setLength(0);
+            file.write(graphicLog.getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

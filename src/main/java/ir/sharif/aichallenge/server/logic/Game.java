@@ -720,7 +720,7 @@ public class Game {
                     final King king = kings.get(pId); //TODO
                     int health = king.getHealth();
                     final Unit targetUnit = king.getMainUnit().getTargetUnit();
-                    return new TurnKing(pId, health > 0, health, targetUnit == null ? -1 : targetUnit.getId());
+                    return new TurnKing(pId, health > 0, health, (targetUnit == null || health <= 0) ? -1 : targetUnit.getId());
                 })
                 .collect(Collectors.toList());
 

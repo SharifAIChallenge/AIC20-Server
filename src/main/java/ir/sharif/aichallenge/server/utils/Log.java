@@ -1,5 +1,7 @@
 package ir.sharif.aichallenge.server.utils;
 
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
@@ -72,11 +74,16 @@ public final class Log {
         tr.printStackTrace(pw);
         return sw.toString();
     }
+
+    public static FileOutputStream outputFile = null;
+
     public static void log(int priority, String tag, String msg) {
         if (priority < LOG_LEVEL)
             return;
         if (DEV_MODE) {
-            System.err.printf("%s (%s): %s%n", LEVELS[priority], tag, msg);
+            PrintStream stream = new PrintStream(outputFile);
+            stream.printf("%s (%s): %s%n", LEVELS[priority], tag, msg);
+//            System.err.printf("%s (%s): %s%n", LEVELS[priority], tag, msg);
         } else {
             System.err.println(LEVELS[priority] + ": " + msg);
         }
@@ -86,7 +93,9 @@ public final class Log {
         if (priority < LOG_LEVEL)
             return;
         if (DEV_MODE) {
-            System.err.printf("%s (%s): %s%n", LEVELS[priority], tag, msg + '\n' + getStackTraceString(tr));
+            PrintStream stream = new PrintStream(outputFile);
+            stream.printf("%s (%s): %s%n", LEVELS[priority], tag, msg + '\n' + getStackTraceString(tr));
+//            System.err.printf("%s (%s): %s%n", LEVELS[priority], tag, msg + '\n' + getStackTraceString(tr));
         } else {
             System.err.println(LEVELS[priority] + ": " + msg);
         }

@@ -79,6 +79,7 @@ public class ClientNetwork extends NetServer {
         mTokens = new HashMap<>();
         mClients = new ArrayList<>();
         endReceivedFlags = new ArrayList<>();
+        isActiveFlags = new ArrayList<>();
         sendExecutor = Executors.newCachedThreadPool();
         receiveExecutor = Executors.newCachedThreadPool();
     }
@@ -131,7 +132,7 @@ public class ClientNetwork extends NetServer {
      */
     private ClientHandler newClient() {
         AtomicBoolean endReceivedFlag = new AtomicBoolean(false);
-        AtomicBoolean isActiveFlag = new AtomicBoolean(false);
+        AtomicBoolean isActiveFlag = new AtomicBoolean(true);
         ClientHandler client = new ClientHandler(simulationSemaphore, currentTurn, endReceivedFlag, isActiveFlag);
         sendExecutor.submit(client.getSender());
         endReceivedFlags.add(endReceivedFlag);

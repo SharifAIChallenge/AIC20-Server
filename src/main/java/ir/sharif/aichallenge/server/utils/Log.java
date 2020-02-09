@@ -75,15 +75,15 @@ public final class Log {
         return sw.toString();
     }
 
-    public static FileOutputStream outputFile = null;
+    public static PrintStream outputFile = null;
 
     public static void log(int priority, String tag, String msg) {
         if (priority < LOG_LEVEL)
             return;
         if (DEV_MODE) {
-            PrintStream stream = new PrintStream(outputFile);
-            stream.printf("%s (%s): %s%n", LEVELS[priority], tag, msg);
-//            System.err.printf("%s (%s): %s%n", LEVELS[priority], tag, msg);
+            if (outputFile != null)
+                outputFile.printf("%s (%s): %s%n", LEVELS[priority], tag, msg);
+            System.err.printf("%s (%s): %s%n", LEVELS[priority], tag, msg);
         } else {
             System.err.println(LEVELS[priority] + ": " + msg);
         }
@@ -93,9 +93,9 @@ public final class Log {
         if (priority < LOG_LEVEL)
             return;
         if (DEV_MODE) {
-            PrintStream stream = new PrintStream(outputFile);
-            stream.printf("%s (%s): %s%n", LEVELS[priority], tag, msg + '\n' + getStackTraceString(tr));
-//            System.err.printf("%s (%s): %s%n", LEVELS[priority], tag, msg + '\n' + getStackTraceString(tr));
+            if (outputFile != null)
+                outputFile.printf("%s (%s): %s%n", LEVELS[priority], tag, msg + '\n' + getStackTraceString(tr));
+            System.err.printf("%s (%s): %s%n", LEVELS[priority], tag, msg + '\n' + getStackTraceString(tr));
         } else {
             System.err.println(LEVELS[priority] + ": " + msg);
         }

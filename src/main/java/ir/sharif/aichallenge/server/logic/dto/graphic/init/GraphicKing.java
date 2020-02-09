@@ -23,7 +23,6 @@ public class GraphicKing {
         graphicKing.setCol(clientBaseKing.getCenter().getCol());
         graphicKing.setPId(clientBaseKing.getPlayerId());
         graphicKing.setHp(clientBaseKing.getHp());
-        //todo set name
         return graphicKing;
     }
 }

@@ -66,7 +66,7 @@ public class Game {
     @Getter
     private ClientTurnMessage[] clientTurnMessages = new ClientTurnMessage[4];
     @Getter
-    private ClientEndMessage[] clientEndMessages = new ClientEndMessage[4]; //todo set in end of game
+    private ClientEndMessage[] clientEndMessages = new ClientEndMessage[4];
     @Getter
     private Set<Integer> damageUpgradedUnits;
     @Getter
@@ -133,7 +133,7 @@ public class Game {
     }
 
     private void initMap(ClientMap clientMap) {
-        map = new Map(clientMap.getRows(), clientMap.getCols());
+        map = new Map(clientMap.getCols(), clientMap.getRows());
         List<ClientPath> clientPaths = clientMap.getPaths();
 
         HashMap<Cell, Integer> kingCellsWithIds = new HashMap<>();
@@ -305,10 +305,13 @@ public class Game {
                 .forEach(message -> {
                     try {
                         Unit unit = Objects.requireNonNull(unitsWithId.get(message.getUnitId()),
-                                "Unit doesn't exist. Unit id: " + message.getUnitId());   //todo if unit is kingUnit?
+                                "Unit doesn't exist. Unit id: " + message.getUnitId());
 
                         if (unit.getPlayer().getId() != message.getPlayerId())
                             throw new UpgradeOtherPlayerUnitException(message.getPlayerId(), unit.getPlayer().getId());
+
+                        if (unit instanceof KingUnit)
+                            throw new UnitIsKingException(message.getPlayerId(), unit.getId());
 
                         Player player = players[unit.getPlayer().getId()];
                         if (message.getType().equals(MessageTypes.UPGRADE_DAMAGE)) {
@@ -344,7 +347,7 @@ public class Game {
                     try {
                         Player player = players[info.getPlayerId()];
                         BaseUnit baseUnit = Objects.requireNonNull(BaseUnit.getInstance(info.getTypeId()),
-                                "Invalid unit type: " + info.getTypeId()); //TODO
+                                "Invalid unit type: " + info.getTypeId());
 
                         player.checkPutUnit(baseUnit);
 
@@ -431,11 +434,7 @@ public class Game {
             Unit unit = iterator.next().getValue();
             if (!unit.isAlive()) {
                 map.removeUnit(unit);
-
                 diedUnits.add(unit);
-
-                //todo refactor
-
                 iterator.remove();
             }
         }

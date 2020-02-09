@@ -11,17 +11,18 @@ public class SpellFactory {
 
     public static Spell createSpell(int typeId, Player player, Cell position, int unitId, Path path) {
         id++;
+        BaseSpell baseSpell = BaseSpell.getInstance(typeId);
         switch (BaseSpell.getTypeByTypeId(typeId)) {
             case HP:
-                return new HPSpell(id, BaseSpell.getInstance(typeId), player, position);
+                return new HPSpell(id, baseSpell, player, position);
             case HASTE:
-                return new HasteSpell(id, player, position);
+                return new HasteSpell(id, baseSpell, player, position);
             case TELE:
-                return new TeleportSpell(id, player, position, unitId,
+                return new TeleportSpell(id, baseSpell, player, position, unitId,
                         PathCell.createPathCell(path, path.shouldReverseForTeam(player.getTeam()), position));
 
             case DUPLICATE:
-                return new DuplicateSpell(id, player, position);
+                return new DuplicateSpell(id, baseSpell, player, position);
             default:
                 return null;
         }

@@ -1,6 +1,5 @@
 package ir.sharif.aichallenge.server.logic.map;
 
-import ir.sharif.aichallenge.server.logic.entities.TargetType;
 import ir.sharif.aichallenge.server.logic.entities.units.Unit;
 import ir.sharif.aichallenge.server.logic.exceptions.InvalidPathPutUnitException;
 import ir.sharif.aichallenge.server.logic.exceptions.LogicException;
@@ -11,12 +10,10 @@ import java.util.stream.Stream;
 
 public class Map {
     public HashMap<Integer, Path> paths;
+    private UnitsInCellsCollection unitsInCell;
 
-    UnitsInCellsCollection unitsInCell;
-    ArrayList<Unit> kings;
-
-    public Map(int height, int width) {
-        unitsInCell = new UnitsInCellsCollection(height, width);
+    public Map(int width, int height) {
+        unitsInCell = new UnitsInCellsCollection(width, height);
         paths = new HashMap<>();
     }
 

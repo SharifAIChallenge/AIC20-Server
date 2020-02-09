@@ -136,7 +136,7 @@ public class GameHandler implements GameLogic {
     }
 
     @Override
-    public void simulateEvents(Map<String, List<ClientMessageInfo>> messages) { //todo filter messages to be this turn
+    public void simulateEvents(Map<String, List<ClientMessageInfo>> messages) {
         if (game.getCurrentTurn().get() == 0) {
             List<ClientMessageInfo> clientMessageInfos = messages.get(MessageTypes.PICK);
             if (clientMessageInfos == null) {
@@ -172,7 +172,7 @@ public class GameHandler implements GameLogic {
 
     @Override
     public Message[] getClientMessages() {
-        if (game.getCurrentTurn().get() == 0) {     //todo check init is 0
+        if (game.getCurrentTurn().get() == 0) {
             return getClientInitialMessages();
         }
 

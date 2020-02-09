@@ -241,7 +241,8 @@ public class ClientHandler {
                         continue;
                     }
 
-                    if (lastReceivedMessage.getType().equals(MessageTypes.END_TURN)) {
+                    if (lastReceivedMessage.getType().equals(MessageTypes.END_TURN) &&
+                            !endReceived.get()) {
                         simulationSemaphore.release();
                         endReceived.set(true);
                         continue;

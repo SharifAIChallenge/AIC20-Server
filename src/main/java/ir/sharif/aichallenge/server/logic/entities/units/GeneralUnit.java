@@ -25,12 +25,19 @@ public class GeneralUnit extends Unit {
 
     public GeneralUnit(BaseUnit baseUnit, Player player) {
         this(baseUnit, player,
-                baseUnit.getBaseHealth(), baseUnit.getBaseDamage());
+                baseUnit.getBaseHealth(), -1);
     }
 
     @Override
     public int getSpeed() {
         return getBaseSpeed() + getSpeedIncrease();
+    }
+
+    @Override
+    public int getDamage() {
+        if (this.damage == -1)
+            return super.getDamage();
+        return this.damage;
     }
 
     @Override

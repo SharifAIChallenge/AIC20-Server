@@ -24,6 +24,8 @@ public interface GameLogic {
      */
     public int getClientsNum();
 
+    boolean[] getActiveClients();
+
     public long getClientResponseTimeout();
 
     public long getTurnTimeout();

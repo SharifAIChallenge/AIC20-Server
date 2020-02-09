@@ -69,6 +69,9 @@ public class ClientNetwork extends NetServer {
     //End flags for clients
     private ArrayList<AtomicBoolean> endReceivedFlags;
 
+    //Active flags for clients
+    private ArrayList<AtomicBoolean> isActiveFlags;
+
     /**
      * Constructor
      */
@@ -128,9 +131,11 @@ public class ClientNetwork extends NetServer {
      */
     private ClientHandler newClient() {
         AtomicBoolean endReceivedFlag = new AtomicBoolean(false);
-        ClientHandler client = new ClientHandler(simulationSemaphore, currentTurn, endReceivedFlag);
+        AtomicBoolean isActiveFlag = new AtomicBoolean(false);
+        ClientHandler client = new ClientHandler(simulationSemaphore, currentTurn, endReceivedFlag, isActiveFlag);
         sendExecutor.submit(client.getSender());
         endReceivedFlags.add(endReceivedFlag);
+        isActiveFlags.add(isActiveFlag);
         return client;
     }
 
@@ -228,6 +233,12 @@ public class ClientNetwork extends NetServer {
     public void startReceivingAll() {
         receiveTimeFlag = true;
         endReceivedFlags.forEach(endReceived -> endReceived.set(false));
+    }
+
+    public void setIsActiveFlags(boolean[] isActives) {
+        for (int i = 0; i < isActives.length; i++) {
+            isActiveFlags.get(i).set(isActives[i]);
+        }
     }
 
     /**

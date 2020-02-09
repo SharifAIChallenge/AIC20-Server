@@ -107,6 +107,11 @@ public class ClientHandler {
     private AtomicBoolean endReceived;
 
     /**
+     * True if client is not active anymore (is dead for example)
+     */
+    private AtomicBoolean isActive;
+
+    /**
      * Constructor.
      */
     public ClientHandler() {
@@ -117,7 +122,8 @@ public class ClientHandler {
         messageNotifier = new Object();
     }
 
-    public ClientHandler(Semaphore simulationSemaphore, AtomicInteger currentTurn, AtomicBoolean endReceived) {
+    public ClientHandler(Semaphore simulationSemaphore, AtomicInteger currentTurn,
+                         AtomicBoolean endReceived, AtomicBoolean isActive) {
         messagesToSend = new LinkedBlockingDeque<>();
         receivedMessages = new ArrayList<>();
         messagesQueued = new ArrayList<>();
@@ -127,6 +133,7 @@ public class ClientHandler {
         this.simulationSemaphore = simulationSemaphore;
         this.currentTurn = currentTurn;
         this.endReceived = endReceived;
+        this.isActive = isActive;
     }
 
     /**
@@ -231,6 +238,11 @@ public class ClientHandler {
         return () -> {
             while (!receiveTerminateFlag) {
                 try {
+                    if (!isActive.get()) {
+                        simulationSemaphore.release();
+                        endReceived.set(true);
+                        continue;
+                    }
                     receive();
                     if (!timeValidator.get() || lastReceivedMessage == null)
                         continue;

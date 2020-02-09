@@ -33,7 +33,7 @@ public class GameHandler implements GameLogic {
         game.setCurrentTurn(currentTurn);
         this.extraTime = extraTime;
         for (int i = 0; i < 4; i++) {
-            CLIENT_NAMES[i] = new StringParam("TeamName"+i, "Team"+i);
+            CLIENT_NAMES[i] = new StringParam("TeamName" + i, "Team" + i);
         }
     }
 
@@ -43,8 +43,17 @@ public class GameHandler implements GameLogic {
     }
 
     @Override
+    public boolean[] getActiveClients() {
+        boolean[] retVal = new boolean[4];
+        for (int i = 0; i < 4; i++) {
+            retVal[i] = game.isPlayerAlive(i);
+        }
+        return retVal;
+    }
+
+    @Override
     public long getClientResponseTimeout() {
-        if(game.getCurrentTurn().get() == 0) {
+        if (game.getCurrentTurn().get() == 0) {
             return initialMessage.getGameConstants().getPickTimeout() + extraTime;
         }
         return initialMessage.getGameConstants().getTurnTimeout() + extraTime;
@@ -61,8 +70,7 @@ public class GameHandler implements GameLogic {
         initialMessage = null;
         try {
             initialMessage = Json.GSON.fromJson(initStr, InitialMessage.class);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Invalid map file!");
             System.exit(0);
@@ -108,7 +116,7 @@ public class GameHandler implements GameLogic {
         ClientMap map = initialMessage.getMap();
         List<ClientBaseKing> kings = map.getKings();
         ClientBaseKing[] sortedKings = new ClientBaseKing[4];
-        for (ClientBaseKing king: kings) {
+        for (ClientBaseKing king : kings) {
             sortedKings[king.getPlayerId()] = king;
         }
 
@@ -200,7 +208,8 @@ public class GameHandler implements GameLogic {
             game.getGraphicHandler().saveLastLog(game.getGraphicMessage());
             game.getGraphicHandler().getFile().close();
             ServerLogHandler.saveServerLog(game.getServerViewLog());
-        } catch (Exception ex) {}
+        } catch (Exception ex) {
+        }
     }
 
     public int getCurrentTurn() {

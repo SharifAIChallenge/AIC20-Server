@@ -215,8 +215,7 @@ public class ClientNetwork extends NetServer {
      */
     public void stopReceivingAll() {
         receiveTimeFlag = false;
-        endReceivedFlags.get(0).set(true);
-        endReceivedFlags.get(1).set(true);
+        endReceivedFlags.forEach(endReceived -> endReceived.set(true));
     }
 
     /**
@@ -228,8 +227,7 @@ public class ClientNetwork extends NetServer {
      */
     public void startReceivingAll() {
         receiveTimeFlag = true;
-        endReceivedFlags.get(0).set(false);
-        endReceivedFlags.get(1).set(false);
+        endReceivedFlags.forEach(endReceived -> endReceived.set(false));
     }
 
     /**

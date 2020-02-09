@@ -166,7 +166,7 @@ public class Player {
         setSpellUsed(false);
         setUpgradeUsed(false);
 
-        ap ++;
+        ap++;
         ap = Math.min(ap, maxAP);
 
         updateHand();

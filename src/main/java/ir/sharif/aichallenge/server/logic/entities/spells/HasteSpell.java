@@ -6,9 +6,9 @@ import ir.sharif.aichallenge.server.logic.map.Cell;
 
 public class HasteSpell extends AreaSpell {
 
-    public HasteSpell(int id, Player player, Cell position) {
+    public HasteSpell(int id, BaseSpell baseSpell, Player player, Cell position) {
         //No need to get baseSpell from constructor
-        super(id, BaseSpell.getInstance(SpellType.HASTE), player, position);
+        super(id, baseSpell, player, position);
     }
 
 

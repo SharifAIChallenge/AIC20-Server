@@ -5,13 +5,14 @@ import ir.sharif.aichallenge.server.utils.Log;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Main {
 
     public static void main(String[] args) throws InterruptedException, FileNotFoundException {
         AtomicInteger currentTurn = new AtomicInteger(0);
-        Log.outputFile = new FileOutputStream("server.log", false);
+        Log.outputFile = new PrintStream(new FileOutputStream("server.log", false));
         int extraTime = extractExtraTime(args);
 
         GameServer gameServer = new GameServer(new GameHandler(currentTurn, extraTime), args, currentTurn);

@@ -27,8 +27,8 @@ public class TeleportSpell extends Spell {
     private Unit caughtUnit;
     private PathCell targetCell;
 
-    public TeleportSpell(int id, Player player, Cell position, int targetUnitId, PathCell targetCell) {
-        super(id, BaseSpell.getInstance(SpellType.TELE), player, position);
+    public TeleportSpell(int id, BaseSpell baseSpell, Player player, Cell position, int targetUnitId, PathCell targetCell) {
+        super(id, baseSpell, player, position);
         this.targetUnitId = targetUnitId;
         this.targetCell = targetCell;
     }

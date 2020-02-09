@@ -13,7 +13,7 @@ public class UnitsInCellsCollection {
     private int height;
     private LinkedList<Unit>[][] unitsInCell;
 
-    public UnitsInCellsCollection(int height, int width) {
+    public UnitsInCellsCollection(int width, int height) {
         this.width = width;
         this.height = height;
         unitsInCell = new LinkedList[height][width];

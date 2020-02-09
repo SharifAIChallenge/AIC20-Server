@@ -88,6 +88,7 @@ public class ClientNetwork extends NetServer {
         mTokens = new HashMap<>();
         mClients = new ArrayList<>();
         endReceivedFlags = new ArrayList<>();
+        isActiveFlags = new ArrayList<>();
         sendExecutor = Executors.newCachedThreadPool();
         receiveExecutor = Executors.newCachedThreadPool();
 

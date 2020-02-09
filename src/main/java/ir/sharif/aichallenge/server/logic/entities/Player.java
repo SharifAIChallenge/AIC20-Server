@@ -5,9 +5,6 @@ import ir.sharif.aichallenge.server.logic.exceptions.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -111,7 +108,6 @@ public class Player {
     }
 
     public void checkPutUnit(BaseUnit baseUnit) throws LogicException {
-
         if (!hand.contains(baseUnit)) throw new UnitNotInHandException(id, baseUnit.getType());
         if (ap < baseUnit.getCost()) throw new NotEnoughAPException(id, baseUnit.getCost(), ap);
 

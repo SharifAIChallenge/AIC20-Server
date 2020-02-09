@@ -30,7 +30,7 @@ public class Player {
     private int numberOfRangeUpgrades = 0;
 
     @Setter
-    private boolean upgradeUsed, spellUsed, putUsed;
+    private boolean upgradeUsed, spellUsed;
     private boolean deckInit;
 
     @Getter
@@ -40,8 +40,6 @@ public class Player {
 
     private Map<BaseUnit, Integer> baseUnitId = new HashMap<>();
 
-    private BaseUnit currentPutUnit;
-
     public Player(int id, int ap, int handSize, int deckSize) {
         this.id = id;
         this.ap = ap;
@@ -50,7 +48,7 @@ public class Player {
         this.handSize = handSize;
         this.deckSize = deckSize;
 
-        upgradeUsed = putUsed = spellUsed = false;
+        upgradeUsed = spellUsed = false;
         deckInit = false;
 
         numberOfUse = new int[deckSize];
@@ -116,17 +114,14 @@ public class Player {
 
         if (!hand.contains(baseUnit)) throw new UnitNotInHandException(id, baseUnit.getType());
         if (ap < baseUnit.getCost()) throw new NotEnoughAPException(id, baseUnit.getCost(), ap);
-        if (putUsed) throw new PutMoreThanOneUnitException(id);
 
     }
 
     public void putUnit(BaseUnit baseUnit) {
-        setPutUsed(true);
-
         numberOfUse[baseUnitId.get(baseUnit)]++;
-
-        currentPutUnit = baseUnit;
+        hand.remove(baseUnit);
         ap -= baseUnit.getCost();
+
     }
 
     public void checkSpell(int type) throws LogicException {
@@ -168,7 +163,6 @@ public class Player {
 
     public void reset() {
 
-        setPutUsed(false);
         setSpellUsed(false);
         setUpgradeUsed(false);
 
@@ -176,13 +170,10 @@ public class Player {
         ap = Math.min(ap, maxAP);
 
         updateHand();
+
     }
 
     private void updateHand() {
-
-        if (currentPutUnit == null) return;
-
-        hand.remove(currentPutUnit);
 
         List<BaseUnit> chances = new ArrayList<>();
         List<Double> probabilities = new ArrayList<>();
@@ -196,20 +187,26 @@ public class Player {
             normalize += prob;
         }
 
-        double random = Math.random() * normalize;
+        while(hand.size() < handSize) {
 
-        int ptr = chances.size() - 1;
+            double random = Math.random() * normalize;
 
-        for (int i = 0; i < chances.size(); i++) {
-            if (random <= probabilities.get(i)) {
-                ptr = i;
-                break;
+            int ptr = chances.size() - 1;
+
+            for (int i = 0; i < chances.size(); i++) {
+                if (random <= probabilities.get(i)) {
+                    ptr = i;
+                    break;
+                }
+                random -= probabilities.get(i);
             }
-            random -= probabilities.get(i);
-        }
 
-        hand.add(chances.get(ptr));
-        currentPutUnit = null;
+            hand.add(chances.get(ptr));
+            chances.remove(ptr);
+            normalize -= probabilities.get(ptr);
+            probabilities.remove(ptr);
+
+        }
     }
 
     public int getTeam() {

@@ -68,4 +68,9 @@ public class BaseUnit {
         this.targetType = targetType;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if(!(obj instanceof BaseUnit)) return false;
+        return ((BaseUnit) obj).type == this.type;
+    }
 }

@@ -314,8 +314,6 @@ public class Game {
                         if (message.getType().equals(MessageTypes.UPGRADE_DAMAGE)) {
                             player.useUpgradeDamage();
                             unit.upgradeDamage();
-                            System.out.println("New Damage --> " + unit.getId() + " :: " + unit.getDamage());
-                            System.out.println(unit.getBaseDamage() + ",," + unit.getDamageLevel());
                             damageUpgradedUnits.add(unit.getId());
                         } else {
                             player.useUpgradeRange();

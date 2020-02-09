@@ -785,7 +785,7 @@ public class Game {
 
     //endregion
 
-    private boolean isPlayerAlive(int playerId) {
+    public boolean isPlayerAlive(int playerId) {
         return kings.get(playerId).isAlive();
     }
 }

@@ -236,6 +236,7 @@ public class GameServer {
 
                 mClientNetwork.startReceivingAll();
                 mClientNetwork.sendAllBlocking();
+                mClientNetwork.setIsActiveFlags(mGameLogic.getActiveClients());
                 end = System.currentTimeMillis();
                 System.err.println((end - start) + " time spent to send the message.");
                 long timeout = mGameLogic.getClientResponseTimeout();

@@ -42,7 +42,8 @@ public abstract class AreaSpell extends Spell {
 
     @Override
     public void evaluateCaughtUnits() {
-        this.caughtUnits.removeIf(unit -> !unit.isAlive());
+        if (this.caughtUnits != null)
+            this.caughtUnits.removeIf(unit -> !unit.isAlive());
     }
 
     @Override

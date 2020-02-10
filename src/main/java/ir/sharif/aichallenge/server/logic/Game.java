@@ -410,6 +410,8 @@ public class Game {
         if (spells.isEmpty())
             return;
 
+        spells.forEach(Spell::evaluateCaughtUnits);
+
         Spell lastSpell = spells.first();
         for (Spell spell : spells) {
             if (spell.getType() != SpellType.HP && lastSpell.getType() == SpellType.HP)

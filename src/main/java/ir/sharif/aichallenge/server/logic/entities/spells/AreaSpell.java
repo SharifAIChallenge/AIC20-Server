@@ -41,8 +41,13 @@ public abstract class AreaSpell extends Spell {
     }
 
     @Override
+    public void evaluateCaughtUnits() {
+        this.caughtUnits.removeIf(unit -> !unit.isAlive());
+    }
+
+    @Override
     public void checkValid(Game game) throws LogicException {
-        if(this.getPosition().getRow() < 0 ||
+        if (this.getPosition().getRow() < 0 ||
                 this.getPosition().getCol() < 0 ||
                 this.getPosition().getRow() >= game.getMap().getHeight() ||
                 this.getPosition().getCol() >= game.getMap().getWidth())

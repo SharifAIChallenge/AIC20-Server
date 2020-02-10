@@ -72,6 +72,11 @@ public class TeleportSpell extends Spell {
     }
 
     @Override
+    public void evaluateCaughtUnits() {
+        //Nothing to do
+    }
+
+    @Override
     public TurnCastSpell getTurnCastSpell() {
         final TurnCastSpell turnCastSpell = super.getTurnCastSpell();
         turnCastSpell.setCell(new ClientCell(targetCell.getCell()));

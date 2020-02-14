@@ -43,11 +43,15 @@ public class GraphicHandler {
         Date date = new Date();
 
         try {
-            file = new RandomAccessFile("graphic--" + formatter.format(date) + ".json", "rwd");
+            File dirMaker = new File("log");
+            dirMaker.mkdir();
+
+            file = new RandomAccessFile("log/graphic--" + formatter.format(date) + ".json", "rwd");
             file.setLength(0);
 
         } catch (Exception ex) {
             System.out.println("Cannot Open graphic.json");
+            System.out.println(ex.getMessage());
         }
     }
 

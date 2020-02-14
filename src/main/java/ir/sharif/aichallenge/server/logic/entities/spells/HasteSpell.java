@@ -16,9 +16,4 @@ public class HasteSpell extends AreaSpell {
     protected void applyEffectOn(Unit unit) {
         unit.setSpeedIncrease(getPower());
     }
-
-    @Override
-    public int getPriority() {
-        return 2;
-    }
 }

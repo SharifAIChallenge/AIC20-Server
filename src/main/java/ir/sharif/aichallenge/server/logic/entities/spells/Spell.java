@@ -61,6 +61,8 @@ public abstract class Spell extends Entity {
 
     public abstract Collection<Unit> getCaughtUnits(); //todo bring caughtUnits here
 
+    public abstract void evaluateCaughtUnits();
+
     public int getRemainingTurns() {
         return remainingTurns;
     }

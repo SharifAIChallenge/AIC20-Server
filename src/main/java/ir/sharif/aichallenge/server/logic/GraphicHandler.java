@@ -43,7 +43,7 @@ public class GraphicHandler {
         Date date = new Date();
 
         try {
-            file = new RandomAccessFile("graphic" + formatter.format(date) + ".json", "rwd");
+            file = new RandomAccessFile("graphic--" + formatter.format(date) + ".json", "rwd");
             file.setLength(0);
 
         } catch (Exception ex) {

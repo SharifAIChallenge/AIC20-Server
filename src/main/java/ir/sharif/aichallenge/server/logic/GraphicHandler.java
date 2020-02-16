@@ -43,10 +43,10 @@ public class GraphicHandler {
         Date date = new Date();
 
         try {
-            File dirMaker = new File("log");
+            File dirMaker = new File("Log");
             dirMaker.mkdir();
 
-            file = new RandomAccessFile("log/graphic--" + formatter.format(date) + ".json", "rwd");
+            file = new RandomAccessFile("Log/graphic--" + formatter.format(date) + ".json", "rwd");
             file.setLength(0);
 
         } catch (Exception ex) {

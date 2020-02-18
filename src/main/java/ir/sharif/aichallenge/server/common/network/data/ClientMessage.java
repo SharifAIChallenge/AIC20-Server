@@ -2,6 +2,7 @@ package ir.sharif.aichallenge.server.common.network.data;
 
 import com.google.gson.JsonObject;
 import ir.sharif.aichallenge.server.common.network.Json;
+import ir.sharif.aichallenge.server.utils.Log;
 import lombok.Getter;
 
 import java.lang.reflect.Type;
@@ -35,6 +36,7 @@ public class ClientMessage extends Message {
                 clazz = PickInfo.class;
                 break;
             default:
+                Log.e("ClientMessage", "Invalid message type: " + this.getType());
                 return null;
         }
         return (ClientMessageInfo) Json.GSON.fromJson(this.getInfo(), clazz);

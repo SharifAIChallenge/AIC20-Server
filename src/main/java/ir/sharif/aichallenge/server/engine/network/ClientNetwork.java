@@ -114,14 +114,14 @@ public class ClientNetwork extends NetServer {
             ArrayList<Integer> arr = new ArrayList<>();
             arr.add(id);
             mTokens.put(token, arr);
-            mClients.add(newClient());
+            mClients.add(newClient(id));
         } else {
             ArrayList<Integer> arr = mTokens.get(token);
             if (arr == null)
                 arr = new ArrayList<>();
             arr.add(id);
             mTokens.put(token, arr);
-            mClients.add(newClient());
+            mClients.add(newClient(id));
         }
         return id;
     }
@@ -131,10 +131,10 @@ public class ClientNetwork extends NetServer {
      *
      * @return new handler
      */
-    private ClientHandler newClient() {
+    private ClientHandler newClient(int id) {
         AtomicBoolean endReceivedFlag = new AtomicBoolean(false);
         AtomicBoolean isActiveFlag = new AtomicBoolean(true);
-        ClientHandler client = new ClientHandler(simulationSemaphore, currentTurn, endReceivedFlag, isActiveFlag);
+        ClientHandler client = new ClientHandler(id, simulationSemaphore, currentTurn, endReceivedFlag, isActiveFlag);
         sendExecutor.submit(client.getSender());
         endReceivedFlags.add(endReceivedFlag);
         isActiveFlags.add(isActiveFlag);
@@ -264,6 +264,13 @@ public class ClientNetwork extends NetServer {
     public List<ClientMessageInfo> getReceivedEvents(int clientID) {
         return getReceivedMessages(clientID).stream()
                 .map(ClientMessage::getParsedInfo)
+                .filter(info -> {
+                    if (info == null) {
+                        Log.e("ClientNetwork", "Invalid message type from client: " + clientID);
+                        return false;
+                    }
+                    return true;
+                })
                 .collect(Collectors.toList());
     }
 

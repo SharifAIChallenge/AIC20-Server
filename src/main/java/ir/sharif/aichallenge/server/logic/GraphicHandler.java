@@ -8,7 +8,9 @@ import ir.sharif.aichallenge.server.logic.entities.Player;
 import lombok.Getter;
 
 import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class GraphicHandler {
 
@@ -36,12 +38,20 @@ public class GraphicHandler {
     }
 
     private void initSaver() {
+
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd----HH-mm-ss");
+        Date date = new Date();
+
         try {
-            file = new RandomAccessFile("graphic.json", "rwd");
+            File dirMaker = new File("Log");
+            dirMaker.mkdir();
+
+            file = new RandomAccessFile("Log/graphic--" + formatter.format(date) + ".json", "rwd");
             file.setLength(0);
 
         } catch (Exception ex) {
             System.out.println("Cannot Open graphic.json");
+            System.out.println(ex.getMessage());
         }
     }
 

@@ -11,11 +11,12 @@ import java.util.stream.Collectors;
 @Getter
 @Setter
 public class Player {
-
-    private int handSize, deckSize;
+    private int handSize;
+    private int deckSize;
     private int id;
     private int ap;
     private int maxAP;
+    private int apAddition;
 
     private Map<Integer, Integer> spellCount = new HashMap<>();
 
@@ -37,13 +38,13 @@ public class Player {
 
     private Map<BaseUnit, Integer> baseUnitId = new HashMap<>();
 
-    public Player(int id, int ap, int handSize, int deckSize) {
+    public Player(int id, int ap, int handSize, int deckSize, int apAddition) {
         this.id = id;
         this.ap = ap;
         this.maxAP = ap;
-
         this.handSize = handSize;
         this.deckSize = deckSize;
+        this.apAddition = apAddition;
 
         upgradeUsed = spellUsed = false;
         deckInit = false;
@@ -162,11 +163,11 @@ public class Player {
         setSpellUsed(false);
         setUpgradeUsed(false);
 
-        ap++;
+        ap += apAddition;
         ap = Math.min(ap, maxAP);
+        System.out.println(id + ": " + ap);
 
         updateHand();
-
     }
 
     private void updateHand() {

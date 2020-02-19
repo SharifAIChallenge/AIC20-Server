@@ -20,4 +20,5 @@ public class GameConstants {
     private int rangeUpgradeAddition;
     private int deckSize;
     private int handSize;
+    private int apAddition;
 }

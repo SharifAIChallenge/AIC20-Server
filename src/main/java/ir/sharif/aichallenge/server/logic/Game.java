@@ -96,7 +96,6 @@ public class Game {
 
     public void init(InitialMessage initialMessage, String[] clientNames) {
         gameConstants = initialMessage.getGameConstants();
-        System.out.println(gameConstants.getApAddition());
 
         //init players
         for (int i = 0; i < 4; i++)

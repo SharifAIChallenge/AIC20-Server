@@ -41,6 +41,10 @@ public class ClientHandler {
      */
     private static final String TAG = "ClientHandler";
 
+    private final String logTag;
+
+    private int id;
+
     /**
      * Socket of the client.
      */
@@ -111,19 +115,9 @@ public class ClientHandler {
      */
     private AtomicBoolean isActive;
 
-    /**
-     * Constructor.
-     */
-    public ClientHandler() {
-        messagesToSend = new LinkedBlockingDeque<>();
-        receivedMessages = new ArrayList<>();
-        messagesQueued = new ArrayList<>();
-        clientLock = new Object();
-        messageNotifier = new Object();
-    }
-
-    public ClientHandler(Semaphore simulationSemaphore, AtomicInteger currentTurn,
+    public ClientHandler(int id, Semaphore simulationSemaphore, AtomicInteger currentTurn,
                          AtomicBoolean endReceived, AtomicBoolean isActive) {
+        this.id = id;
         messagesToSend = new LinkedBlockingDeque<>();
         receivedMessages = new ArrayList<>();
         messagesQueued = new ArrayList<>();
@@ -134,6 +128,8 @@ public class ClientHandler {
         this.currentTurn = currentTurn;
         this.endReceived = endReceived;
         this.isActive = isActive;
+
+        this.logTag = TAG + this.id;
     }
 
     /**
@@ -178,7 +174,7 @@ public class ClientHandler {
                         continue;
                     client.send(msg);
                 } catch (Exception e) {
-                    Log.i(TAG, "Message sending failure", e);
+                    Log.i(logTag, "Message sending failure", e);
                 }
             }
         };
@@ -211,7 +207,7 @@ public class ClientHandler {
             if (client != null)
                 client.close();
         } catch (IOException e) {
-            Log.i(TAG, "socket closing failure", e);
+            Log.i(logTag, "socket closing failure", e);
             handleIOE(e);
         } finally {
             synchronized (clientLock) {
@@ -238,26 +234,29 @@ public class ClientHandler {
         return () -> {
             while (!receiveTerminateFlag) {
                 try {
-                    if (!isActive.get()) {
+                    if (!isActive.get() && !endReceived.get() && timeValidator.get()) {
                         simulationSemaphore.release();
                         endReceived.set(true);
-                        continue;
+                        Log.i(logTag, "Not waiting for messages because player is not active.");
                     }
+                    if (endReceived.get())
+                        continue;
                     receive();
                     if (!timeValidator.get() || lastReceivedMessage == null)
                         continue;
 
                     if (lastReceivedMessage.getTurn() != currentTurn.get())  //Invalid message
                     {
-                        Log.i(TAG, "Message received late.");
+                        Log.i(logTag, "Message received late.");
                         continue;
                     }
 
-                    if (lastReceivedMessage.getType().equals(MessageTypes.END_TURN) &&
-                            !endReceived.get()) {
-                        simulationSemaphore.release();
-                        endReceived.set(true);
-                        continue;
+                    if (lastReceivedMessage.getType().equals(MessageTypes.END_TURN)) {
+                        if (!endReceived.get()) {
+                            simulationSemaphore.release();
+                            endReceived.set(true);
+                        }
+                        continue;   //skipping end message
                     }
 
                     synchronized (receivedMessages) {
@@ -265,15 +264,15 @@ public class ClientHandler {
                     }
 
                 } catch (IOException e) {
-                    Log.i(TAG, "message receiving failure", e);
+                    Log.i(logTag, "message receiving failure", e);
                     handleIOE(e);
                 } catch (Exception e) {
-                    Log.i(TAG, "message receiving failure", e);
+                    Log.i(logTag, "message receiving failure", e);
                 }
             }
             if (!endReceived.get())
                 simulationSemaphore.release();
-            System.err.println("Client Terminated at turn " + currentTurn.get() + ".");
+            Log.i(logTag, String.format("Client Terminated at turn: %d", currentTurn.get()));
         };
     }
 

@@ -84,7 +84,7 @@ public abstract class Spell extends Entity {
                 .id(getId())
                 .casterId(getPlayer().getId())
                 .cell(new ClientCell(getPosition()))
-                .wasCastThisTurn(isFirstTurn())
+                .wasCastThisTurn(getRemainingTurns() + 1 == getDuration())
                 .typeId(getTypeId())
                 .remainingTurns(getRemainingTurns())
                 .build();

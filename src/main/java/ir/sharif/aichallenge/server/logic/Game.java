@@ -682,7 +682,7 @@ public class Game {
         ClientCell clientTargetCell = targetCell == null ? null : new ClientCell(targetCell);
         return TurnUnit.builder().unitId(unit.getId()).playerId(unit.getPlayer().getId()).typeId(unit.getBaseUnit().getType()).
                 pathId(pathId).cell(new ClientCell(unit.getCell()))
-                .hp(unit.getHealth())
+                .hp(Math.max(unit.getHealth(), 0))
                 .attack(unit.getDamage()).damageLevel(unit.getDamageLevel())
                 .range(unit.getRange()).rangeLevel(unit.getRangeLevel())
                 .isDuplicate(unit.isDuplicate())
@@ -717,7 +717,7 @@ public class Game {
                     final King king = kings.get(pId); //TODO
                     int health = king.getHealth();
                     final Unit targetUnit = king.getMainUnit().getTargetUnit();
-                    return new TurnKing(pId, health > 0, health, (targetUnit == null || health <= 0) ? -1 : targetUnit.getId());
+                    return new TurnKing(pId, health > 0, Math.max(health, 0), (targetUnit == null || health <= 0) ? -1 : targetUnit.getId());
                 })
                 .collect(Collectors.toList());
 

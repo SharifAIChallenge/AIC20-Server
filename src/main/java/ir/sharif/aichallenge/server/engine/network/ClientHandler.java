@@ -238,8 +238,9 @@ public class ClientHandler {
                         simulationSemaphore.release();
                         endReceived.set(true);
                         Log.i(logTag, "Not waiting for messages because player is not active.");
-                        continue;
                     }
+                    if (endReceived.get())
+                        continue;
                     receive();
                     if (!timeValidator.get() || lastReceivedMessage == null)
                         continue;

@@ -6,7 +6,7 @@ import lombok.*;
 
 import java.util.Set;
 
-@Builder
+@Builder(toBuilder = true)
 @Getter
 @Setter
 @AllArgsConstructor

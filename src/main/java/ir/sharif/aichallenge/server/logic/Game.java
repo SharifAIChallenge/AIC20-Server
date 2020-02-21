@@ -215,8 +215,7 @@ public class Game {
         System.out.println();
 
         System.out.println("Debug Players");
-        for (Player player : players)
-        {
+        for (Player player : players) {
             System.out.println(player.getId() + " --> " + player.getAp());
             for (int id : player.getHandIds())
                 System.out.print(id + ", ");
@@ -229,7 +228,7 @@ public class Game {
 
         System.out.println("Debug Units");
         for (Unit unit : unitsWithId.values()) {
-            if(unit instanceof KingUnit) continue ;
+            if (unit instanceof KingUnit) continue;
             System.out.println(unit.getPlayer().getId() + " , " + unit.getId());
             System.out.println(unit.getCell().getRow() + " , " + unit.getCell().getCol());
             System.out.println();
@@ -472,11 +471,10 @@ public class Game {
                 map.getUnits(targetUnit.getCell())
                         .filter(unit::isTarget)
                         .forEach(
-                        defender -> currentAttacks.add(TurnAttack.getTurnAttack(unit, defender))
-                );
+                                defender -> currentAttacks.add(TurnAttack.getTurnAttack(unit, defender))
+                        );
 
-            }
-            else {
+            } else {
                 currentAttacks.add(TurnAttack.getTurnAttack(unit, targetUnit));
                 targetUnit.decreaseHealth(unit.getDamage());
             }
@@ -551,12 +549,12 @@ public class Game {
     private void finishGame(int[] scores) {
 
         List<PlayerScore> playerScoreList = new ArrayList<>();
-        for (int pId=0; pId<4; pId++) {
+        for (int pId = 0; pId < 4; pId++) {
             PlayerScore playerScore = new PlayerScore(pId, scores[pId]);
             playerScoreList.add(playerScore);
         }
 
-        for (int pId=0; pId<4; pId++) {
+        for (int pId = 0; pId < 4; pId++) {
             clientEndMessages[pId] = new ClientEndMessage();
             clientEndMessages[pId].setTurnMessage(clientTurnMessages[pId]);
             clientEndMessages[pId].setScores(playerScoreList);
@@ -697,17 +695,17 @@ public class Game {
                 .wasPlayedThisTurn(playedUnits.contains(unit.getId())).build();
     }
 
-    private void bindPathId(TurnUnit tunit, int sendToId, Unit unit) {
-        tunit.setPathId(unit.getPlayer().isAlly(sendToId) ? unit.getPath().getId() : -1);
+    private TurnUnit bindPathId(TurnUnit tunit, int sendToId, Unit unit) {
+        return tunit.toBuilder().pathId(unit.getPlayer().isAlly(sendToId) ? unit.getPath().getId() : -1).build();
     }
 
     private int getPlayerId(int unitId) {
         int pId = 0;
-        if(unitsWithId.containsKey(unitId))
+        if (unitsWithId.containsKey(unitId))
             pId = unitsWithId.get(unitId).getPlayer().getId();
         else {
             for (Unit dead : diedUnits)
-                if(dead.getId() == unitId)
+                if (dead.getId() == unitId)
                     pId = dead.getPlayer().getId();
         }
         return pId;
@@ -733,7 +731,7 @@ public class Game {
 
         List<TurnUnit> deadTurnUnits = new ArrayList<>();
         for (Unit deadUnit : diedUnits) {
-            if(deadUnit instanceof KingUnit) continue ;
+            if (deadUnit instanceof KingUnit) continue;
             TurnUnit turnUnit = buildTurnUnit(deadUnit);
             deadTurnUnits.add(turnUnit);
         }
@@ -744,10 +742,11 @@ public class Game {
             final ClientTurnMessage message = clientTurnMessages[pId];
             final Player player = players[pId];
 
+            final List<TurnUnit> turnUnitsWithPathIds = new ArrayList<>(turnUnits.size());
             for (int i = 0; i < units.size(); i++)
-                bindPathId(turnUnits.get(i), pId, units.get(i));
+                turnUnitsWithPathIds.add(bindPathId(turnUnits.get(i), pId, units.get(i)));
 
-            message.setUnits(turnUnits);
+            message.setUnits(turnUnitsWithPathIds);
             message.setCurrTurn(currentTurn.get());
 
             message.setDiedUnits(deadTurnUnits);

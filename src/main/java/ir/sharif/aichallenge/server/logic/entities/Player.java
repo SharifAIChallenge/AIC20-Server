@@ -165,7 +165,6 @@ public class Player {
 
         ap += apAddition;
         ap = Math.min(ap, maxAP);
-        System.out.println(id + ": " + ap);
 
         updateHand();
     }

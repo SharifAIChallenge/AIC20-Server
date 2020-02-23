@@ -291,7 +291,7 @@ public class ClientNetwork extends NetServer {
         });
     }
 
-    private void verifyClient(JsonSocket client) throws Exception {
+    private synchronized void verifyClient(JsonSocket client) throws Exception {
         // get the token, timeout is 2000 seconds
         Future<Message> futureMessage
                 = acceptExecutor.submit(() -> client.get(Message.class));

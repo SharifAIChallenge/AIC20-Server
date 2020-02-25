@@ -673,7 +673,7 @@ public class Game {
         Cell targetCell = null;
         if (unit.getTargetUnit() != null) {
             if (unit.getTargetUnit() instanceof KingUnit)
-                targetId = unit.getPlayer().getId();
+                targetId = unit.getTargetUnit().getPlayer().getId();
             else
                 targetId = unit.getTargetUnit().getId();
             targetCell = unit.getTargetUnit().getCell();

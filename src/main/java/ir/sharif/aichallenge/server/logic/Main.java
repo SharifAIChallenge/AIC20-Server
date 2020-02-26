@@ -3,6 +3,7 @@ package ir.sharif.aichallenge.server.logic;
 import ir.sharif.aichallenge.server.engine.core.GameServer;
 import ir.sharif.aichallenge.server.utils.Log;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
@@ -12,7 +13,8 @@ public class Main {
 
     public static void main(String[] args) throws InterruptedException, FileNotFoundException {
         AtomicInteger currentTurn = new AtomicInteger(0);
-        Log.outputFile = new PrintStream(new FileOutputStream("server.log", false));
+        new File("Log/server").mkdirs();
+        Log.outputFile = new PrintStream(new FileOutputStream("Log/server/server.log", false));
         int extraTime = extractExtraTime(args);
 
         GameServer gameServer = new GameServer(new GameHandler(currentTurn, extraTime), args, currentTurn);

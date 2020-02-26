@@ -7,6 +7,7 @@ import ir.sharif.aichallenge.server.logic.dto.client.turn.TurnUnit;
 import ir.sharif.aichallenge.server.logic.entities.units.KingUnit;
 import ir.sharif.aichallenge.server.logic.entities.units.Unit;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
@@ -63,7 +64,9 @@ public class ServerLogHandler {
         RandomAccessFile file;
         String serverLog = new Gson().toJson(serverViewLog);
         try {
-            file = new RandomAccessFile("server_log.json", "rwd");
+            new File("Log/server").mkdirs();
+
+            file = new RandomAccessFile("Log/server/server_log.json", "rwd");
             file.setLength(0);
             file.write(serverLog.getBytes());
             file.close();

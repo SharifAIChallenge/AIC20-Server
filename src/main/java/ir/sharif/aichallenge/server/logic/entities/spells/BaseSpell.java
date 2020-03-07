@@ -4,11 +4,13 @@ import ir.sharif.aichallenge.server.logic.dto.client.init.ClientSpell;
 import ir.sharif.aichallenge.server.logic.exceptions.LogicException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.util.HashMap;
 
 @Getter
 @AllArgsConstructor
+@ToString
 public class BaseSpell {
 
     private static HashMap<Integer, BaseSpell> instances = new HashMap<>();
@@ -43,3 +45,5 @@ public class BaseSpell {
     private SpellTargetType targetType;
     private int power;
 }
+
+

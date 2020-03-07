@@ -11,12 +11,14 @@ import ir.sharif.aichallenge.server.logic.exceptions.LogicException;
 import ir.sharif.aichallenge.server.logic.map.Cell;
 import ir.sharif.aichallenge.server.logic.map.Map;
 import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.Delegate;
 
 import java.util.Collection;
 import java.util.stream.Stream;
 
 @Getter
+@ToString
 public abstract class Spell extends Entity {
 
     @Delegate

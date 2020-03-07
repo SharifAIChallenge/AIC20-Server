@@ -188,21 +188,25 @@ public class Game {
 
     //TODO: exception handling
     public void pick(List<PickInfo> messages) {
-        currentTurn.incrementAndGet();
+        try {
+            currentTurn.incrementAndGet();
 
-        for (PickInfo pickInfo : messages) {
-            int playerId = pickInfo.getPlayerId();
-            players[playerId].initDeck(pickInfo.getUnits(), numberOfBaseUnits);
+            for (PickInfo pickInfo : messages) {
+                int playerId = pickInfo.getPlayerId();
+                players[playerId].initDeck(pickInfo.getUnits(), numberOfBaseUnits);
+            }
+
+            for (int pId = 0; pId < 4; pId++)
+                if (!players[pId].getDeckInit())
+                    players[pId].initDeck(new ArrayList<>(), numberOfBaseUnits);
+
+            initializeTurn();
+            checkToGiveUpgradeTokens();
+            checkToGiveSpells();
+            fillClientMessage();
+        } catch (Exception ex) {
+            Log.e("Error", "Unhandled exception", ex);
         }
-
-        for (int pId = 0; pId < 4; pId++)
-            if (!players[pId].getDeckInit())
-                players[pId].initDeck(new ArrayList<>(), numberOfBaseUnits);
-
-        initializeTurn();
-        checkToGiveUpgradeTokens();
-        checkToGiveSpells();
-        fillClientMessage();
     }
 
     private void debug() {
@@ -278,8 +282,12 @@ public class Game {
     }
 
     private void addTurnInfoToLog() {
-        TurnInfo turnInfo = ServerLogHandler.getTurnInfo(this);
-        serverViewLog.getTurns().add(turnInfo);
+        try {
+            TurnInfo turnInfo = ServerLogHandler.getTurnInfo(this);
+            serverViewLog.getTurns().add(turnInfo);
+        } catch (Exception ex) {
+            Log.e("Error", "Exception in server log.", ex);
+        }
     }
 
     private void initializeTurn() {
@@ -300,20 +308,20 @@ public class Game {
         if (upgradeMessages == null)
             return;
 
-        upgradeMessages.stream().map(info -> (UpgradeInfo) info)
-                .forEach(message -> {
+        upgradeMessages.stream().map(message -> (UpgradeInfo) message)
+                .forEach(info -> {
                     try {
-                        Unit unit = Objects.requireNonNull(unitsWithId.get(message.getUnitId()),
-                                "Unit doesn't exist. Unit id: " + message.getUnitId());
+                        Unit unit = Objects.requireNonNull(unitsWithId.get(info.getUnitId()),
+                                "Unit doesn't exist. Unit id: " + info.getUnitId());
 
-                        if (unit.getPlayer().getId() != message.getPlayerId())
-                            throw new UpgradeOtherPlayerUnitException(message.getPlayerId(), unit.getPlayer().getId());
+                        if (unit.getPlayer().getId() != info.getPlayerId())
+                            throw new UpgradeOtherPlayerUnitException(info.getPlayerId(), unit.getPlayer().getId());
 
                         if (unit instanceof KingUnit)
-                            throw new UnitIsKingException(message.getPlayerId(), unit.getId());
+                            throw new UnitIsKingException(info.getPlayerId(), unit.getId());
 
                         Player player = players[unit.getPlayer().getId()];
-                        if (message.getType().equals(MessageTypes.UPGRADE_DAMAGE)) {
+                        if (info.getType().equals(MessageTypes.UPGRADE_DAMAGE)) {
                             player.useUpgradeDamage();
                             unit.upgradeDamage();
                             damageUpgradedUnits.add(unit.getId());
@@ -324,12 +332,14 @@ public class Game {
                         }
 
                         Log.i("game_upgrade_unit", "Player " + unit.getPlayer().getId() + " " +
-                                message.getType() + " " + unit.getId());
+                                info.getType() + " " + unit.getId());
 
                         currentUpgradedUnits.add(unit.getId());
 
                     } catch (LogicException | NullPointerException ex) {
                         Log.i("Logic error:", ex.getMessage());
+                    } catch (Exception ex) {
+                        Log.e("Error", "Exception in applying upgrades. Upgrade info: " + info, ex);
                     }
                 });
     }
@@ -367,6 +377,8 @@ public class Game {
 
                     } catch (LogicException | NullPointerException ex) {
                         Log.i("Logic error:", ex.getMessage());
+                    } catch (Exception ex) {
+                        Log.e("Error", "Exception in putting units. Put info: " + info, ex);
                     }
                 });
     }
@@ -374,9 +386,13 @@ public class Game {
     private void evaluateSpells() {
         List<Spell> removeSpells = new ArrayList<>();
         for (Spell spell : spells) {
-            if (spell.shouldRemove()) {
-                spell.getCaughtUnits().forEach(unit -> unit.removeActiveSpell(spell.getId()));
-                removeSpells.add(spell);
+            try {
+                if (spell.shouldRemove()) {
+                    spell.getCaughtUnits().forEach(unit -> unit.removeActiveSpell(spell.getId()));
+                    removeSpells.add(spell);
+                }
+            } catch (Exception ex) {
+                Log.e("Error", "Exception in evaluating spell. Spell: " + spell, ex);
             }
         }
 
@@ -403,6 +419,8 @@ public class Game {
                     spells.add(spell);
                 } catch (LogicException | NullPointerException ex) {
                     Log.i("Logic error:", ex.getMessage());
+                } catch (Exception ex) {
+                    Log.e("Error", "Exception in casting spells. Spell cast info: " + info, ex);
                 }
             });
 
@@ -425,65 +443,83 @@ public class Game {
                 Log.i("game_cast_spell", turnCastSpell.toString());
             } catch (LogicException ex) {
                 Log.i("Logic error:", ex.getMessage());
+            } catch (Exception ex) {
+                Log.e("Error", "Exception in applying spells. Spell: " + spell, ex);
             }
         }
 
     }
 
     private void evaluateUnits() {
-        for (Iterator<java.util.Map.Entry<Integer, Unit>> iterator = unitsWithId.entrySet().iterator(); iterator.hasNext(); ) {
-            Unit unit = iterator.next().getValue();
-            if (!unit.isAlive()) {
-                map.removeUnit(unit);
-                diedUnits.add(unit);
-                iterator.remove();
+        try {
+            for (Iterator<java.util.Map.Entry<Integer, Unit>> iterator = unitsWithId.entrySet().iterator(); iterator.hasNext(); ) {
+                Unit unit = iterator.next().getValue();
+                if (!unit.isAlive()) {
+                    map.removeUnit(unit);
+                    diedUnits.add(unit);
+                    iterator.remove();
+                }
             }
+        } catch (Exception ex) {
+            Log.e("Error", "Exception in evaluating units.", ex);
         }
     }
 
     private void resetPlayers() {
-        Arrays.stream(players).forEach(Player::reset);
+        try {
+            Arrays.stream(players).forEach(Player::reset);
+        } catch (Exception ex) {
+            Log.e("Error", "Exception in resetting players.", ex);
+        }
     }
 
     private void setUnitsTargets() {
-        unitsWithId.values().forEach(unit -> unit.findTarget(map));
+        unitsWithId.values().forEach(unit -> {
+            try {
+                unit.findTarget(map);
+            } catch (Exception ex) {
+                Log.e("Error", "Exception in finding target. Unit: " + unit, ex);
+            }
+        });
     }
 
     private void attack() {
         currentAttacks = new ArrayList<>();
 
-        for (Unit unit : unitsWithId.values()) {
-            Unit targetUnit = unit.getTargetUnit();
+        for (Unit unit : unitsWithId.values())
+            try {
+                Unit targetUnit = unit.getTargetUnit();
 
+                if (targetUnit == null) {
+                    unit.setHasAttacked(false);
+                    continue;
+                }
 
-            if (targetUnit == null) {
-                unit.setHasAttacked(false);
-                continue;
+                unit.setHasAttacked(true);
+                if (unit.isMultiTarget()) {
+                    map.getUnits(targetUnit.getCell())
+                            .filter(unit::isTarget)
+                            .forEach(target -> {
+                                target.decreaseHealth(unit.getDamage());
+                                currentAttacks.add(TurnAttack.getTurnAttack(unit, target));
+                            });
+                } else {
+                    currentAttacks.add(TurnAttack.getTurnAttack(unit, targetUnit));
+                    targetUnit.decreaseHealth(unit.getDamage());
+                }
+            } catch (Exception ex) {
+                Log.e("Error", "Exception in attack. Unit: " + unit, ex);
             }
-
-            unit.setHasAttacked(true);
-            if (unit.isMultiTarget()) {
-                map.getUnits(targetUnit.getCell())
-                        .filter(unit::isTarget)
-                        .forEach(target -> target.decreaseHealth(unit.getDamage()));
-
-                map.getUnits(targetUnit.getCell())
-                        .filter(unit::isTarget)
-                        .forEach(
-                                defender -> currentAttacks.add(TurnAttack.getTurnAttack(unit, defender))
-                        );
-
-            } else {
-                currentAttacks.add(TurnAttack.getTurnAttack(unit, targetUnit));
-                targetUnit.decreaseHealth(unit.getDamage());
-            }
-        }
     }
 
     private void move() {
         for (Unit unit : unitsWithId.values())
-            if (unit.isAlive() && !unit.hasAttacked())
-                map.moveUnit(unit, unit.getNextMoveCell());
+            try {
+                if (unit.isAlive() && !unit.hasAttacked())
+                    map.moveUnit(unit, unit.getNextMoveCell());
+            } catch (Exception ex) {
+                Log.e("Error", "Exception in move. Unit: " + unit, ex);
+            }
     }
 
     public GeneralUnit cloneUnit(Unit unit, int rateOfHealthOfCloneUnit, int rateOfDamageCloneUnit) {
@@ -546,22 +582,25 @@ public class Game {
     }
 
     private void finishGame(int[] scores) {
+        try {
+            List<PlayerScore> playerScoreList = new ArrayList<>();
+            for (int pId = 0; pId < 4; pId++) {
+                PlayerScore playerScore = new PlayerScore(pId, scores[pId]);
+                playerScoreList.add(playerScore);
+            }
 
-        List<PlayerScore> playerScoreList = new ArrayList<>();
-        for (int pId = 0; pId < 4; pId++) {
-            PlayerScore playerScore = new PlayerScore(pId, scores[pId]);
-            playerScoreList.add(playerScore);
+            for (int pId = 0; pId < 4; pId++) {
+                clientEndMessages[pId] = new ClientEndMessage();
+                clientEndMessages[pId].setTurnMessage(clientTurnMessages[pId]);
+                clientEndMessages[pId].setScores(playerScoreList);
+            }
+
+            graphicMessage.setEnd(playerScoreList);
+
+            isGameFinished = true;
+        } catch (Exception ex) {
+            Log.e("Error", "Exception in finishing game.", ex);
         }
-
-        for (int pId = 0; pId < 4; pId++) {
-            clientEndMessages[pId] = new ClientEndMessage();
-            clientEndMessages[pId].setTurnMessage(clientTurnMessages[pId]);
-            clientEndMessages[pId].setScores(playerScoreList);
-        }
-
-        graphicMessage.setEnd(playerScoreList);
-
-        isGameFinished = true;
     }
 
     //region Token Givings
@@ -583,13 +622,15 @@ public class Game {
     }
 
     private void giveSpellToPlayer(int playerId, int type) {
+        try {
+            players[playerId].addSpell(type);
+            clientTurnMessages[playerId].setReceivedSpell(type);
+            clientTurnMessages[playerId ^ 2].setFriendReceivedSpell(type);
 
-        players[playerId].addSpell(type);
-        clientTurnMessages[playerId].setReceivedSpell(type);
-        clientTurnMessages[playerId ^ 2].setFriendReceivedSpell(type);
-
-        players[playerId].setReceivedSpell(type);
-
+            players[playerId].setReceivedSpell(type);
+        } catch (Exception ex) {
+            Log.e("Error", String.format("Exception in give upgrade spell. Player id: %d, Type: %d", playerId, type), ex);
+        }
     }
 
     private void giveSpells() {
@@ -651,15 +692,23 @@ public class Game {
     }
 
     private void giveUpgradeDamageToPlayer(int playerId) {
-        players[playerId].addUpgradeDamageToken();
-        clientTurnMessages[playerId].setGotDamageUpgrade(true);
-        players[playerId].setGotDamageUpgrade(true);
+        try {
+            players[playerId].addUpgradeDamageToken();
+            clientTurnMessages[playerId].setGotDamageUpgrade(true);
+            players[playerId].setGotDamageUpgrade(true);
+        } catch (Exception ex) {
+            Log.e("Error", "Exception in give upgrade damage. Player id: " + playerId, ex);
+        }
     }
 
     private void giveUpgradeRangeToPlayer(int playerId) {
-        players[playerId].addUpgradeRangeToken();
-        clientTurnMessages[playerId].setGotRangeUpgrade(true);
-        players[playerId].setGotRangeUpgrade(true);
+        try {
+            players[playerId].addUpgradeRangeToken();
+            clientTurnMessages[playerId].setGotRangeUpgrade(true);
+            players[playerId].setGotRangeUpgrade(true);
+        } catch (Exception ex) {
+            Log.e("Error", "Exception in give upgrade range. Player id: " + playerId, ex);
+        }
     }
 
     //endregion
@@ -711,66 +760,71 @@ public class Game {
     }
 
     private void fillClientMessage() {
+        try {
+            List<TurnKing> turnKings = IntStream.range(0, 4).boxed()
+                    .map(pId -> {
+                        final King king = kings.get(pId); //TODO
+                        int health = king.getHealth();
+                        final Unit targetUnit = king.getMainUnit().getTargetUnit();
+                        return new TurnKing(pId, health > 0, Math.max(health, 0), (targetUnit == null || health <= 0) ? -1 : targetUnit.getId());
+                    })
+                    .collect(Collectors.toList());
 
-        List<TurnKing> turnKings = IntStream.range(0, 4).boxed()
-                .map(pId -> {
-                    final King king = kings.get(pId); //TODO
-                    int health = king.getHealth();
-                    final Unit targetUnit = king.getMainUnit().getTargetUnit();
-                    return new TurnKing(pId, health > 0, Math.max(health, 0), (targetUnit == null || health <= 0) ? -1 : targetUnit.getId());
-                })
-                .collect(Collectors.toList());
-
-        final List<Unit> units = new ArrayList<>(unitsWithId.values())
-                .stream().filter(unit -> !(unit instanceof KingUnit)).collect(Collectors.toList());
-        final List<TurnUnit> turnUnits = units.stream()
-                .map(this::buildTurnUnit)
-                .collect(Collectors.toList());
+            final List<Unit> units = new ArrayList<>(unitsWithId.values())
+                    .stream().filter(unit -> !(unit instanceof KingUnit)).collect(Collectors.toList());
+            final List<TurnUnit> turnUnits = units.stream()
+                    .map(this::buildTurnUnit)
+                    .collect(Collectors.toList());
 
 
-        List<TurnUnit> deadTurnUnits = new ArrayList<>();
-        for (Unit deadUnit : diedUnits) {
-            if (deadUnit instanceof KingUnit) continue;
-            TurnUnit turnUnit = buildTurnUnit(deadUnit);
-            deadTurnUnits.add(turnUnit);
+            List<TurnUnit> deadTurnUnits = new ArrayList<>();
+            for (Unit deadUnit : diedUnits) {
+                if (deadUnit instanceof KingUnit) continue;
+                TurnUnit turnUnit = buildTurnUnit(deadUnit);
+                deadTurnUnits.add(turnUnit);
+            }
+
+            for (int pId = 0; pId < 4; pId++) {
+                int friendId = pId ^ 2;
+
+                final ClientTurnMessage message = clientTurnMessages[pId];
+                final Player player = players[pId];
+
+                final List<TurnUnit> turnUnitsWithPathIds = new ArrayList<>(turnUnits.size());
+                for (int i = 0; i < units.size(); i++)
+                    turnUnitsWithPathIds.add(bindPathId(turnUnits.get(i), pId, units.get(i)));
+
+                message.setUnits(turnUnitsWithPathIds);
+                message.setCurrTurn(currentTurn.get());
+
+                message.setDiedUnits(deadTurnUnits);
+                message.setKings(turnKings);
+
+                message.setAvailableRangeUpgrades(player.getNumberOfRangeUpgrades());
+                message.setAvailableDamageUpgrades(player.getNumberOfDamageUpgrades());
+
+                message.setRemainingAP(player.getAp());
+
+                message.setMySpells(player.getAvailableSpellIds());
+                message.setFriendSpells(players[friendId].getAvailableSpellIds());
+                message.setCastSpells(turnCastSpells);
+
+                message.setDeck(player.getDeckIds());
+                message.setHand(player.getHandIds());
+            }
+        } catch (Exception ex) {
+            Log.e("Error", "Exception in filling client messages.", ex);
         }
-
-        for (int pId = 0; pId < 4; pId++) {
-            int friendId = pId ^ 2;
-
-            final ClientTurnMessage message = clientTurnMessages[pId];
-            final Player player = players[pId];
-
-            final List<TurnUnit> turnUnitsWithPathIds = new ArrayList<>(turnUnits.size());
-            for (int i = 0; i < units.size(); i++)
-                turnUnitsWithPathIds.add(bindPathId(turnUnits.get(i), pId, units.get(i)));
-
-            message.setUnits(turnUnitsWithPathIds);
-            message.setCurrTurn(currentTurn.get());
-
-            message.setDiedUnits(deadTurnUnits);
-            message.setKings(turnKings);
-
-            message.setAvailableRangeUpgrades(player.getNumberOfRangeUpgrades());
-            message.setAvailableDamageUpgrades(player.getNumberOfDamageUpgrades());
-
-            message.setRemainingAP(player.getAp());
-
-            message.setMySpells(player.getAvailableSpellIds());
-            message.setFriendSpells(players[friendId].getAvailableSpellIds());
-            message.setCastSpells(turnCastSpells);
-
-            message.setDeck(player.getDeckIds());
-            message.setHand(player.getHandIds());
-        }
-
     }
 
     private void addTurnToGraphicMessage() {
-        GraphicTurn graphicTurn = graphicHandler.getGraphicTurn(this);
-        graphicMessage.getTurns().add(graphicTurn);
-        graphicHandler.saveGraphicLog(graphicMessage, graphicTurn);
-
+        try {
+            GraphicTurn graphicTurn = graphicHandler.getGraphicTurn(this);
+            graphicMessage.getTurns().add(graphicTurn);
+            graphicHandler.saveGraphicLog(graphicMessage, graphicTurn);
+        } catch (Exception ex) {
+            Log.e("Error", "Exception in graphic message.", ex);
+        }
     }
 
 

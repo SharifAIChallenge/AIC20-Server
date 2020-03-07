@@ -34,7 +34,7 @@ public class TeleportSpell extends Spell {
     }
 
     @Override
-    public void applyTo(Game game) throws LogicException {
+    public void applyTo(Game game) {
         if (isDisposed())
             return;
         caughtUnit = game.getUnitById(targetUnitId);
@@ -68,7 +68,7 @@ public class TeleportSpell extends Spell {
 
     @Override
     public Collection<Unit> getCaughtUnits() {
-        return Collections.singletonList(caughtUnit);
+        return caughtUnit == null ? Collections.emptySet() : Collections.singletonList(caughtUnit);
     }
 
     @Override

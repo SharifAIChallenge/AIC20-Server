@@ -54,6 +54,8 @@ public class Player {
 
     public void initDeck(List<Integer> baseUnitIds, int numberOfBaseUnits) {
 
+        if(deckInit) return ;
+
         deckInit = true;
 
         ArrayList<Integer> validIds = new ArrayList<>();

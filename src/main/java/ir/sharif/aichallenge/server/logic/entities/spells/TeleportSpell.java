@@ -38,6 +38,9 @@ public class TeleportSpell extends Spell {
         if (isDisposed())
             return;
         caughtUnit = game.getUnitById(targetUnitId);
+
+        if(caughtUnit == null) return ;
+
         game.teleportUnit(caughtUnit, targetCell);  //Take care about direction of targetcell
     }
 

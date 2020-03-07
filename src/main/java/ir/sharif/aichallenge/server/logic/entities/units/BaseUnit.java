@@ -4,14 +4,14 @@ import ir.sharif.aichallenge.server.logic.dto.client.init.ClientBaseUnit;
 import ir.sharif.aichallenge.server.logic.entities.TargetType;
 import ir.sharif.aichallenge.server.logic.exceptions.LogicException;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.util.HashMap;
 import java.util.Objects;
 
 @Getter
+@ToString
 public class BaseUnit {
-
-
     private static HashMap<Integer, BaseUnit> instances = new HashMap<>();
 
     public static BaseUnit getInstance(int type) {

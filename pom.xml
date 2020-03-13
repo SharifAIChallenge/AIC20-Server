@@ -6,7 +6,7 @@
 
     <groupId>ir.sharif.aichallenge</groupId>
     <artifactId>AIC20_Server</artifactId>
-    <version>1.1.7</version>
+    <version>1.1.9</version>
     <build>
         <plugins>
             <plugin>

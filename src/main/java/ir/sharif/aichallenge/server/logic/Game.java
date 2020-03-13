@@ -60,9 +60,9 @@ public class Game {
 
     @Getter
     private Player[] players = new Player[4];
+    private King[] kings = new King[4];
     @Getter
     private HashMap<Integer, Unit> unitsWithId = new HashMap<>();
-    private ArrayList<King> kings = new ArrayList<>();
     @Getter
     private ClientTurnMessage[] clientTurnMessages = new ClientTurnMessage[4];
     @Getter
@@ -181,7 +181,7 @@ public class Game {
             unitsWithId.put(kingUnit.getId(), kingUnit);
             map.putUnit(kingUnit);
         }
-        kings.add(king);
+        kings[player.getId()] = king;
     }
 
     //endregion
@@ -545,8 +545,8 @@ public class Game {
     private boolean checkForGameEnd() {
         if (currentTurn.get() >= gameConstants.getMaxTurns())
             finishAndGiveScores();
-        else if (!kings.get(0).isAlive() && !kings.get(2).isAlive() ||
-                !kings.get(1).isAlive() && !kings.get(3).isAlive())
+        else if (!kings[0].isAlive() && !kings[2].isAlive() ||
+                !kings[1].isAlive() && !kings[3].isAlive())
             finishAndGiveScores();
         else
             return false;
@@ -557,7 +557,7 @@ public class Game {
         int[] scores = new int[4];
 
         int[] healthsSum = new int[2];
-        int[] healths = kings.stream().mapToInt(King::getHealth).map(h -> Math.max(0, h)).toArray();
+        int[] healths = Arrays.stream(kings).mapToInt(King::getHealth).map(h -> Math.max(0, h)).toArray();
         for (int i = 0; i < 4; i++)
             healthsSum[i % 2] += healths[i];
 
@@ -763,7 +763,7 @@ public class Game {
         try {
             List<TurnKing> turnKings = IntStream.range(0, 4).boxed()
                     .map(pId -> {
-                        final King king = kings.get(pId); //TODO
+                        final King king = kings[pId]; //TODO
                         int health = king.getHealth();
                         final Unit targetUnit = king.getMainUnit().getTargetUnit();
                         return new TurnKing(pId, health > 0, Math.max(health, 0), (targetUnit == null || health <= 0) ? -1 : targetUnit.getId());
@@ -838,6 +838,6 @@ public class Game {
     //endregion
 
     public boolean isPlayerAlive(int playerId) {
-        return kings.get(playerId).isAlive();
+        return kings[playerId].isAlive();
     }
 }
